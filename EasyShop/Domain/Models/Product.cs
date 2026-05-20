@@ -9,6 +9,7 @@ public class Product : BaseEntity
     public double Multiplicator { get; set; } = 1.0;
     public Money TotalCost { get; set; } = new Money(0m, CurrencyCode.USD);
     public Money UnitPrice { get; set; } = new Money(0m, CurrencyCode.USD);
+    
 
     public decimal GetUnitCost() 
         => Units == 0 ? 0 : TotalCost.Amount / Units;

@@ -1,4 +1,5 @@
-﻿using EasyShop.Domain.Commons;
+﻿using EasyShop.Data;
+using EasyShop.Domain.Commons;
 using Microsoft.Extensions.Logging;
 
 namespace EasyShop
@@ -27,9 +28,9 @@ namespace EasyShop
 
             var app = builder.Build();
 
-            //using var scope = app.Services.CreateScope();
-            //var db = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
-            //db.CreateDatabase();
+            using var scope = app.Services.CreateScope();
+            var db = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+            db.CreateDatabase();
 
             var cultureInfo = new System.Globalization.CultureInfo("en-US");
             System.Globalization.CultureInfo.DefaultThreadCurrentCulture = cultureInfo;

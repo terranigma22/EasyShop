@@ -14,4 +14,5 @@ public class Travel : BaseEntity
     // Navigation
     public virtual ICollection<Expense> Expenses { get; set; } = new List<Expense>();
     public virtual ICollection<Product> Products { get; set; } = new List<Product>();
+    public virtual ICollection<Income> Incomes { get; set; } = new List<Income>();
 }
