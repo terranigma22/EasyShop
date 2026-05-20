@@ -1,4 +1,5 @@
 ﻿using EasyShop.Data;
+using EasyShop.Features.Travels;
 using Microsoft.EntityFrameworkCore;
 using Radzen;
 
@@ -12,6 +13,8 @@ internal static class DependencyContainer
 
         services.AddRadzen();
 
+        services.AddTravelFeatures();
+
         return services;
     }
 
@@ -19,6 +22,17 @@ internal static class DependencyContainer
     {
         services.AddDbContext<ApplicationDbContext>(options =>
             options.UseSqlite(connectionString));
+
+        return services;
+    }
+
+    static IServiceCollection AddTravelFeatures(this IServiceCollection services)
+    {
+        services.AddScoped<CreateTravelHandler>();
+        services.AddScoped<UpdateTravelHandler>();
+        services.AddScoped<DeleteTravelHandler>();
+        services.AddScoped<GetTravelsHandler>();
+        services.AddScoped<GetTravelHandler>();
 
         return services;
     }

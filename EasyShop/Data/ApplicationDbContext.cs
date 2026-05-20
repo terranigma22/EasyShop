@@ -28,6 +28,12 @@ public class ApplicationDbContext : DbContext
                 b.Property(e => e.Currency).HasColumnName("ChangeValue_Currency").HasConversion<int>();
             });
 
+            entity.ComplexProperty(e => e.MoneyToTravel, b =>
+            {
+                b.Property(e => e.Amount).HasColumnName("MoneyToTravel_Amount");
+                b.Property(e => e.Currency).HasColumnName("MoneyToTravel_Currency").HasConversion<int>();
+            });
+
             entity.Property(e => e.CostCurrencyCode).HasConversion<int>();
             entity.Property(e => e.PriceCurrencyCode).HasConversion<int>();
 

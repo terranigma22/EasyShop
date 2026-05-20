@@ -6,6 +6,7 @@ public class Travel : BaseEntity
 {
     public CurrencyCode CostCurrencyCode { get; set; } = CurrencyCode.USD;
     public CurrencyCode PriceCurrencyCode { get; set; } = CurrencyCode.CUP;
+    public Money MoneyToTravel { get; set; } = new Money(0m, CurrencyCode.USD);
     public double Multiplicator { get; set; } = 1.0;
     public Money ChangeValue { get; set; } = new Money(500m, CurrencyCode.CUP);
     public DateOnly StartDate { get; set; } = DateOnly.FromDateTime(DateTime.Now);
