@@ -1,0 +1,7 @@
+﻿<div class="rz-mb-4">
+    @ChildContent
+</div>
+
+@code {
+    [EditorRequired, Parameter] public RenderFragment? ChildContent { get; set; }
+}

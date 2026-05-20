@@ -1,0 +1,50 @@
+﻿@implements IDisposable
+
+<div class="rz-mb-4">
+    <RadzenFormField Text="@Placeholder" Variant="Variant.Outlined" Style="width:100%">
+        <Start>
+            <RadzenIcon Icon="search" />
+        </Start>
+        <ChildContent>
+            <RadzenTextBox @oninput="@OnInput" Name="Search" />
+        </ChildContent>
+    </RadzenFormField>
+</div>
+
+@code {
+    [Parameter] public string Placeholder { get; set; } = "Buscar...";
+    [Parameter] public int DebounceMilliseconds { get; set; } = 300;
+    [EditorRequired, Parameter] public EventCallback<string> OnSearch { get; set; }
+
+    private CancellationTokenSource? _searchCts;
+    private string _lastSearchValue = string.Empty;
+
+    private async Task OnInput(ChangeEventArgs args)
+    {
+        string value = args.Value?.ToString() ?? string.Empty;
+
+        _searchCts?.Cancel();
+        _searchCts = new CancellationTokenSource();
+        
+        if (_lastSearchValue == value) return;
+        _lastSearchValue = value;
+
+        try
+        {
+            await Task.Delay(DebounceMilliseconds, _searchCts.Token);
+            if (!_searchCts.Token.IsCancellationRequested)
+            {
+                await OnSearch.InvokeAsync(value);
+            }
+        }
+        catch (TaskCanceledException)
+        {
+        }
+    }
+
+    public void Dispose()
+    {
+        _searchCts?.Cancel();
+        _searchCts?.Dispose();
+    }
+}

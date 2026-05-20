@@ -1,0 +1,15 @@
+﻿<style>
+    .page-container {
+        padding: var(--easysell-space-4);
+        max-width: var(--easysell-content-max-width);
+        margin: 0 auto;
+    }
+</style>
+
+<div class="page-container" style="padding: 0;">
+    @ChildContent
+</div>
+
+@code {
+    [Parameter] public RenderFragment? ChildContent { get; set; }
+}

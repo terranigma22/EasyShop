@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.Logging;
+﻿using EasyShop.Domain.Commons;
+using Microsoft.Extensions.Logging;
 
 namespace EasyShop
 {
@@ -14,14 +15,27 @@ namespace EasyShop
                     fonts.AddFont("OpenSans-Regular.ttf", "OpenSansRegular");
                 });
 
-            builder.Services.AddMauiBlazorWebView();
+            var conectionString = $"Filename={ConectionDb.GetConectionString("easyshop.db")}";
+
+            builder.Services.AddPresentation()
+                            .AddLocalDataBase(conectionString);
 
 #if DEBUG
-    		builder.Services.AddBlazorWebViewDeveloperTools();
+            builder.Services.AddBlazorWebViewDeveloperTools();
     		builder.Logging.AddDebug();
 #endif
 
-            return builder.Build();
+            var app = builder.Build();
+
+            //using var scope = app.Services.CreateScope();
+            //var db = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+            //db.CreateDatabase();
+
+            var cultureInfo = new System.Globalization.CultureInfo("en-US");
+            System.Globalization.CultureInfo.DefaultThreadCurrentCulture = cultureInfo;
+            System.Globalization.CultureInfo.DefaultThreadCurrentUICulture = cultureInfo;
+
+            return app;
         }
     }
 }

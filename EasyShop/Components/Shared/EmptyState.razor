@@ -1,0 +1,48 @@
+﻿<style>
+    .empty-state {
+        text-align: center;
+        padding: var(--easysell-space-12) var(--easysell-space-6);
+        color: var(--easysell-gray-400);
+    }
+
+    .empty-state-icon {
+        font-size: 4rem;
+        margin-bottom: var(--easysell-space-4);
+        opacity: 0.5;
+    }
+
+    .empty-state-title {
+        font-size: var(--easysell-text-xl);
+        font-weight: 600;
+        color: var(--easysell-gray-600);
+        margin-bottom: var(--easysell-space-2);
+    }
+
+    .empty-state-message {
+        font-size: var(--easysell-text-sm);
+        color: var(--easysell-gray-400);
+    }
+</style>
+
+<AnimateFadeIn>
+    <div class="empty-state">
+        <div class="empty-state-icon">
+            <RadzenIcon Icon="@Icon" Style="font-size: 4rem; opacity: 0.3;" />
+        </div>
+        <h3 class="empty-state-title">@Title</h3>
+        <p class="empty-state-message">@Message</p>
+        @if (ChildContent != null)
+        {
+            <div style="margin-top: var(--easysell-space-6);">
+                @ChildContent
+            </div>
+        }
+    </div>
+</AnimateFadeIn>
+
+@code {
+    [Parameter] public string Icon { get; set; } = "inbox";
+    [Parameter] public string Title { get; set; } = "No hay datos";
+    [Parameter] public string Message { get; set; } = "No se encontraron elementos para mostrar.";
+    [Parameter] public RenderFragment? ChildContent { get; set; }
+}

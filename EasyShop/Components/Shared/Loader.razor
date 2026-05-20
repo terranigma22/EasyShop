@@ -1,0 +1,15 @@
+﻿<div style="@Style">
+    <LoadingComponent/>
+    @* <span class="loader"></span> *@
+</div>
+
+@code{
+    [Parameter]
+    public string Height { get; set; } = "80";
+    public string Style { get; set; } = "display:grid; place-items:center; height:80dvh;";
+
+    protected override void OnInitialized()
+    {
+        Style = $"display:grid; place-items:center; height:{Height}dvh;";
+    }
+}

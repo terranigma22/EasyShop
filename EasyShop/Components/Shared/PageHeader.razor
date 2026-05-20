@@ -1,0 +1,11 @@
+﻿<RadzenBreadCrumb>
+    <RadzenBreadCrumbItem Icon="@Icon" />
+    <RadzenBreadCrumbItem>
+        <h3>@Title</h3>
+    </RadzenBreadCrumbItem>
+</RadzenBreadCrumb>
+
+@code {
+    [EditorRequired, Parameter] public string Title { get; set; } = "Usuarios";
+    [EditorRequired, Parameter] public string Icon { get; set; } = "people";
+}
