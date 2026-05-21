@@ -1,12 +1,86 @@
 ﻿@page "/"
 
-<PageContainer>
+@using EasyShop.Services
 
+@inject TravelStateService TravelState
+
+<PageContainer>
     <RadzenRow>
         <RadzenColumn>
             <PageHeader Title="Panel" Icon="dashboard" />
         </RadzenColumn>
     </RadzenRow>
+
+    @if (_travel == null)
+    {
+        <EmptyState Icon="travel" Title="No hay viaje activo" Message="Selecciona o crea un viaje para comenzar">
+            <RadzenButton Icon="travel" ButtonStyle="ButtonStyle.Primary" Text="Ir a Viajes"
+                          Click="@(() => NavigationManager.NavigateTo("/travels"))" />
+        </EmptyState>
+    }
+    else
+    {
+        
+
+        <RadzenRow>
+            <RadzenColumn Size="12">
+                <EasyTravelCard Data="_travel" IsCurrent="true" />
+            </RadzenColumn>
+        </RadzenRow>
+
+        <RadzenRow Gap="1rem" Style="margin-top: 0.5rem;">
+            <RadzenColumn Size="12">
+
+                <RadzenCard Variant="Variant.Flat" class="animate-card">
+
+                    <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="1rem" Style="text-align: center;">
+
+                        <RadzenButton Icon="inventory_2" ButtonStyle="ButtonStyle.Info" Size="ButtonSize.Large" Variant="Variant.Text" />
+                        <span style="font-weight: 600; font-size: 1.5rem;">@_travel.Products.Count</span>
+                        <span style="color: var(--rz-text-secondary);">Productos</span>
+                        <span style="font-size: 0.875rem;">
+                            @($"{_travel.Products.Sum(p => p.TotalCost.Amount):F2} {_travel.CostCurrencyCode}")
+                        </span>
+                    </RadzenStack>
+                </RadzenCard>
+            </RadzenColumn Size="12">
+            <RadzenColumn>
+                <RadzenCard Variant="Variant.Flat" class="animate-card">
+                    <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="1rem" Style="text-align: center;">
+
+                        <RadzenButton Icon="money_off" ButtonStyle="ButtonStyle.Danger" Size="ButtonSize.Large" Variant="Variant.Text" />
+                        <span style="font-weight: 600; font-size: 1.5rem;">@_travel.Expenses.Count</span>
+                        <span style="color: var(--rz-text-secondary);">Gastos</span>
+                        <span style="font-size: 0.875rem;">
+                            @($"{_travel.Expenses.Sum(e => e.Value.Amount):F2} {_travel.CostCurrencyCode}")
+                        </span>
+                    </RadzenStack>
+                </RadzenCard>
+            </RadzenColumn>
+            <RadzenColumn Size="12">
+                <RadzenCard Variant="Variant.Flat" class="animate-card">
+                    <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="1rem" Style="text-align: center;">
+
+                        <RadzenButton Icon="account_balance" ButtonStyle="ButtonStyle.Success" Size="ButtonSize.Large" Variant="Variant.Text" />
+                        <span style="font-weight: 600; font-size: 1.5rem;">@_travel.Incomes.Count</span>
+                        <span style="color: var(--rz-text-secondary);">Ingresos</span>
+                        <span style="font-size: 0.875rem;">
+                            @($"{_travel.Incomes.Sum(i => i.Value.Amount):F2} {_travel.PriceCurrencyCode}")
+                        </span>
+                    </RadzenStack>
+                </RadzenCard>
+            </RadzenColumn>
+        </RadzenRow>
+    }
 </PageContainer>
 
 
+@code{
+
+    Travel? _travel { get; set; }
+
+    protected override void OnInitialized()
+    {
+        _travel = TravelState.CurrentTravel;
+    }
+}
