@@ -6,5 +6,5 @@ public class Income : BaseEntity
 {
     public Guid TravelId { get; set; }
     public string Description { get; set; } = string.Empty;
-    public Money Value { get; set; } = new Money(0m, CurrencyCode.CUP);
+    public Money Value { get; set; } = new Money(0m, CurrencyCode.USD);
 }
