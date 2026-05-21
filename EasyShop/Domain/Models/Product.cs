@@ -5,8 +5,8 @@ namespace EasyShop.Domain.Models;
 public class Product : BaseEntity
 {
     public Guid TravelId { get; set; }
-    public int Units { get; set; } = 0;
-    public double Multiplicator { get; set; } = 1.0;
+    public int Units { get; set; } = 12;
+    public double Multiplicator { get; set; } = 2.5;
     public Money TotalCost { get; set; } = new Money(0m, CurrencyCode.USD);
     public Money UnitPrice { get; set; } = new Money(0m, CurrencyCode.USD);
     
