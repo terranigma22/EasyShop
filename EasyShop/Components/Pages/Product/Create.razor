@@ -60,12 +60,12 @@
                 <RadzenRow>
                     <RadzenColumn Size="6">
                         <RadzenFormField Text="@($"Precio venta ({_travel!.MoneyToTravel.Currency})")" Style="width:100%;">
-                            <RadzenNumeric Value="@_unitPrice" Min="0" Step="0.01" ReadOnly="true" />
+                            <RadzenNumeric Value="@_unitPrice" Min="0" Step="0.01" ReadOnly="true" Format="N2" />
                         </RadzenFormField>
                     </RadzenColumn>
                     <RadzenColumn Size="6">
                         <RadzenFormField Text="@($"Precio venta ({_travel!.ChangeValue.Currency})")" Style="width:100%;">
-                            <RadzenNumeric Value="@_unitChangePrice" Min="0" Step="0.01" ReadOnly="true" />
+                            <RadzenNumeric Value="@_unitChangePrice" Min="0" Step="0.01" ReadOnly="true" Format="N2" />
                         </RadzenFormField>
                     </RadzenColumn>
                 </RadzenRow>
