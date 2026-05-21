@@ -20,7 +20,6 @@
             <RadzenColumn Size="12">
                 <RadzenCard Variant="Variant.Flat" class="animate-card">
                     <RadzenStack Orientation="Orientation.Vertical" Gap="1rem">
-                        <PageHeader Title="Balance del viaje" Icon="account_balance_wallet" />
 
                         <div style="display: flex; justify-content: space-between; padding: 0.25rem 0;">
                             <span>Presupuesto</span>
@@ -38,9 +37,25 @@
                         </div>
 
                         <div style="display: flex; justify-content: space-between; padding: 0.25rem 0;">
-                            <span>Ingresos</span>
+                            <span>Entradas</span>
                             <span style="color: var(--rz-success);">+ @($"{_travel.GetIncomesTotal():F2} {_travel.MoneyToTravel.Currency}")</span>
                         </div>
+
+                        <div style="display: flex; justify-content: space-between; padding: 0.25rem 0;">
+                            <span>Ganancias</span>
+                            <span style="color: var(--rz-success);">
+                                @($"{_travel.GetProfit(_travel.MoneyToTravel.Currency):F2} {_travel.MoneyToTravel.Currency}")
+                            </span>
+                        </div>
+                        @if (_travel.ChangeValue.Currency != _travel.MoneyToTravel.Currency)
+                        {
+                            <div style="display: flex; justify-content: space-between; padding: 0.1rem 0 0.25rem 0;">
+                                <span></span>
+                                <span style="color: var(--rz-success); font-size: 0.85rem;">
+                                    @($"{_travel.GetProfit(_travel.ChangeValue.Currency):F2} {_travel.ChangeValue.Currency}")
+                                </span>
+                            </div>
+                        }
 
                         <div style="display: flex; justify-content: space-between; padding: 0.5rem 0; border-top: 1px solid var(--rz-border-color);">
                             <span style="font-weight: 600;">Restante</span>
@@ -48,23 +63,6 @@
                                 @($"{_remaining:F2} {_travel.MoneyToTravel.Currency}")
                             </span>
                         </div>
-                    </RadzenStack>
-                </RadzenCard>
-            </RadzenColumn>
-
-            <RadzenColumn Size="12">
-                <RadzenCard Variant="Variant.Flat" class="animate-card">
-                    <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="1rem" Style="text-align: center;">
-                        <RadzenButton Icon="trending_up" ButtonStyle="ButtonStyle.Success" Size="ButtonSize.Large" Variant="Variant.Text" class="rz-border-radius-10" />
-                        <span style="font-weight: 600; font-size: 1.5rem; color: var(--rz-success);">
-                            @(_profitCurrencyMode == ProfitCurrency.Price
-                                ? $"{_travel.GetProductsProfit():F2}"
-                                : $"{_travel.GetProductsProfitInTravelCurrency():F2}")
-                        </span>
-                        <RadzenDropDown @bind-Value="_profitCurrencyMode"
-                                        Data="@_profitCurrencyOptions"
-                                        TextProperty="Text" ValueProperty="Value"
-                                        Style="width: auto; min-width: 40px;" />
                     </RadzenStack>
                 </RadzenCard>
             </RadzenColumn>
@@ -100,7 +98,7 @@
                     <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="1rem" Style="text-align: center;">
                         <RadzenButton Icon="account_balance" ButtonStyle="ButtonStyle.Success" Size="ButtonSize.Large" Variant="Variant.Text" class="rz-border-radius-10" />
                         <span style="font-weight: 600; font-size: 1.5rem;">@_travel.Incomes.Count</span>
-                        <span style="color: var(--rz-text-secondary);">Ingresos</span>
+                        <span style="color: var(--rz-text-secondary);">Entradas</span>
                         <span style="font-size: 0.875rem;">
                             @($"{_travel.Incomes.Sum(i => i.Value.Amount):F2} {_travel.ChangeValue.Currency}")
                         </span>
@@ -116,24 +114,8 @@
 
     decimal? _remaining => _travel?.GetRemaining();
 
-    ProfitCurrency _profitCurrencyMode = ProfitCurrency.Travel;
-
-    List<ProfitCurrencyOption> _profitCurrencyOptions => new()
-    {
-        new() { Value = ProfitCurrency.Price, Text = _travel!.ChangeValue.Currency.ToString() },
-        new() { Value = ProfitCurrency.Travel, Text = _travel!.MoneyToTravel.Currency.ToString() },
-    };
-
     protected override void OnInitialized()
     {
         _travel = TravelState.CurrentTravel;
-    }
-
-    enum ProfitCurrency { Price, Travel }
-
-    sealed class ProfitCurrencyOption
-    {
-        public ProfitCurrency Value { get; set; }
-        public string Text { get; set; } = string.Empty;
     }
 }

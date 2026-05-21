@@ -29,16 +29,18 @@ public class Travel : BaseEntity
     public decimal GetRemaining()
         => MoneyToTravel.Amount - GetExpensesTotal() - GetProductsTotal() + GetIncomesTotal();
 
-    public decimal GetProductsProfit()
+    decimal GetProductsProfit()
         => Products.Sum(p => p.GetProfit());
 
-    public decimal GetProductsProfitInTravelCurrency()
+    public decimal GetProfit(CurrencyCode currency)
     {
-        decimal amount = 1;
+        decimal profit = GetProductsProfit() - GetExpensesTotal();
 
-        if (ChangeValue.Currency != MoneyToTravel.Currency)
+        decimal amount = 1.0m;
+
+        if (currency != MoneyToTravel.Currency)
             amount = ChangeValue.Amount <= 0 ? 1.0m : ChangeValue.Amount;
 
-        return GetProductsProfit() * amount;
+        return profit * amount;
     }
 }
