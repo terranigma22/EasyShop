@@ -1,4 +1,7 @@
 ﻿using EasyShop.Data;
+using EasyShop.Features.Expenses;
+using EasyShop.Features.Incomes;
+using EasyShop.Features.Products;
 using EasyShop.Features.Travels;
 using EasyShop.Services;
 using Microsoft.EntityFrameworkCore;
@@ -35,6 +38,10 @@ internal static class DependencyContainer
         services.AddScoped<DeleteTravelHandler>();
         services.AddScoped<GetTravelsHandler>();
         services.AddScoped<GetTravelHandler>();
+
+        services.AddScoped<CreateProductHandler>();
+        services.AddScoped<CreateExpenseHandler>();
+        services.AddScoped<CreateIncomeHandler>();
 
         return services;
     }

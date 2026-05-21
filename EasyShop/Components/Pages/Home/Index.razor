@@ -68,7 +68,7 @@
             </RadzenColumn>
 
             <RadzenColumn Size="12">
-                <RadzenCard Variant="Variant.Flat" class="animate-card">
+                <RadzenCard Variant="Variant.Flat" class="animate-card" @onclick="@(() => NavigationManager.NavigateTo("/travels/products"))" Style="cursor: pointer;">
                     <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="1rem" Style="text-align: center;">
                         <RadzenButton Icon="inventory_2" ButtonStyle="ButtonStyle.Info" Size="ButtonSize.Large" Variant="Variant.Text" class="rz-border-radius-10"/>
                         <span style="font-weight: 600; font-size: 1.5rem;">@_travel.Products.Count</span>
@@ -81,7 +81,7 @@
             </RadzenColumn>
 
             <RadzenColumn Size="12">
-                <RadzenCard Variant="Variant.Flat" class="animate-card">
+                <RadzenCard Variant="Variant.Flat" class="animate-card" @onclick="@(() => NavigationManager.NavigateTo("/travels/expenses"))" Style="cursor: pointer;">
                     <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="1rem" Style="text-align: center;">
                         <RadzenButton Icon="money_off" ButtonStyle="ButtonStyle.Danger" Size="ButtonSize.Large" Variant="Variant.Text" class="rz-border-radius-10" />
                         <span style="font-weight: 600; font-size: 1.5rem;">@_travel.Expenses.Count</span>
@@ -94,7 +94,7 @@
             </RadzenColumn>
 
             <RadzenColumn Size="12">
-                <RadzenCard Variant="Variant.Flat" class="animate-card">
+                <RadzenCard Variant="Variant.Flat" class="animate-card" @onclick="@(() => NavigationManager.NavigateTo("/travels/incomes"))" Style="cursor: pointer;">
                     <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="1rem" Style="text-align: center;">
                         <RadzenButton Icon="account_balance" ButtonStyle="ButtonStyle.Success" Size="ButtonSize.Large" Variant="Variant.Text" class="rz-border-radius-10" />
                         <span style="font-weight: 600; font-size: 1.5rem;">@_travel.Incomes.Count</span>

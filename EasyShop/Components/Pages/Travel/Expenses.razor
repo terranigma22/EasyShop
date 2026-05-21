@@ -1,0 +1,66 @@
+@page "/travels/expenses"
+@using EasyShop.Domain.Models
+@using EasyShop.Services
+
+@inject TravelStateService TravelState
+@inject NotificationService NotificationService
+
+<PageContainer>
+    <RadzenRow>
+        <RadzenColumn>
+            <PageHeader Title="Gastos" Icon="money_off" />
+        </RadzenColumn>
+        <RadzenColumn Style="align-self: center;">
+            <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center"
+                         JustifyContent="JustifyContent.End" Gap="0.5rem">
+                <RadzenButton Icon="add_circle" ButtonStyle="ButtonStyle.Primary" Text="Nuevo gasto"
+                              Click="@(() => NavigationManager.NavigateTo("/travels/expenses/create"))" />
+            </RadzenStack>
+        </RadzenColumn>
+    </RadzenRow>
+
+    @if (_travel == null)
+    {
+        <EmptyState Icon="travel" Title="No hay viaje activo" Message="Selecciona un viaje para ver sus gastos">
+            <RadzenButton Icon="travel" ButtonStyle="ButtonStyle.Primary" Text="Ir a Viajes"
+                          Click="@(() => NavigationManager.NavigateTo("/travels"))" />
+        </EmptyState>
+    }
+    else if (_travel.Expenses.Count == 0)
+    {
+        <EmptyState Icon="money_off" Title="Sin gastos" Message="Este viaje no tiene gastos registrados" />
+    }
+    else
+    {
+        <AnimateFadeIn>
+            <RadzenRow Gap="1rem">
+                @foreach (var expense in _travel.Expenses)
+                {
+                    <RadzenColumn Size="12" SizeSmall="6" SizeMedium="4">
+                        <RadzenCard Variant="Variant.Flat" class="animate-card">
+                            <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center"
+                                         JustifyContent="JustifyContent.SpaceBetween">
+                                <RadzenStack Gap="0.25rem">
+                                    <span style="font-weight: 500;">@expense.Description</span>
+                                    <span style="color: var(--rz-text-secondary); font-size: 0.75rem;">@expense.Id</span>
+                                </RadzenStack>
+                                <span style="font-weight: 600; color: var(--rz-danger);">
+                                    − @($"{expense.Value.Amount:F2} {expense.Value.Currency}")
+                                </span>
+                            </RadzenStack>
+                        </RadzenCard>
+                    </RadzenColumn>
+                }
+            </RadzenRow>
+        </AnimateFadeIn>
+    }
+</PageContainer>
+
+@code {
+    Travel? _travel;
+
+    protected override void OnInitialized()
+    {
+        _travel = TravelState.CurrentTravel;
+    }
+}

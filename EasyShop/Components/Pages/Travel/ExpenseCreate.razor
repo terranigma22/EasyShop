@@ -1,0 +1,98 @@
+@page "/travels/expenses/create"
+@using EasyShop.Domain.Primitives
+@using EasyShop.Features.Commons
+@using EasyShop.Features.Expenses
+@using EasyShop.Services
+
+@inject CreateExpenseHandler Handler
+@inject TravelStateService TravelState
+@inject NotificationService NotificationService
+
+<PageContainer>
+    <RadzenRow>
+        <RadzenColumn>
+            <PageHeader Title="Nuevo gasto" Icon="money_off" />
+        </RadzenColumn>
+    </RadzenRow>
+
+    @if (_travel == null)
+    {
+        <EmptyState Icon="travel" Title="No hay viaje activo" Message="Selecciona o crea un viaje primero">
+            <RadzenButton Icon="travel" ButtonStyle="ButtonStyle.Primary" Text="Ir a Viajes"
+                          Click="@(() => NavigationManager.NavigateTo("/travels"))" />
+        </EmptyState>
+    }
+    else
+    {
+        <RadzenCard>
+            <RadzenStack Orientation="Orientation.Vertical" Gap="1.5rem">
+
+                <RadzenRow>
+                    <RadzenColumn Size="12">
+                        <RadzenFormField Text="Descripción">
+                            <RadzenTextBox @bind-Value="@_description" Placeholder="Ej: Transporte, Alojamiento..." />
+                        </RadzenFormField>
+                    </RadzenColumn>
+                </RadzenRow>
+
+                <RadzenRow>
+                    <RadzenColumn Size="12">
+                        <RadzenFormField Text="@($"Valor ({_travel!.MoneyToTravel.Currency})")">
+                            <RadzenNumeric @bind-Value="@_valueAmount" Min="0" Step="0.01" />
+                        </RadzenFormField>
+                    </RadzenColumn>
+                </RadzenRow>
+
+                <RadzenRow>
+                    <RadzenColumn>
+                        <RadzenStack Orientation="Orientation.Horizontal" Gap="1rem">
+                            <RadzenButton Text="Guardar" ButtonType="ButtonType.Submit" ButtonStyle="ButtonStyle.Primary" Icon="save" Click="@HandleSubmit" />
+                            <RadzenButton Text="Cancelar" ButtonStyle="ButtonStyle.Secondary" Icon="close" Click="@(() => NavigationManager.NavigateTo("/travels/expenses"))" />
+                        </RadzenStack>
+                    </RadzenColumn>
+                </RadzenRow>
+
+            </RadzenStack>
+        </RadzenCard>
+    }
+</PageContainer>
+
+@code {
+    private Travel? _travel;
+    private string _description = string.Empty;
+    private decimal _valueAmount = 0m;
+
+    protected override void OnInitialized()
+    {
+        _travel = TravelState.CurrentTravel;
+    }
+
+    private async Task HandleSubmit()
+    {
+        if (string.IsNullOrWhiteSpace(_description))
+        {
+            NotificationService.Notify(NotificationSeverity.Warning, "La descripción es obligatoria");
+            return;
+        }
+
+        var currency = _travel!.MoneyToTravel.Currency;
+
+        var request = new CreateExpenseRequest(
+            _travel.Id,
+            _description,
+            new MoneyRequest(_valueAmount, currency)
+        );
+
+        try
+        {
+            await Handler.HandleAsync(request);
+            await TravelState.SetCurrentTravelAsync(_travel.Id);
+            NotificationService.Notify(NotificationSeverity.Success, "Gasto creado correctamente");
+            NavigationManager.NavigateTo("/travels/expenses");
+        }
+        catch (Exception ex)
+        {
+            NotificationService.Notify(NotificationSeverity.Error, "Error al crear el gasto", ex.Message);
+        }
+    }
+}
