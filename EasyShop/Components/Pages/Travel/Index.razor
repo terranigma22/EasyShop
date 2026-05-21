@@ -9,7 +9,7 @@
         <RadzenColumn Style="align-self: center;">
             <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center"
                          JustifyContent="JustifyContent.End" Gap="0.5rem">
-                <RadzenButton Icon="add_circle" ButtonStyle="ButtonStyle.Primary" title="Nuevo viaje" />
+                <RadzenButton Icon="add_circle" ButtonStyle="ButtonStyle.Primary" title="Nuevo viaje" Click="@(() => NavigationManager.NavigateTo("/travels/create"))" />
             </RadzenStack>
         </RadzenColumn>
     </RadzenRow>

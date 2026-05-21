@@ -1,0 +1,147 @@
+@page "/travels/create"
+@using EasyShop.Domain.Primitives
+@using EasyShop.Features.Travels
+@using EasyShop.Features.Commons
+
+<PageContainer>
+    <RadzenRow>
+        <RadzenColumn>
+            <PageHeader Title="Nuevo viaje" Icon="travel" />
+        </RadzenColumn>
+    </RadzenRow>
+
+    <RadzenCard>
+        <RadzenStack Orientation="Orientation.Vertical" Gap="1.5rem">
+
+            <RadzenRow>
+                <RadzenColumn Size="6">
+                    <RadzenFormField Text="Fecha de inicio">
+                        <RadzenDatePicker @bind-Value="@_startDate" DateOnly="true" />
+                    </RadzenFormField>
+                </RadzenColumn>
+                <RadzenColumn Size="6">
+                    <RadzenFormField Text="Fecha de fin">
+                        <RadzenDatePicker @bind-Value="@_endDate" DateOnly="true" />
+                    </RadzenFormField>
+                </RadzenColumn>
+            </RadzenRow>
+
+            <RadzenRow>
+                <RadzenColumn Size="6">
+                    <RadzenFormField Text="Moneda de costo">
+                        <RadzenDropDown @bind-Value="@_costCurrencyCode"
+                                        Data="@CurrencyOptions" TextProperty="Text" ValueProperty="Value" />
+                    </RadzenFormField>
+                </RadzenColumn>
+                <RadzenColumn Size="6">
+                    <RadzenFormField Text="Moneda de precio">
+                        <RadzenDropDown @bind-Value="@_priceCurrencyCode"
+                                        Data="@CurrencyOptions" TextProperty="Text" ValueProperty="Value" />
+                    </RadzenFormField>
+                </RadzenColumn>
+            </RadzenRow>
+
+            <RadzenRow>
+                <RadzenColumn Size="6">
+                    <RadzenFormField Text="Multiplicador">
+                        <RadzenNumeric @bind-Value="@_multiplicator" Min="0" Step="0.01" />
+                    </RadzenFormField>
+                </RadzenColumn>
+            </RadzenRow>
+
+            <RadzenRow>
+                <RadzenColumn Size="8">
+                    <RadzenFormField Text="Dinero a viajar">
+                        <RadzenNumeric @bind-Value="@_moneyToTravelAmount" Min="0" Step="0.01" />
+                    </RadzenFormField>
+                </RadzenColumn>
+                <RadzenColumn Size="4">
+                    <RadzenFormField Text="Moneda">
+                        <RadzenDropDown @bind-Value="@_moneyToTravelCurrency"
+                                        Data="@CurrencyOptions" TextProperty="Text" ValueProperty="Value" />
+                    </RadzenFormField>
+                </RadzenColumn>
+            </RadzenRow>
+
+            <RadzenRow>
+                <RadzenColumn Size="8">
+                    <RadzenFormField Text="Valor de cambio">
+                        <RadzenNumeric @bind-Value="@_changeValueAmount" Min="0" Step="0.01" />
+                    </RadzenFormField>
+                </RadzenColumn>
+                <RadzenColumn Size="4">
+                    <RadzenFormField Text="Moneda">
+                        <RadzenDropDown @bind-Value="@_changeValueCurrency"
+                                        Data="@CurrencyOptions" TextProperty="Text" ValueProperty="Value" />
+                    </RadzenFormField>
+                </RadzenColumn>
+            </RadzenRow>
+
+            <RadzenRow>
+                <RadzenColumn>
+                    <RadzenStack Orientation="Orientation.Horizontal" Gap="1rem">
+                        <RadzenButton Text="Guardar" ButtonType="ButtonType.Submit" ButtonStyle="ButtonStyle.Primary" Icon="save" Click="@HandleSubmit" />
+                        <RadzenButton Text="Cancelar" ButtonStyle="ButtonStyle.Secondary" Icon="close" Click="@(() => NavigationManager.NavigateTo("/travels"))" />
+                    </RadzenStack>
+                </RadzenColumn>
+            </RadzenRow>
+
+        </RadzenStack>
+    </RadzenCard>
+</PageContainer>
+
+@code {
+    private DateOnly _startDate = DateOnly.FromDateTime(DateTime.Now);
+    private DateOnly _endDate = DateOnly.FromDateTime(DateTime.Now);
+    private CurrencyCode _costCurrencyCode = CurrencyCode.USD;
+    private CurrencyCode _priceCurrencyCode = CurrencyCode.CUP;
+    private double _multiplicator = 1.0;
+    private decimal _moneyToTravelAmount = 0m;
+    private CurrencyCode _moneyToTravelCurrency = CurrencyCode.USD;
+    private decimal _changeValueAmount = 500m;
+    private CurrencyCode _changeValueCurrency = CurrencyCode.CUP;
+
+    private List<CurrencyOption> CurrencyOptions => Enum.GetValues<CurrencyCode>()
+        .Cast<CurrencyCode>()
+        .Select(c => new CurrencyOption { Value = c, Text = c.ToString() })
+        .ToList();
+
+    [Inject]
+    private CreateTravelHandler Handler { get; set; } = default!;
+
+    private async Task HandleSubmit()
+    {
+        if (_endDate < _startDate)
+        {
+            NotificationService.Notify(NotificationSeverity.Warning, "La fecha de fin debe ser posterior a la fecha de inicio");
+            return;
+        }
+
+        var request = new CreateTravelRequest(
+            _startDate,
+            _endDate,
+            _costCurrencyCode,
+            _priceCurrencyCode,
+            _multiplicator,
+            new MoneyRequest(_changeValueAmount, _changeValueCurrency),
+            new MoneyRequest(_moneyToTravelAmount, _moneyToTravelCurrency)
+        );
+
+        try
+        {
+            await Handler.HandleAsync(request);
+            NotificationService.Notify(NotificationSeverity.Success, "Viaje creado correctamente");
+            NavigationManager.NavigateTo("/travels");
+        }
+        catch (Exception ex)
+        {
+            NotificationService.Notify(NotificationSeverity.Error, "Error al crear el viaje", ex.Message);
+        }
+    }
+
+    private sealed class CurrencyOption
+    {
+        public CurrencyCode Value { get; set; }
+        public string Text { get; set; } = string.Empty;
+    }
+}
