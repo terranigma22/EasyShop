@@ -1,11 +1,10 @@
 ﻿@page "/"
-
+@using EasyShop.Domain.Primitives
 @using EasyShop.Services
 
 @inject TravelStateService TravelState
 
 <PageContainer>
-    
 
     @if (_travel == null)
     {
@@ -54,7 +53,23 @@
             </RadzenColumn>
 
             <RadzenColumn Size="12">
+                <RadzenCard Variant="Variant.Flat" class="animate-card">
+                    <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="1rem" Style="text-align: center;">
+                        <RadzenButton Icon="trending_up" ButtonStyle="ButtonStyle.Success" Size="ButtonSize.Large" Variant="Variant.Text" class="rz-border-radius-10" />
+                        <span style="font-weight: 600; font-size: 1.5rem; color: var(--rz-success);">
+                            @(_profitCurrencyMode == ProfitCurrency.Price
+                                ? $"{_travel.GetProductsProfit():F2}"
+                                : $"{_travel.GetProductsProfitInTravelCurrency():F2}")
+                        </span>
+                        <RadzenDropDown @bind-Value="_profitCurrencyMode"
+                                        Data="@_profitCurrencyOptions"
+                                        TextProperty="Text" ValueProperty="Value"
+                                        Style="width: auto; min-width: 40px;" />
+                    </RadzenStack>
+                </RadzenCard>
+            </RadzenColumn>
 
+            <RadzenColumn Size="12">
                 <RadzenCard Variant="Variant.Flat" class="animate-card">
                     <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="1rem" Style="text-align: center;">
                         <RadzenButton Icon="inventory_2" ButtonStyle="ButtonStyle.Info" Size="ButtonSize.Large" Variant="Variant.Text" class="rz-border-radius-10"/>
@@ -96,15 +111,29 @@
     }
 </PageContainer>
 
-
-    @code {
-
+@code {
     Travel? _travel { get; set; }
 
     decimal? _remaining => _travel?.GetRemaining();
 
+    ProfitCurrency _profitCurrencyMode = ProfitCurrency.Travel;
+
+    List<ProfitCurrencyOption> _profitCurrencyOptions => new()
+    {
+        new() { Value = ProfitCurrency.Price, Text = _travel!.ChangeValue.Currency.ToString() },
+        new() { Value = ProfitCurrency.Travel, Text = _travel!.MoneyToTravel.Currency.ToString() },
+    };
+
     protected override void OnInitialized()
     {
         _travel = TravelState.CurrentTravel;
+    }
+
+    enum ProfitCurrency { Price, Travel }
+
+    sealed class ProfitCurrencyOption
+    {
+        public ProfitCurrency Value { get; set; }
+        public string Text { get; set; } = string.Empty;
     }
 }

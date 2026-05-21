@@ -32,4 +32,7 @@ public class Product : BaseEntity
             UnitPrice = unitPrice
         };
     }
+
+    public decimal GetProfit()
+        => UnitPrice.Amount * Units - TotalCost.Amount;
 }
