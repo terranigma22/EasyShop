@@ -1,0 +1,61 @@
+﻿<RadzenCard Variant="Variant.Flat" class="animate-card">
+    <AnimateFadeIn>
+        <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="1rem">
+            <RadzenIcon Icon="travel" Style="width: 40px; height: 40px;" />
+            @* <RadzenImage Path="@Item.Employee?.Photo" class="rz-border-radius-10" Style="width: 80px; height: 80px;"
+            AlternateText="@(order.Employee?.FirstName + " " + order.Employee?.LastName)" /> *@
+            <RadzenStack Gap="0">
+                <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.End" Gap="0.5rem">
+                    <RadzenIcon Icon="calendar_month" Style="font-size: 1.25rem;" />
+                    <span style="font-weight: 500;">
+                        @Data.StartDate.ToString("dd/MM/yyyy") → @Data.EndDate.ToString("dd/MM/yyyy")
+                    </span>
+                </RadzenStack>
+
+                <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="0.5rem">
+                    <RadzenIcon Icon="payments" Style="font-size: 1.25rem;" />
+                    <span>@($"{Data.MoneyToTravel.ToString()} {Data.MoneyToTravel.Currency}")</span>
+                    
+                </RadzenStack>
+
+                <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="0.5rem">
+                    <RadzenIcon Icon="swap_horiz" Style="font-size: 1.25rem; " />
+                    <span>@($"{Data.ChangeValue.Amount.ToString()} {Data.ChangeValue.Currency}")</span>
+                    <RadzenIcon Icon="calculate" Style="font-size: 1.25rem; margin-left: 0.5rem;" />
+                    <span>@Data.Multiplicator.ToString("F2")</span>
+                </RadzenStack>
+
+                @* <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="0.5rem">
+                    <RadzenIcon Icon="calculate" Style="font-size: 1.25rem;" />
+                    <span>Multiplicador: @Data.Multiplicator.ToString("F2")</span>
+                </RadzenStack> *@
+
+                @* <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="1rem">
+                    <RadzenBadge Text="Productos" BadgeStyle="BadgeStyle.Info">
+                        @Data.Products.Count
+                    </RadzenBadge>
+                    <RadzenBadge Text="Gastos" BadgeStyle="BadgeStyle.Warning">
+                        @Data.Expenses.Count
+                    </RadzenBadge>
+                    <RadzenBadge Text="Ingresos" BadgeStyle="BadgeStyle.Success">
+                        @Data.Incomes.Count
+                    </RadzenBadge>
+                </RadzenStack> *@
+            </RadzenStack>
+        </RadzenStack>
+    </AnimateFadeIn>
+</RadzenCard>
+
+@code {
+    [EditorRequired, Parameter] public Travel Data { get; set; }
+    [Parameter] public EventCallback OnAdded { get; set; }
+    [Parameter] public EventCallback OnEdited { get; set; }
+    [Parameter] public EventCallback OnDeleted { get; set; }
+    [Parameter] public EventCallback OnRestored { get; set; }
+
+    
+    void OnAdd()
+    {
+        OnAdded.InvokeAsync();
+    }
+}

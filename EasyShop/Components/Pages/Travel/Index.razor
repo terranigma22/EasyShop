@@ -1,7 +1,10 @@
 ﻿@page "/travels"
 
-<PageContainer>
+@using EasyShop.Features.Travels
 
+@inject GetTravelsHandler GetTravelsHandler
+
+<PageContainer>
     <RadzenRow>
         <RadzenColumn>
             <PageHeader Title="Viajes" Icon="travel" />
@@ -9,10 +12,63 @@
         <RadzenColumn Style="align-self: center;">
             <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center"
                          JustifyContent="JustifyContent.End" Gap="0.5rem">
-                <RadzenButton Icon="add_circle" ButtonStyle="ButtonStyle.Primary" title="Nuevo viaje" Click="@(() => NavigationManager.NavigateTo("/travels/create"))" />
+                <RadzenButton Icon="add_circle" ButtonStyle="ButtonStyle.Primary" Text="Nuevo viaje"
+                              Click="@(() => NavigationManager.NavigateTo("/travels/create"))" />
             </RadzenStack>
         </RadzenColumn>
     </RadzenRow>
+
+    @if (_loading)
+    {
+        <Loader />
+    }
+    else if (_items.Count == 0)
+    {
+        <EmptyState Icon="travel" Title="No hay viajes" Message="Crea tu primer viaje para comenzar">
+            <RadzenButton Icon="add_circle" ButtonStyle="ButtonStyle.Primary" Text="Nuevo viaje"
+                          Click="@(() => NavigationManager.NavigateTo("/travels/create"))" />
+        </EmptyState>
+    }
+    else
+    {
+        <AnimateFadeIn>
+            <EasyGridForCards>
+
+                @foreach (var item in _items)
+                {
+                    <EasyColumForCard>
+                        <EasyTravelCard Data="item" />
+                    </EasyColumForCard>
+                }
+            </EasyGridForCards>
+        </AnimateFadeIn>
+    }
 </PageContainer>
 
+@code {
+    private List<Travel> _items = [];
+    private bool _loading = true;
 
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadTravels();
+    }
+
+    private async Task LoadTravels()
+    {
+        _loading = true;
+        try
+        {
+            _items = await GetTravelsHandler.HandleAsync(new GetTravelsRequest());
+        }
+        finally
+        {
+            _loading = false;
+        }
+    }
+
+    private void NavigateToDetail(Guid id)
+    {
+        NavigationManager.NavigateTo($"/travels/{id}");
+    }
+}

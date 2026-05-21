@@ -1,0 +1,17 @@
+﻿<AnimateFadeIn>
+    <RadzenRow Gap="1rem">
+        @ChildContent
+    </RadzenRow>
+</AnimateFadeIn>
+
+@* <div style="max-height: 78dvh; overflow-y: auto; display: flex; flex-direction: column;">
+    <AnimateFadeIn>
+        <RadzenRow Gap="0.5rem" Style="overflow-y: auto;">
+            @ChildContent
+        </RadzenRow>
+    </AnimateFadeIn>
+</div> *@
+
+@code {
+    [EditorRequired, Parameter] public RenderFragment? ChildContent { get; set; }
+}

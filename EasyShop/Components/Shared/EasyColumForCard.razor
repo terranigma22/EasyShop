@@ -1,0 +1,7 @@
+﻿<RadzenColumn Size="12" SizeSM="6" SizeMD="4" SizeLG="3">
+    @ChildContent
+</RadzenColumn>
+
+@code {
+    [EditorRequired, Parameter] public RenderFragment? ChildContent { get; set; }
+}
