@@ -4,7 +4,6 @@ namespace EasyShop.Domain.Models;
 
 public class Travel : BaseEntity
 {
-    public CurrencyCode CostCurrencyCode { get; set; } = CurrencyCode.USD;
     public CurrencyCode PriceCurrencyCode { get; set; } = CurrencyCode.CUP;
     public Money MoneyToTravel { get; set; } = new Money(0m, CurrencyCode.USD);
     public double Multiplicator { get; set; } = 1.0;

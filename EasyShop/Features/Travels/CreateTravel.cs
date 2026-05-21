@@ -8,7 +8,6 @@ namespace EasyShop.Features.Travels;
 public sealed record CreateTravelRequest(
     DateOnly StartDate,
     DateOnly EndDate,
-    CurrencyCode CostCurrencyCode,
     CurrencyCode PriceCurrencyCode,
     double Multiplicator,
     MoneyRequest ChangeValue,

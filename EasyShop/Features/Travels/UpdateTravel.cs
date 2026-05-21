@@ -9,7 +9,6 @@ public sealed record UpdateTravelRequest(
     Guid Id,
     DateOnly StartDate,
     DateOnly EndDate,
-    CurrencyCode CostCurrencyCode,
     CurrencyCode PriceCurrencyCode,
     double Multiplicator,
     MoneyRequest ChangeValue,

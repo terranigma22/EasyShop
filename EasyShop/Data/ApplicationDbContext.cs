@@ -34,7 +34,6 @@ public class ApplicationDbContext : DbContext
                 b.Property(e => e.Currency).HasColumnName("MoneyToTravel_Currency").HasConversion<int>();
             });
 
-            entity.Property(e => e.CostCurrencyCode).HasConversion<int>();
             entity.Property(e => e.PriceCurrencyCode).HasConversion<int>();
 
             entity.HasMany(e => e.Expenses)

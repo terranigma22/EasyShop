@@ -30,17 +30,17 @@
 
                         <div style="display: flex; justify-content: space-between; padding: 0.25rem 0;">
                             <span>Productos</span>
-                            <span style="color: var(--rz-danger);">− @($"{_travel.GetProductsTotal():F2} {_travel.CostCurrencyCode}")</span>
+                            <span style="color: var(--rz-danger);">− @($"{_travel.GetProductsTotal():F2} {_travel.MoneyToTravel.Currency}")</span>
                         </div>
 
                         <div style="display: flex; justify-content: space-between; padding: 0.25rem 0;">
                             <span>Gastos</span>
-                            <span style="color: var(--rz-danger);">− @($"{_travel.GetExpensesTotal():F2} {_travel.CostCurrencyCode}")</span>
+                            <span style="color: var(--rz-danger);">− @($"{_travel.GetExpensesTotal():F2} {_travel.MoneyToTravel.Currency}")</span>
                         </div>
 
                         <div style="display: flex; justify-content: space-between; padding: 0.25rem 0;">
                             <span>Ingresos</span>
-                            <span style="color: var(--rz-success);">+ @($"{_travel.GetIncomesTotal():F2} {_travel.CostCurrencyCode}")</span>
+                            <span style="color: var(--rz-success);">+ @($"{_travel.GetIncomesTotal():F2} {_travel.MoneyToTravel.Currency}")</span>
                         </div>
 
                         <div style="display: flex; justify-content: space-between; padding: 0.5rem 0; border-top: 1px solid var(--rz-border-color);">
@@ -61,7 +61,7 @@
                         <span style="font-weight: 600; font-size: 1.5rem;">@_travel.Products.Count</span>
                         <span style="color: var(--rz-text-secondary);">Productos</span>
                         <span style="font-size: 0.875rem;">
-                            @($"{_travel.Products.Sum(p => p.TotalCost.Amount):F2} {_travel.CostCurrencyCode}")
+                            @($"{_travel.Products.Sum(p => p.TotalCost.Amount):F2} {_travel.MoneyToTravel.Currency}")
                         </span>
                     </RadzenStack>
                 </RadzenCard>
@@ -74,7 +74,7 @@
                         <span style="font-weight: 600; font-size: 1.5rem;">@_travel.Expenses.Count</span>
                         <span style="color: var(--rz-text-secondary);">Gastos</span>
                         <span style="font-size: 0.875rem;">
-                            @($"{_travel.Expenses.Sum(e => e.Value.Amount):F2} {_travel.CostCurrencyCode}")
+                            @($"{_travel.Expenses.Sum(e => e.Value.Amount):F2} {_travel.MoneyToTravel.Currency}")
                         </span>
                     </RadzenStack>
                 </RadzenCard>

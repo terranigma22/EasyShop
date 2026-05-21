@@ -28,9 +28,8 @@ internal static class TravelMapping
         {
             StartDate = request.StartDate,
             EndDate = request.EndDate,
-            CostCurrencyCode = request.CostCurrencyCode,
             PriceCurrencyCode = request.PriceCurrencyCode,
-            Multiplicator = request.Multiplicator,
+            Multiplicator = request.Multiplicator <= 0 ? 1.0 : request.Multiplicator,
             ChangeValue = new Money(request.ChangeValue.Amount, request.ChangeValue.Currency),
             MoneyToTravel = new Money(request.MoneyToTravel.Amount, request.MoneyToTravel.Currency)
         };
@@ -40,9 +39,8 @@ internal static class TravelMapping
     {
         entity.StartDate = request.StartDate;
         entity.EndDate = request.EndDate;
-        entity.CostCurrencyCode = request.CostCurrencyCode;
         entity.PriceCurrencyCode = request.PriceCurrencyCode;
-        entity.Multiplicator = request.Multiplicator;
+        entity.Multiplicator = request.Multiplicator <= 0 ? 1.0 : request.Multiplicator;
         entity.ChangeValue = new Money(request.ChangeValue.Amount, request.ChangeValue.Currency);
         entity.MoneyToTravel = new Money(request.MoneyToTravel.Amount, request.MoneyToTravel.Currency);
 

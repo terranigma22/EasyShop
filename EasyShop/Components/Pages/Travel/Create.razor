@@ -89,7 +89,7 @@
     private DateOnly _startDate = DateOnly.FromDateTime(DateTime.Now);
     private DateOnly _endDate = DateOnly.FromDateTime(DateTime.Now);
     private CurrencyCode _priceCurrencyCode = CurrencyCode.CUP;
-    private double _multiplicator = 1.0;
+    private double _multiplicator = 2.5;
     private decimal _moneyToTravelAmount = 0m;
     private CurrencyCode _moneyToTravelCurrency = CurrencyCode.USD;
     private decimal _changeValueAmount = 500m;
@@ -117,7 +117,6 @@
         var request = new CreateTravelRequest(
             _startDate,
             _endDate,
-            _moneyToTravelCurrency,
             _priceCurrencyCode,
             _multiplicator,
             new MoneyRequest(_changeValueAmount, _changeValueCurrency),
