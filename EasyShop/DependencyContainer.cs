@@ -1,5 +1,6 @@
 ﻿using EasyShop.Data;
 using EasyShop.Features.Travels;
+using EasyShop.Services;
 using Microsoft.EntityFrameworkCore;
 using Radzen;
 
@@ -14,6 +15,7 @@ internal static class DependencyContainer
         services.AddRadzen();
 
         services.AddTravelFeatures();
+        services.AddScoped<TravelStateService>();
 
         return services;
     }

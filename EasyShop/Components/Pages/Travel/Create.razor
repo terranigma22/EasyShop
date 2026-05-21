@@ -2,6 +2,7 @@
 @using EasyShop.Domain.Primitives
 @using EasyShop.Features.Travels
 @using EasyShop.Features.Commons
+@using EasyShop.Services
 
 <PageContainer>
     <RadzenRow>
@@ -109,6 +110,9 @@
     [Inject]
     private CreateTravelHandler Handler { get; set; } = default!;
 
+    [Inject]
+    private TravelStateService TravelState { get; set; } = default!;
+
     private async Task HandleSubmit()
     {
         if (_endDate < _startDate)
@@ -129,7 +133,8 @@
 
         try
         {
-            await Handler.HandleAsync(request);
+            var id = await Handler.HandleAsync(request);
+            await TravelState.SetCurrentTravelAsync(id);
             NotificationService.Notify(NotificationSeverity.Success, "Viaje creado correctamente");
             NavigationManager.NavigateTo("/travels");
         }

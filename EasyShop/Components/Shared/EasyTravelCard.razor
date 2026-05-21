@@ -1,7 +1,7 @@
-﻿<RadzenCard Variant="Variant.Flat" class="animate-card">
+﻿<RadzenCard Variant="Variant.Flat" class="animate-card" Clickable="true">
     <AnimateFadeIn>
         <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="1rem">
-            <RadzenIcon Icon="travel" Style="width: 40px; height: 40px;" />
+            <RadzenIcon Icon="travel" Style="@_iconStyle" />
             @* <RadzenImage Path="@Item.Employee?.Photo" class="rz-border-radius-10" Style="width: 80px; height: 80px;"
             AlternateText="@(order.Employee?.FirstName + " " + order.Employee?.LastName)" /> *@
             <RadzenStack Gap="0">
@@ -48,12 +48,16 @@
 
 @code {
     [EditorRequired, Parameter] public Travel Data { get; set; }
+    [Parameter] public bool IsCurrent { get; set; }
     [Parameter] public EventCallback OnAdded { get; set; }
     [Parameter] public EventCallback OnEdited { get; set; }
     [Parameter] public EventCallback OnDeleted { get; set; }
     [Parameter] public EventCallback OnRestored { get; set; }
 
-    
+    string _iconStyle => IsCurrent
+        ? "width: 40px; height: 40px; color: var(--rz-primary);"
+        : "width: 40px; height: 40px;";
+
     void OnAdd()
     {
         OnAdded.InvokeAsync();

@@ -1,5 +1,7 @@
 ﻿@inherits LayoutComponentBase
 
+@inject TravelStateService TravelState
+
 <RadzenComponents />
 <RadzenTheme Theme="material-light" />
 
@@ -14,6 +16,15 @@
                         <RadzenSidebarToggle Click="@(() => sidebarExpanded = !sidebarExpanded)"
                                              Icon="space_dashboard" />
                         <RadzenLabel Text="EasyShop" />
+                        @if (TravelState.CurrentTravel != null)
+                        {
+                            <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="0.25rem" Style="margin-left: 1rem;">
+                                <RadzenIcon Icon="arrow_forward_ios" Style="font-size: 0.875rem; color: var(--rz-text-secondary);" />
+                                <RadzenBadge BadgeStyle="BadgeStyle.Base" Style="font-size: 0.75rem;">
+                                    @TravelState.CurrentTravel.StartDate.ToString("dd/MM") → @TravelState.CurrentTravel.EndDate.ToString("dd/MM")
+                                </RadzenBadge>
+                            </RadzenStack>
+                        }
                     </RadzenStack>
                 </RadzenColumn>
                 <RadzenColumn Size="2">
@@ -53,12 +64,13 @@
 @code {
     bool sidebarExpanded = false;
 
-    private void OnClick()
+    protected override async Task OnInitializedAsync()
     {
         sidebarExpanded = false;
+        await TravelState.LoadLastTravelAsync();
     }
 
-    protected override void OnInitialized()
+    private void OnClick()
     {
         sidebarExpanded = false;
     }
