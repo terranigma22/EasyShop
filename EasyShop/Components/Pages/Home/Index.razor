@@ -31,7 +31,7 @@
 
                 <RadzenCard Variant="Variant.Flat" class="animate-card">
                     <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="1rem" Style="text-align: center;">
-                        <RadzenButton Icon="inventory_2" ButtonStyle="ButtonStyle.Info" Size="ButtonSize.Large" Variant="Variant.Text" />
+                        <RadzenButton Icon="inventory_2" ButtonStyle="ButtonStyle.Info" Size="ButtonSize.Large" Variant="Variant.Text" class="rz-border-radius-10"/>
                         <span style="font-weight: 600; font-size: 1.5rem;">@_travel.Products.Count</span>
                         <span style="color: var(--rz-text-secondary);">Productos</span>
                         <span style="font-size: 0.875rem;">
@@ -39,11 +39,11 @@
                         </span>
                     </RadzenStack>
                 </RadzenCard>
-            </RadzenColumn Size="12">
-            <RadzenColumn>
+            </RadzenColumn>
+            <RadzenColumn Size="12">
                 <RadzenCard Variant="Variant.Flat" class="animate-card">
                     <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="1rem" Style="text-align: center;">
-                        <RadzenButton Icon="money_off" ButtonStyle="ButtonStyle.Danger" Size="ButtonSize.Large" Variant="Variant.Text" />
+                        <RadzenButton Icon="money_off" ButtonStyle="ButtonStyle.Danger" Size="ButtonSize.Large" Variant="Variant.Text" class="rz-border-radius-10" />
                         <span style="font-weight: 600; font-size: 1.5rem;">@_travel.Expenses.Count</span>
                         <span style="color: var(--rz-text-secondary);">Gastos</span>
                         <span style="font-size: 0.875rem;">
@@ -55,7 +55,7 @@
             <RadzenColumn Size="12">
                 <RadzenCard Variant="Variant.Flat" class="animate-card">
                     <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="1rem" Style="text-align: center;">
-                        <RadzenButton Icon="account_balance" ButtonStyle="ButtonStyle.Success" Size="ButtonSize.Large" Variant="Variant.Text" />
+                        <RadzenButton Icon="account_balance" ButtonStyle="ButtonStyle.Success" Size="ButtonSize.Large" Variant="Variant.Text" class="rz-border-radius-10" />
                         <span style="font-weight: 600; font-size: 1.5rem;">@_travel.Incomes.Count</span>
                         <span style="color: var(--rz-text-secondary);">Ingresos</span>
                         <span style="font-size: 0.875rem;">

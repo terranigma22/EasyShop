@@ -126,6 +126,17 @@ public sealed class Money : IEquatable<Money>, IComparable<Money>
         return $"{symbol}{_amount:F2}";
     }
 
+    public string ToUI()
+    {
+        var symbol = _currency switch
+        {
+            CurrencyCode.CUP => "$",
+            CurrencyCode.USD => "$",
+            _ => "?"
+        };
+        return $"{symbol}{_amount:F2} {_currency}";
+    }
+
     // Formato según cultura (útil solo para UI)
     //public string ToString(CultureInfo culture) => _amount.ToString("C", culture);
     //public override string ToString() => ToString(CultureInfo.CurrentCulture);
