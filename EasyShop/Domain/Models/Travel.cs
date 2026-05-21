@@ -16,4 +16,18 @@ public class Travel : BaseEntity
     public virtual ICollection<Expense> Expenses { get; set; } = new List<Expense>();
     public virtual ICollection<Product> Products { get; set; } = new List<Product>();
     public virtual ICollection<Income> Incomes { get; set; } = new List<Income>();
+
+    public decimal GetExpensesTotal()
+        => Expenses.Sum(e => e.Value.Amount);
+
+    public decimal GetProductsTotal()
+        => Products.Sum(p => p.TotalCost.Amount);
+
+    public decimal GetIncomesTotal()
+        => Incomes.Sum(i => i.Value.Amount);
+    public decimal GetNetTotal()
+        => GetIncomesTotal() - GetExpensesTotal() - GetProductsTotal();
+
+    public decimal GetRemaining()
+        => MoneyToTravel.Amount - GetExpensesTotal() - GetProductsTotal() + GetIncomesTotal();
 }

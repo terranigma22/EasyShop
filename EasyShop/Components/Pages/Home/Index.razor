@@ -5,11 +5,7 @@
 @inject TravelStateService TravelState
 
 <PageContainer>
-    <RadzenRow>
-        <RadzenColumn>
-            <PageHeader Title="Panel" Icon="dashboard" />
-        </RadzenColumn>
-    </RadzenRow>
+    
 
     @if (_travel == null)
     {
@@ -20,13 +16,43 @@
     }
     else
     {
-        <RadzenRow>
-            <RadzenColumn Size="12">
-                <EasyTravelCard Data="_travel" IsCurrent="true" />
-            </RadzenColumn>
-        </RadzenRow>
+        <RadzenRow Gap="1rem">
 
-        <RadzenRow Gap="1rem" Style="margin-top: 0.5rem;">
+            <RadzenColumn Size="12">
+                <RadzenCard Variant="Variant.Flat" class="animate-card">
+                    <RadzenStack Orientation="Orientation.Vertical" Gap="1rem">
+                        <PageHeader Title="Balance del viaje" Icon="account_balance_wallet" />
+
+                        <div style="display: flex; justify-content: space-between; padding: 0.25rem 0;">
+                            <span>Presupuesto</span>
+                            <span style="font-weight: 500;">@($"{_travel.MoneyToTravel.Amount:F2} {_travel.MoneyToTravel.Currency}")</span>
+                        </div>
+
+                        <div style="display: flex; justify-content: space-between; padding: 0.25rem 0;">
+                            <span>Productos</span>
+                            <span style="color: var(--rz-danger);">− @($"{_travel.GetProductsTotal():F2} {_travel.CostCurrencyCode}")</span>
+                        </div>
+
+                        <div style="display: flex; justify-content: space-between; padding: 0.25rem 0;">
+                            <span>Gastos</span>
+                            <span style="color: var(--rz-danger);">− @($"{_travel.GetExpensesTotal():F2} {_travel.CostCurrencyCode}")</span>
+                        </div>
+
+                        <div style="display: flex; justify-content: space-between; padding: 0.25rem 0;">
+                            <span>Ingresos</span>
+                            <span style="color: var(--rz-success);">+ @($"{_travel.GetIncomesTotal():F2} {_travel.CostCurrencyCode}")</span>
+                        </div>
+
+                        <div style="display: flex; justify-content: space-between; padding: 0.5rem 0; border-top: 1px solid var(--rz-border-color);">
+                            <span style="font-weight: 600;">Restante</span>
+                            <span style="font-weight: 600; color: @(_remaining >= 0 ? "var(--rz-success)" : "var(--rz-danger)");">
+                                @($"{_remaining:F2} {_travel.MoneyToTravel.Currency}")
+                            </span>
+                        </div>
+                    </RadzenStack>
+                </RadzenCard>
+            </RadzenColumn>
+
             <RadzenColumn Size="12">
 
                 <RadzenCard Variant="Variant.Flat" class="animate-card">
@@ -40,6 +66,7 @@
                     </RadzenStack>
                 </RadzenCard>
             </RadzenColumn>
+
             <RadzenColumn Size="12">
                 <RadzenCard Variant="Variant.Flat" class="animate-card">
                     <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="1rem" Style="text-align: center;">
@@ -52,6 +79,7 @@
                     </RadzenStack>
                 </RadzenCard>
             </RadzenColumn>
+
             <RadzenColumn Size="12">
                 <RadzenCard Variant="Variant.Flat" class="animate-card">
                     <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="1rem" Style="text-align: center;">
@@ -69,9 +97,11 @@
 </PageContainer>
 
 
-@code{
+    @code {
 
     Travel? _travel { get; set; }
+
+    decimal? _remaining => _travel?.GetRemaining();
 
     protected override void OnInitialized()
     {
