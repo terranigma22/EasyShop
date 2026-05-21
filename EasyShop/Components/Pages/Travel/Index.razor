@@ -2,6 +2,7 @@
 
 @inject GetTravelsHandler GetTravelsHandler
 @inject TravelStateService TravelState
+@inject NotificationService NotificationService
 
 <PageContainer>
     <RadzenRow>
@@ -36,7 +37,7 @@
                 @foreach (var item in _items)
                 {
                     <EasyColumForCard>
-                        <EasyTravelCard Data="item" IsCurrent="item.Id == TravelState.CurrentTravel?.Id" />
+                        <EasyTravelCard Data="item" IsCurrent="item.Id == TravelState.CurrentTravel?.Id" OnSelected="@HandleCardSelected" />
                     </EasyColumForCard>
                 }
             </EasyGridForCards>
@@ -64,5 +65,10 @@
         {
             _loading = false;
         }
+    }
+
+    private async Task HandleCardSelected(Guid id)
+    {
+        await TravelState.SetCurrentTravelAsync(id);
     }
 }

@@ -1,9 +1,11 @@
-﻿<RadzenCard Variant="Variant.Flat" class="animate-card" Clickable="true">
+﻿<RadzenCard Variant="Variant.Flat" class="animate-card">
     <AnimateFadeIn>
+
         <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="1rem">
-            <RadzenIcon Icon="travel" Style="@_iconStyle" />
-            @* <RadzenImage Path="@Item.Employee?.Photo" class="rz-border-radius-10" Style="width: 80px; height: 80px;"
-            AlternateText="@(order.Employee?.FirstName + " " + order.Employee?.LastName)" /> *@
+
+            <RadzenButton Icon="check" ButtonStyle="@_buttonStyle" Click="@(() => OnSelected.InvokeAsync(Data.Id))"
+                          Size="ButtonSize.Medium" />
+
             <RadzenStack Gap="0">
                 <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.End" Gap="0.5rem">
                     <RadzenIcon Icon="calendar_month" Style="font-size: 1.25rem;" />
@@ -49,14 +51,15 @@
 @code {
     [EditorRequired, Parameter] public Travel Data { get; set; }
     [Parameter] public bool IsCurrent { get; set; }
+    [Parameter] public EventCallback<Guid> OnSelected { get; set; }
     [Parameter] public EventCallback OnAdded { get; set; }
     [Parameter] public EventCallback OnEdited { get; set; }
     [Parameter] public EventCallback OnDeleted { get; set; }
     [Parameter] public EventCallback OnRestored { get; set; }
 
-    string _iconStyle => IsCurrent
-        ? "width: 40px; height: 40px; color: var(--rz-primary);"
-        : "width: 40px; height: 40px;";
+    ButtonStyle _buttonStyle => IsCurrent
+        ? ButtonStyle.Primary
+        : ButtonStyle.Base;
 
     void OnAdd()
     {

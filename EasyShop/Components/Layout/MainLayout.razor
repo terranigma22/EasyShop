@@ -68,6 +68,8 @@
     {
         sidebarExpanded = false;
         await TravelState.LoadLastTravelAsync();
+
+        TravelState.OnTravelChanged += StateHasChanged; 
     }
 
     private void OnClick()
