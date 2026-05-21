@@ -20,8 +20,6 @@
     }
     else
     {
-        
-
         <RadzenRow>
             <RadzenColumn Size="12">
                 <EasyTravelCard Data="_travel" IsCurrent="true" />
@@ -32,9 +30,7 @@
             <RadzenColumn Size="12">
 
                 <RadzenCard Variant="Variant.Flat" class="animate-card">
-
                     <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="1rem" Style="text-align: center;">
-
                         <RadzenButton Icon="inventory_2" ButtonStyle="ButtonStyle.Info" Size="ButtonSize.Large" Variant="Variant.Text" />
                         <span style="font-weight: 600; font-size: 1.5rem;">@_travel.Products.Count</span>
                         <span style="color: var(--rz-text-secondary);">Productos</span>
@@ -47,7 +43,6 @@
             <RadzenColumn>
                 <RadzenCard Variant="Variant.Flat" class="animate-card">
                     <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="1rem" Style="text-align: center;">
-
                         <RadzenButton Icon="money_off" ButtonStyle="ButtonStyle.Danger" Size="ButtonSize.Large" Variant="Variant.Text" />
                         <span style="font-weight: 600; font-size: 1.5rem;">@_travel.Expenses.Count</span>
                         <span style="color: var(--rz-text-secondary);">Gastos</span>
@@ -60,7 +55,6 @@
             <RadzenColumn Size="12">
                 <RadzenCard Variant="Variant.Flat" class="animate-card">
                     <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="1rem" Style="text-align: center;">
-
                         <RadzenButton Icon="account_balance" ButtonStyle="ButtonStyle.Success" Size="ButtonSize.Large" Variant="Variant.Text" />
                         <span style="font-weight: 600; font-size: 1.5rem;">@_travel.Incomes.Count</span>
                         <span style="color: var(--rz-text-secondary);">Ingresos</span>
