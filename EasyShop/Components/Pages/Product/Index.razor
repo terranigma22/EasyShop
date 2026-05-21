@@ -1,4 +1,5 @@
-@page "/travels/products"
+@page "/products"
+
 @using EasyShop.Domain.Models
 @using EasyShop.Services
 
@@ -14,7 +15,7 @@
             <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center"
                          JustifyContent="JustifyContent.End" Gap="0.5rem">
                 <RadzenButton Icon="add_circle" ButtonStyle="ButtonStyle.Primary" Text="Nuevo producto"
-                              Click="@(() => NavigationManager.NavigateTo("/travels/products/create"))" />
+                              Click="@(() => NavigationManager.NavigateTo("/products/create"))" />
             </RadzenStack>
         </RadzenColumn>
     </RadzenRow>
@@ -39,6 +40,9 @@
                     <RadzenColumn Size="12" SizeSmall="6" SizeMedium="4">
                         <RadzenCard Variant="Variant.Flat" class="animate-card">
                             <RadzenStack Gap="0.5rem">
+                                <div style="font-weight: 600; font-size: 1rem; margin-bottom: 0.25rem;">
+                                    @product.Name
+                                </div>
                                 <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.SpaceBetween">
                                     <RadzenBadge Text="Producto" BadgeStyle="BadgeStyle.Info" />
                                     <span style="font-weight: 500;">
@@ -52,6 +56,10 @@
                                 <div style="display: flex; justify-content: space-between;">
                                     <span style="color: var(--rz-text-secondary); font-size: 0.875rem;">Precio venta</span>
                                     <span style="font-weight: 500;">@($"{product.UnitPrice.Amount:F2} {product.UnitPrice.Currency}")</span>
+                                </div>
+                                <div style="display: flex; justify-content: space-between;">
+                                    <span style="color: var(--rz-text-secondary); font-size: 0.875rem;">Precio venta (@product.UnitChangePrice.Currency)</span>
+                                    <span style="font-weight: 500;">@($"{product.UnitChangePrice.Amount:F2} {product.UnitChangePrice.Currency}")</span>
                                 </div>
                                 <div style="display: flex; justify-content: space-between;">
                                     <span style="color: var(--rz-text-secondary); font-size: 0.875rem;">Ganancia</span>

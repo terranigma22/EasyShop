@@ -7,10 +7,12 @@ namespace EasyShop.Features.Products;
 
 public sealed record CreateProductRequest(
     Guid TravelId,
+    string Name,
     int Units,
     double Multiplicator,
     MoneyRequest TotalCost,
-    MoneyRequest UnitPrice
+    MoneyRequest UnitPrice,
+    MoneyRequest UnitChangePrice
 );
 
 public sealed class CreateProductHandler
@@ -22,10 +24,12 @@ public sealed class CreateProductHandler
     {
         var product = Product.New(
             request.TravelId,
+            request.Name,
             request.Units,
             request.Multiplicator,
             new Money(request.TotalCost.Amount, request.TotalCost.Currency),
-            new Money(request.UnitPrice.Amount, request.UnitPrice.Currency)
+            new Money(request.UnitPrice.Amount, request.UnitPrice.Currency),
+            new Money(request.UnitChangePrice.Amount, request.UnitChangePrice.Currency)
         );
 
         _db.Products.Add(product);

@@ -67,6 +67,13 @@ public class ApplicationDbContext : DbContext
                 b.Property(e => e.Currency).HasColumnName("UnitPrice_Currency").HasConversion<int>();
             });
 
+            entity.ComplexProperty(e => e.UnitChangePrice, b =>
+            {
+                b.Property(e => e.Amount).HasColumnName("UnitChangePrice_Amount");
+                b.Property(e => e.Currency).HasColumnName("UnitChangePrice_Currency").HasConversion<int>();
+            });
+
+            entity.Property(e => e.Name).IsRequired().HasMaxLength(200);
             entity.Property(e => e.TravelId).IsRequired();
         });
 

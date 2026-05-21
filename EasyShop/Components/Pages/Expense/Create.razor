@@ -1,17 +1,18 @@
-@page "/travels/incomes/create"
+@page "/expenses/create"
+
 @using EasyShop.Domain.Primitives
 @using EasyShop.Features.Commons
-@using EasyShop.Features.Incomes
+@using EasyShop.Features.Expenses
 @using EasyShop.Services
 
-@inject CreateIncomeHandler Handler
+@inject CreateExpenseHandler Handler
 @inject TravelStateService TravelState
 @inject NotificationService NotificationService
 
 <PageContainer>
     <RadzenRow>
         <RadzenColumn>
-            <PageHeader Title="Nuevo ingreso" Icon="account_balance" />
+            <PageHeader Title="Nuevo gasto" Icon="money_off" />
         </RadzenColumn>
     </RadzenRow>
 
@@ -29,15 +30,15 @@
 
                 <RadzenRow>
                     <RadzenColumn Size="12">
-                        <RadzenFormField Text="Descripción">
-                            <RadzenTextBox @bind-Value="@_description" Placeholder="Ej: Venta de productos, Extras..." />
+                        <RadzenFormField Text="Descripción" Style="width:100%;">
+                            <RadzenTextBox @bind-Value="@_description" Placeholder="Ej: Transporte, Alojamiento..." />
                         </RadzenFormField>
                     </RadzenColumn>
                 </RadzenRow>
 
                 <RadzenRow>
                     <RadzenColumn Size="12">
-                        <RadzenFormField Text="@($"Valor ({_travel!.MoneyToTravel.Currency})")">
+                        <RadzenFormField Text="@($"Valor ({_travel!.MoneyToTravel.Currency})")" Style="width:100%;">
                             <RadzenNumeric @bind-Value="@_valueAmount" Min="0" Step="0.01" />
                         </RadzenFormField>
                     </RadzenColumn>
@@ -47,7 +48,7 @@
                     <RadzenColumn>
                         <RadzenStack Orientation="Orientation.Horizontal" Gap="1rem">
                             <RadzenButton Text="Guardar" ButtonType="ButtonType.Submit" ButtonStyle="ButtonStyle.Primary" Icon="save" Click="@HandleSubmit" />
-                            <RadzenButton Text="Cancelar" ButtonStyle="ButtonStyle.Secondary" Icon="close" Click="@(() => NavigationManager.NavigateTo("/travels/incomes"))" />
+                            <RadzenButton Text="Cancelar" ButtonStyle="ButtonStyle.Secondary" Icon="close" Click="@(() => NavigationManager.NavigateTo("/expenses"))" />
                         </RadzenStack>
                     </RadzenColumn>
                 </RadzenRow>
@@ -77,7 +78,7 @@
 
         var currency = _travel!.MoneyToTravel.Currency;
 
-        var request = new CreateIncomeRequest(
+        var request = new CreateExpenseRequest(
             _travel.Id,
             _description,
             new MoneyRequest(_valueAmount, currency)
@@ -87,12 +88,12 @@
         {
             await Handler.HandleAsync(request);
             await TravelState.SetCurrentTravelAsync(_travel.Id);
-            NotificationService.Notify(NotificationSeverity.Success, "Ingreso creado correctamente");
-            NavigationManager.NavigateTo("/travels/incomes");
+            NotificationService.Notify(NotificationSeverity.Success, "Gasto creado correctamente");
+            NavigationManager.NavigateTo("/expenses");
         }
         catch (Exception ex)
         {
-            NotificationService.Notify(NotificationSeverity.Error, "Error al crear el ingreso", ex.Message);
+            NotificationService.Notify(NotificationSeverity.Error, "Error al crear el gasto", ex.Message);
         }
     }
 }
