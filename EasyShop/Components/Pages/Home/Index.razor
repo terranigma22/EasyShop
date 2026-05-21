@@ -87,7 +87,7 @@
                         <span style="font-weight: 600; font-size: 1.5rem;">@_travel.Incomes.Count</span>
                         <span style="color: var(--rz-text-secondary);">Ingresos</span>
                         <span style="font-size: 0.875rem;">
-                            @($"{_travel.Incomes.Sum(i => i.Value.Amount):F2} {_travel.PriceCurrencyCode}")
+                            @($"{_travel.Incomes.Sum(i => i.Value.Amount):F2} {_travel.ChangeValue.Currency}")
                         </span>
                     </RadzenStack>
                 </RadzenCard>

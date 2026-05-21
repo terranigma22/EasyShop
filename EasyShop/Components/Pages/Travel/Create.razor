@@ -1,4 +1,5 @@
 @page "/travels/create"
+
 @using EasyShop.Domain.Primitives
 @using EasyShop.Features.Travels
 @using EasyShop.Features.Commons
@@ -17,36 +18,25 @@
             <RadzenRow>
                 <RadzenColumn Size="6">
                     <RadzenFormField Text="Fecha de inicio">
-                        <RadzenDatePicker @bind-Value="@_startDate" DateOnly="true" />
+                        <RadzenDatePicker @bind-Value="@_startDate" DateFormat="dd/MM/yyyy" />
                     </RadzenFormField>
                 </RadzenColumn>
                 <RadzenColumn Size="6">
                     <RadzenFormField Text="Fecha de fin">
-                        <RadzenDatePicker @bind-Value="@_endDate" DateOnly="true" />
+                        <RadzenDatePicker @bind-Value="@_endDate" DateFormat="dd/MM/yyyy" />
                     </RadzenFormField>
                 </RadzenColumn>
             </RadzenRow>
 
             <RadzenRow>
-                <RadzenColumn Size="6">
-                    <RadzenFormField Text="Moneda de precio">
-                        <RadzenDropDown @bind-Value="@_priceCurrencyCode"
-                                        Data="@CurrencyOptions" TextProperty="Text" ValueProperty="Value" />
-                    </RadzenFormField>
-                </RadzenColumn>
-            </RadzenRow>
-
-            <RadzenRow>
-                <RadzenColumn Size="6">
-                    <RadzenFormField Text="Multiplicador">
-                        <RadzenNumeric @bind-Value="@_multiplicator" Min="0" Step="0.01" />
-                    </RadzenFormField>
-                </RadzenColumn>
+                <RadzenFormField Text="Multiplicador">
+                    <RadzenNumeric @bind-Value="@_multiplicator" Min="0" Step="0.01" />
+                </RadzenFormField>
             </RadzenRow>
 
             <RadzenRow>
                 <RadzenColumn Size="8">
-                    <RadzenFormField Text="Dinero a viajar (moneda de costo)">
+                    <RadzenFormField Text="Presupuesto">
                         <RadzenNumeric @bind-Value="@_moneyToTravelAmount" Min="0" Step="0.01" />
                     </RadzenFormField>
                 </RadzenColumn>
@@ -88,11 +78,10 @@
 @code {
     private DateOnly _startDate = DateOnly.FromDateTime(DateTime.Now);
     private DateOnly _endDate = DateOnly.FromDateTime(DateTime.Now);
-    private CurrencyCode _priceCurrencyCode = CurrencyCode.CUP;
     private double _multiplicator = 2.5;
     private decimal _moneyToTravelAmount = 0m;
     private CurrencyCode _moneyToTravelCurrency = CurrencyCode.USD;
-    private decimal _changeValueAmount = 500m;
+    private decimal _changeValueAmount = 700m;
     private CurrencyCode _changeValueCurrency = CurrencyCode.CUP;
 
     private List<CurrencyOption> CurrencyOptions => Enum.GetValues<CurrencyCode>()
@@ -117,7 +106,6 @@
         var request = new CreateTravelRequest(
             _startDate,
             _endDate,
-            _priceCurrencyCode,
             _multiplicator,
             new MoneyRequest(_changeValueAmount, _changeValueCurrency),
             new MoneyRequest(_moneyToTravelAmount, _moneyToTravelCurrency)
