@@ -1,0 +1,92 @@
+@page "/expenses/create"
+
+@using EasyShop.Domain.Primitives
+@using EasyShop.Features.Commons
+@using EasyShop.Features.Expenses
+@using EasyShop.Services
+
+@inject CreateExpenseHandler Handler
+@inject TravelStateService TravelState
+@inject NotificationService NotificationService
+
+
+<RadzenTemplateForm TItem="ExpenseDto" Data="@_expense" Submit="Save">
+    <RadzenStack Gap="1rem">
+        <RadzenRow>
+            <RadzenColumn Size="12">
+                <RadzenFormField Text="Descripción" Style="width: 100%">
+                    <ChildContent>
+                        <RadzenTextBox @bind-Value="@_expense.Description" Name="Description" />
+                    </ChildContent>
+                    <Helper>
+                        <RadzenRequiredValidator Component="Description" Text="Descripción requerida" />
+                        <RadzenLengthValidator Component="Description" Min="2" Max="100" Text="Descripción debe tener entre 2 y 100 caracteres" />
+                    </Helper>
+                </RadzenFormField>
+            </RadzenColumn>
+        </RadzenRow>
+        <RadzenRow>
+            <RadzenColumn Size="12">
+                <RadzenFormField Text="@($"Valor ({_travel!.MoneyToTravel.Currency})")" Style="width: 100%">
+                    <ChildContent>
+                        <RadzenNumeric @bind-Value="@_expense.Amount" Min="0" Step="0.01" Name="Amount" />
+                    </ChildContent>
+                </RadzenFormField>
+            </RadzenColumn>
+        </RadzenRow>
+
+    </RadzenStack>
+
+    <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" JustifyContent="JustifyContent.End"
+                 Gap=".5rem" class="rz-mt-6">
+        <RadzenButton Text="Cancelar" Icon="cancel" ButtonStyle="ButtonStyle.Danger" Click="Cancel" />
+        <RadzenButton Text="Guardar" Icon="save" ButtonStyle="ButtonStyle.Primary" ButtonType="ButtonType.Submit" />
+    </RadzenStack>
+
+</RadzenTemplateForm>
+
+
+@code {
+    private Travel? _travel;
+
+    private ExpenseDto _expense = new ExpenseDto();
+
+    protected override void OnInitialized()
+    {
+        _travel = TravelState.CurrentTravel;
+    }
+
+    private async Task Save()
+    {
+        var currency = _travel!.MoneyToTravel.Currency;
+
+        var request = new CreateExpenseRequest(
+            _travel.Id,
+            _expense.Description,
+            new MoneyRequest(_expense.Amount, currency)
+        );
+
+        try
+        {
+            await Handler.HandleAsync(request);
+            await TravelState.SetCurrentTravelAsync(_travel.Id);
+
+            NotificationService.Notify(NotificationSeverity.Success, "Gasto creado");
+
+            DialogService.CloseSide(true);
+        }
+        catch (Exception ex)
+        {
+            NotificationService.Notify(NotificationSeverity.Error, "Error al crear el gasto");
+        }
+    }
+
+    private void Cancel() 
+        => DialogService.CloseSide(false);
+
+    private class ExpenseDto
+    {
+        public string Description { get; set; } = string.Empty;
+        public decimal Amount { get; set; } = 0m;
+    }
+}

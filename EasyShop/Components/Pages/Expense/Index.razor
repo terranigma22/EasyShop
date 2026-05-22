@@ -15,7 +15,7 @@
             <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center"
                          JustifyContent="JustifyContent.End" Gap="0.5rem">
                 <RadzenButton Icon="add_circle" ButtonStyle="ButtonStyle.Primary"
-                              Click="@(() => NavigationManager.NavigateTo("/expenses/create"))" />
+                              Click="@Create" />
             </RadzenStack>
         </RadzenColumn>
     </RadzenRow>
@@ -62,5 +62,19 @@
     protected override void OnInitialized()
     {
         _travel = TravelState.CurrentTravel;
+    }
+
+    async Task Create()
+    {
+        var result = await DialogService.OpenSideAsync<ExpenseCreate>("Nuevo Gasto",
+            null,
+            new SideDialogOptions
+            {
+                Width = "600px",
+                ShowClose = false,
+                ShowMask = true,
+                CloseDialogOnOverlayClick = true,
+                Position = DialogPosition.Right
+            });
     }
 }
