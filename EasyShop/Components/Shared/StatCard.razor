@@ -1,55 +1,40 @@
-<RadzenCard Variant="Variant.Flat" class="animate-card">
+<RadzenCard Variant="Variant.Flat" class="animate-card" Style="cursor: pointer;" @onclick="@HandleClick">
     <AnimateFadeIn>
-        <div style="display: flex; justify-content: space-between; align-items: flex-start;">
-            <div>
-                <div class="stat-card-title">@Title</div>
-                <div class="stat-card-value">@Value</div>
-                @if (!string.IsNullOrEmpty(Subtitle))
-                {
-                    <div style="font-size: var(--easysell-text-sm); color: var(--easysell-gray-500); margin-top: var(--easysell-space-1);">
-                        @Subtitle
-                    </div>
-                }
+
+        <div style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
+            <div style="display: flex; align-items: center; gap: 1rem;">
+                <div class="stat-card-icon">
+                    <RadzenIcon Icon="@Icon" IconColor="@IconColor" />
+                </div>
+                <span style="font-weight: 600; font-size: 1.5rem;">@Value</span>
+                <span style="color: var(--rz-text-secondary);">@Title</span>
             </div>
-            <div class="stat-card-icon">
-                <RadzenIcon Icon="@Icon" IconColor="@IconColor" />
-            </div>
+            <span style="font-size: 0.875rem;">
+                @Subtitle
+            </span>
         </div>
-        @if (ChildContent != null)
-        {
-            <div style="margin-top: var(--easysell-space-4);">
-                @ChildContent
-            </div>
-        }
+
     </AnimateFadeIn>
 </RadzenCard>
 
 @code {
     [Parameter] public string Title { get; set; } = "";
-    [Parameter] public string Value { get; set; } = "";
+    [Parameter] public int Value { get; set; } = 0;
     [Parameter] public string Subtitle { get; set; } = "";
     [Parameter] public string Icon { get; set; } = "analytics";
     [Parameter] public string IconColor { get; set; } = Colors.Base400;
-    [Parameter] public RenderFragment? ChildContent { get; set; }
+
+    [Parameter] public EventCallback Click { get; set; }
+
+    private async Task HandleClick()
+    {
+        if (Click.HasDelegate)
+            await Click.InvokeAsync();
+    }   
 }
 
 <style>
-    .stat-card-title {
-        font-size: var(--easysell-text-sm);
-        margin-bottom: var(--easysell-space-2);
-        text-transform: uppercase;
-        letter-spacing: 0.05em;
-    }
-
-    .stat-card-value {
-        font-size: var(--easysell-text-3xl);
-        font-weight: 700;
-        line-height: 1;
-    }
-
     .stat-card-icon {
-        float: right;
         font-size: var(--easysell-text-3xl);
     }
-
 </style>

@@ -12,7 +12,7 @@
         <RadzenColumn Style="align-self: center;">
             <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center"
                          JustifyContent="JustifyContent.End" Gap="0.5rem">
-                <RadzenButton Icon="add_circle" ButtonStyle="ButtonStyle.Primary" Text="Nuevo viaje"
+                <RadzenButton Icon="add_circle" ButtonStyle="ButtonStyle.Primary"
                               Click="@(() => NavigationManager.NavigateTo("/travels/create"))" />
             </RadzenStack>
         </RadzenColumn>
@@ -24,10 +24,7 @@
     }
     else if (_items.Count == 0)
     {
-        <EmptyState Icon="travel" Title="No hay viajes" Message="Crea tu primer viaje para comenzar">
-            <RadzenButton Icon="add_circle" ButtonStyle="ButtonStyle.Primary" Text="Nuevo viaje"
-                          Click="@(() => NavigationManager.NavigateTo("/travels/create"))" />
-        </EmptyState>
+        <EmptyState Icon="travel" Title="No hay viajes" Message="Crea tu primer viaje para comenzar" />
     }
     else
     {
