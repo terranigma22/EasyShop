@@ -13,7 +13,7 @@
             <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center"
                          JustifyContent="JustifyContent.End" Gap="0.5rem">
                 <RadzenButton Icon="add_circle" ButtonStyle="ButtonStyle.Primary"
-                              Click="@(() => NavigationManager.NavigateTo("/travels/create"))" />
+                              Click="@Create" />
             </RadzenStack>
         </RadzenColumn>
     </RadzenRow>
@@ -42,7 +42,7 @@
     }
 </PageContainer>
 
-@code {
+    @code {
     private List<Travel> _items = [];
     private bool _loading = true;
 
@@ -67,5 +67,23 @@
     private async Task HandleCardSelected(Guid id)
     {
         await TravelState.SetCurrentTravelAsync(id);
+    }
+
+    async Task Create()
+    {
+        var result = await DialogService.OpenSideAsync<TravelCreate>("Nuevo Viaje",
+            null,
+            new SideDialogOptions
+            {
+                Width = "600px",
+                ShowClose = false,
+                ShowMask = true,
+                CloseDialogOnOverlayClick = true,
+                Position = DialogPosition.Right
+            });
+
+        if (result)
+            await LoadTravels();
+
     }
 }
