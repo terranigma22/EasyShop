@@ -7,18 +7,20 @@
 @inject NotificationService NotificationService
 
 <PageContainer>
-    <RadzenRow>
-        <RadzenColumn>
-            <PageHeader Title="Productos" Icon="inventory_2" />
-        </RadzenColumn>
-        <RadzenColumn Style="align-self: center;">
-            <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center"
-                         JustifyContent="JustifyContent.End" Gap="0.5rem">
-                <RadzenButton Icon="add_circle" ButtonStyle="ButtonStyle.Primary"
-                              Click="@(() => NavigationManager.NavigateTo("/products/create"))" />
-            </RadzenStack>
-        </RadzenColumn>
-    </RadzenRow>
+    <div style="position: sticky; top: 0; z-index: 10; background: var(--rz-page-background); padding: 1rem 0 0.5rem 0;">
+        <RadzenRow>
+            <RadzenColumn>
+                <PageHeader Title="Productos" Icon="inventory_2" />
+            </RadzenColumn>
+            <RadzenColumn Style="align-self: center;">
+                <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center"
+                             JustifyContent="JustifyContent.End" Gap="0.5rem">
+                    <RadzenButton Icon="add_circle" ButtonStyle="ButtonStyle.Primary"
+                                  Click="@(() => NavigationManager.NavigateTo("/products/create"))" />
+                </RadzenStack>
+            </RadzenColumn>
+        </RadzenRow>
+    </div>
 
     @if (_travel == null)
     {
