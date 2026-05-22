@@ -4,7 +4,6 @@
 @using EasyShop.Services
 
 @inject TravelStateService TravelState
-@inject NotificationService NotificationService
 
 <PageContainer>
     <RadzenRow>
@@ -15,21 +14,21 @@
             <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center"
                          JustifyContent="JustifyContent.End" Gap="0.5rem">
                 <RadzenButton Icon="add_circle" ButtonStyle="ButtonStyle.Primary"
-                              Click="@(() => NavigationManager.NavigateTo("/incomes/create"))" />
+                              Click="@Create" />
             </RadzenStack>
         </RadzenColumn>
     </RadzenRow>
 
     @if (_travel == null)
     {
-        <EmptyState Icon="travel" Title="No hay viaje activo" Message="Selecciona un viaje para ver sus inentradasgresos">
+        <EmptyState Icon="travel" Title="No hay viaje activo" Message="Selecciona un viaje para ver sus ingresos">
             <RadzenButton Icon="travel" ButtonStyle="ButtonStyle.Primary" Text="Ir a Viajes"
                           Click="@(() => NavigationManager.NavigateTo("/travels"))" />
         </EmptyState>
     }
     else if (_travel.Incomes.Count == 0)
     {
-        <EmptyState Icon="account_balance" Title="Sin entradas" Message="Este viaje no tiene entradas registrados" />
+        <EmptyState Icon="account_balance" Title="Sin entradas" Message="Este viaje no tiene entradas registradas" />
     }
     else
     {
@@ -62,5 +61,19 @@
     protected override void OnInitialized()
     {
         _travel = TravelState.CurrentTravel;
+    }
+
+    async Task Create()
+    {
+        var result = await DialogService.OpenSideAsync<IncomeCreate>("Nueva Entrada",
+            null,
+            new SideDialogOptions
+            {
+                Width = "600px",
+                ShowClose = false,
+                ShowMask = true,
+                CloseDialogOnOverlayClick = true,
+                Position = DialogPosition.Right
+            });
     }
 }
