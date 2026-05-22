@@ -39,12 +39,12 @@
                 <RadzenRow>
                     <RadzenColumn Size="6">
                         <RadzenFormField Text="Unidades" Style="width:100%;">
-                            <RadzenNumeric @bind-Value="@_units" Min="0" Step="1" />
+                            <RadzenNumeric @bind-Value="@_units" Min="0" Step="1" @oninput="@(() => StateHasChanged())" />
                         </RadzenFormField>
                     </RadzenColumn>
                     <RadzenColumn Size="6">
                         <RadzenFormField Text="Multiplicador" Style="width:100%;">
-                            <RadzenNumeric @bind-Value="@_multiplicator" Min="0" Step="0.01" />
+                            <RadzenNumeric @bind-Value="@_multiplicator" Min="0" Step="0.01" @oninput="@(() => StateHasChanged())" />
                         </RadzenFormField>
                     </RadzenColumn>
                 </RadzenRow>
@@ -52,7 +52,7 @@
                 <RadzenRow>
                     <RadzenColumn Size="12">
                         <RadzenFormField Text="@($"Costo total ({_travel!.MoneyToTravel.Currency})")" Style="width:100%;">
-                            <RadzenNumeric @bind-Value="@_totalCostAmount" Min="0" Step="0.01" />
+                            <RadzenNumeric @bind-Value="@_totalCostAmount" Min="0" Step="0.01" @oninput="@(() => StateHasChanged())" />
                         </RadzenFormField>
                     </RadzenColumn>
                 </RadzenRow>
