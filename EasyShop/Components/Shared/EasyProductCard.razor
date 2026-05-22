@@ -1,0 +1,56 @@
+﻿<RadzenCard Variant="Variant.Flat" class="animate-card" Style="cursor: pointer;" @onclick="@HandleClick">
+    <AnimateFadeIn>
+
+        <RadzenStack Gap="0.5rem">
+            <div style="font-weight: 600; font-size: 1rem; margin-bottom: 0.25rem;">
+                @Data.Name
+            </div>
+            <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.SpaceBetween">
+                <span style="color: var(--rz-text-secondary); font-size: 0.875rem;">Cantidad</span>
+                <span style="font-weight: 500;">
+                    @Data.Units uds × @($"{Data.GetUnitCost():F2} {Data.TotalCost.Currency}")
+                </span>
+            </RadzenStack>
+            <div style="display: flex; justify-content: space-between;">
+                <span style="color: var(--rz-text-secondary); font-size: 0.875rem;">Costo total</span>
+                <span style="font-weight: 500;">@($"{Data.TotalCost.Amount:F2}                                {Data.TotalCost.Currency}")</span>
+            </div>
+            <div style="display: flex; justify-content: space-between;">
+                <span style="color: var(--rz-text-secondary); font-size: 0.875rem;">Precio venta</span>
+                <span style="font-weight: 500;">@($"{Data.UnitPrice.Amount:F2}                                {Data.UnitPrice.Currency}")</span>
+            </div>
+            <div style="display: flex; justify-content: space-between;">
+                <span style="color: var(--rz-text-secondary); font-size: 0.875rem;">
+                    Precio venta
+                    (@Data.UnitChangePrice.Currency)
+                </span>
+
+                <RadzenBadge BadgeStyle="BadgeStyle.Success" Shade="Shade.Lighter" IsPill="true">
+                    <RadzenText class="rz-mb-0"
+                                Text="@($"{Data.UnitChangePrice.Amount:F2} {Data.UnitChangePrice.Currency}")" />
+                </RadzenBadge>
+            </div>
+            <div style="display: flex; justify-content: space-between;">
+                <span style="color: var(--rz-text-secondary); font-size: 0.875rem;">Ganancia</span>
+                <span style="font-weight: 600; color: var(--rz-success);">
+                    @($"{Data.GetProfit():F2} {Data.TotalCost.Currency}")
+                </span>
+            </div>
+        </RadzenStack>
+    </AnimateFadeIn>
+</RadzenCard>
+
+@code {
+    [EditorRequired, Parameter] public Product Data { get; set; }
+
+    [Parameter] public EventCallback<Guid> Click { get; set; }
+
+    private async Task HandleClick()
+    {
+        if (Click.HasDelegate)
+        {
+            await Click.InvokeAsync(Data.Id);
+        }
+    }
+
+}

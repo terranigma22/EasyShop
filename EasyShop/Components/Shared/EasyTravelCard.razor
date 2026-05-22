@@ -1,10 +1,11 @@
-﻿<RadzenCard Variant="Variant.Flat" class="animate-card">
+﻿<RadzenCard Variant="Variant.Flat" class="animate-card" Style="cursor: pointer;" @onclick="@HandleClick">
     <AnimateFadeIn>
 
         <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="1rem">
 
-            <RadzenButton Icon="check" ButtonStyle="@_buttonStyle" Click="@(() => OnSelected.InvokeAsync(Data.Id))"
-                          Size="ButtonSize.Medium" class="rz-border-radius-10" />
+            <div class="stat-card-icon">
+                <RadzenIcon Icon="check" IconColor="@_iconColor" />
+            </div>
 
             <RadzenStack Gap="0">
                 <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.End" Gap="0.5rem">
@@ -34,19 +35,26 @@
 
 @code {
     [EditorRequired, Parameter] public Travel Data { get; set; }
+    
     [Parameter] public bool IsCurrent { get; set; }
-    [Parameter] public EventCallback<Guid> OnSelected { get; set; }
-    [Parameter] public EventCallback OnAdded { get; set; }
-    [Parameter] public EventCallback OnEdited { get; set; }
-    [Parameter] public EventCallback OnDeleted { get; set; }
-    [Parameter] public EventCallback OnRestored { get; set; }
 
-    ButtonStyle _buttonStyle => IsCurrent
-        ? ButtonStyle.Primary
-        : ButtonStyle.Base;
+    [Parameter] public EventCallback<Guid> Click { get; set; }
 
-    void OnAdd()
+    private async Task HandleClick()
     {
-        OnAdded.InvokeAsync();
+        if (Click.HasDelegate)
+        {
+            await Click.InvokeAsync(Data.Id);
+        }
     }
+
+    string _iconColor => IsCurrent
+        ? Colors.Primary
+        : Colors.Base400;
 }
+
+<style>
+    .stat-card-icon {
+        font-size: var(--easysell-text-3xl);
+    }
+</style>

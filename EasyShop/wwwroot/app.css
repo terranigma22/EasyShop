@@ -51,6 +51,7 @@
     .animate-card:hover {
         transform: translateY(-4px);
         box-shadow: var(--easysell-shadow-md);
+        background-color: var(--rz-primary-lighter) !important;
     }
 
 /* ============================================

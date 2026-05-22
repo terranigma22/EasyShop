@@ -9,7 +9,7 @@
 <PageContainer>
     <RadzenRow>
         <RadzenColumn>
-            <PageHeader Title="Gastos" Icon="money_off" />
+            <PageHeader Title="@($"Gastos: {_travel?.Expenses.Count}")" Icon="money_off" />
         </RadzenColumn>
         <RadzenColumn Style="align-self: center;">
             <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center"
@@ -33,24 +33,26 @@
     }
     else
     {
-        <AnimateFadeIn>
-            <RadzenRow Gap="1rem">
-                @foreach (var expense in _travel.Expenses)
-                {
-                    <RadzenColumn Size="12" SizeSmall="6" SizeMedium="4">
-                        <RadzenCard Variant="Variant.Flat" class="animate-card">
-                            <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center"
-                                         JustifyContent="JustifyContent.SpaceBetween">
-                                <span style="font-weight: 500;">@expense.Description</span>
-                                <span style="font-weight: 600; color: var(--rz-danger);">
-                                    − @($"{expense.Value.Amount:F2} {expense.Value.Currency}")
-                                </span>
-                            </RadzenStack>
-                        </RadzenCard>
-                    </RadzenColumn>
-                }
-            </RadzenRow>
-        </AnimateFadeIn>
+        <ListContainer>
+            <AnimateFadeIn>
+                <EasyGridForCards>
+                    @foreach (var item in _travel.Expenses)
+                    {
+                        <EasyColumForCard>
+                            <RadzenCard Variant="Variant.Flat" class="animate-card">
+                                <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center"
+                                             JustifyContent="JustifyContent.SpaceBetween">
+                                    <span style="font-weight: 500;">@item.Description</span>
+                                    <span style="font-weight: 600; color: var(--rz-danger);">
+                                        − @($"{item.Value.Amount:F2} {item.Value.Currency}")
+                                    </span>
+                                </RadzenStack>
+                            </RadzenCard>
+                        </EasyColumForCard>
+                    }
+                </EasyGridForCards>
+            </AnimateFadeIn>
+        </ListContainer>
     }
 </PageContainer>
 

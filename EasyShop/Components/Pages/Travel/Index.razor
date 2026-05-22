@@ -34,7 +34,7 @@
                 @foreach (var item in _items)
                 {
                     <EasyColumForCard>
-                        <EasyTravelCard Data="item" IsCurrent="item.Id == TravelState.CurrentTravel?.Id" OnSelected="@HandleCardSelected" />
+                        <EasyTravelCard Data="item" IsCurrent="item.Id == TravelState.CurrentTravel?.Id" Click="@HandleCardSelected" />
                     </EasyColumForCard>
                 }
             </EasyGridForCards>

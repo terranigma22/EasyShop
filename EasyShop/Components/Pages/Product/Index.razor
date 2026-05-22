@@ -7,20 +7,18 @@
 @inject NotificationService NotificationService
 
 <PageContainer>
-    <div style="position: sticky; top: 0; z-index: 10; background: var(--rz-page-background); padding: 1rem 0 0.5rem 0;">
-        <RadzenRow>
-            <RadzenColumn>
-                <PageHeader Title="Productos" Icon="inventory_2" />
-            </RadzenColumn>
-            <RadzenColumn Style="align-self: center;">
-                <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center"
-                             JustifyContent="JustifyContent.End" Gap="0.5rem">
-                    <RadzenButton Icon="add_circle" ButtonStyle="ButtonStyle.Primary"
-                                  Click="@(() => NavigationManager.NavigateTo("/products/create"))" />
-                </RadzenStack>
-            </RadzenColumn>
-        </RadzenRow>
-    </div>
+    <RadzenRow>
+        <RadzenColumn>
+            <PageHeader Title="@($"Productos: {_travel?.Products.Count}")" Icon="inventory_2" />
+        </RadzenColumn>
+        <RadzenColumn Style="align-self: center;">
+            <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center"
+                         JustifyContent="JustifyContent.End" Gap="0.5rem">
+                <RadzenButton Icon="add_circle" ButtonStyle="ButtonStyle.Primary"
+                              Click="@(() => NavigationManager.NavigateTo("/products/create"))" />
+            </RadzenStack>
+        </RadzenColumn>
+    </RadzenRow>
 
     @if (_travel == null)
     {
@@ -35,53 +33,20 @@
     }
     else
     {
-        <AnimateFadeIn>
-            <RadzenRow Gap="1rem">
-                @foreach (var product in _travel.Products)
-                {
-                    <RadzenColumn Size="12" SizeSmall="6" SizeMedium="4">
-                        <RadzenCard Variant="Variant.Flat" class="animate-card">
-                            <RadzenStack Gap="0.5rem">
-                                <div style="font-weight: 600; font-size: 1rem; margin-bottom: 0.25rem;">
-                                    @product.Name
-                                </div>
-                                <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.SpaceBetween">
-                                    <span style="color: var(--rz-text-secondary); font-size: 0.875rem;">Cantidad</span>
-                                    <span style="font-weight: 500;">
-                                        @product.Units uds × @($"{product.GetUnitCost():F2} {product.TotalCost.Currency}")
-                                    </span>
-                                </RadzenStack>
-                                <div style="display: flex; justify-content: space-between;">
-                                    <span style="color: var(--rz-text-secondary); font-size: 0.875rem;">Costo total</span>
-                                    <span style="font-weight: 500;">@($"{product.TotalCost.Amount:F2}                                {product.TotalCost.Currency}")</span>
-                                </div>
-                                <div style="display: flex; justify-content: space-between;">
-                                    <span style="color: var(--rz-text-secondary); font-size: 0.875rem;">Precio venta</span>
-                                    <span style="font-weight: 500;">@($"{product.UnitPrice.Amount:F2}                                {product.UnitPrice.Currency}")</span>
-                                </div>
-                                <div style="display: flex; justify-content: space-between;">
-                                    <span style="color: var(--rz-text-secondary); font-size: 0.875rem;">Precio venta
-                                        (@product.UnitChangePrice.Currency)</span>
-
-                                        <RadzenBadge BadgeStyle="BadgeStyle.Success" Shade="Shade.Lighter" IsPill="true">
-                                            <RadzenText class="rz-mb-0"
-                                                        Text="@($"{product.UnitChangePrice.Amount:F2} {product.UnitChangePrice.Currency}")" />
-                                        </RadzenBadge>
-                                    </div>
-                                    <div style="display: flex; justify-content: space-between;">
-                                        <span style="color: var(--rz-text-secondary); font-size: 0.875rem;">Ganancia</span>
-                                        <span style="font-weight: 600; color: var(--rz-success);">
-                                            @($"{product.GetProfit():F2} {product.TotalCost.Currency}")
-                                        </span>
-                                    </div>
-                                </RadzenStack>
-                            </RadzenCard>
-                        </RadzenColumn>
+        <ListContainer>
+            <AnimateFadeIn>
+                <EasyGridForCards>
+                    @foreach (var item in _travel.Products)
+                    {
+                        <EasyColumForCard>
+                            <EasyProductCard Data="item" />
+                        </EasyColumForCard>
                     }
-                </RadzenRow>
+                </EasyGridForCards>
             </AnimateFadeIn>
-        }
-    </PageContainer>
+        </ListContainer>
+    }
+</PageContainer>
 
 @code {
     Travel? _travel;
