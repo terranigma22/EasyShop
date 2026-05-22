@@ -14,7 +14,7 @@
         <RadzenColumn Style="align-self: center;">
             <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center"
                          JustifyContent="JustifyContent.End" Gap="0.5rem">
-                <RadzenButton Icon="add_circle" ButtonStyle="ButtonStyle.Primary" Text="Nuevo gasto"
+                <RadzenButton Icon="add_circle" ButtonStyle="ButtonStyle.Primary"
                               Click="@(() => NavigationManager.NavigateTo("/expenses/create"))" />
             </RadzenStack>
         </RadzenColumn>
@@ -41,10 +41,7 @@
                         <RadzenCard Variant="Variant.Flat" class="animate-card">
                             <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center"
                                          JustifyContent="JustifyContent.SpaceBetween">
-                                <RadzenStack Gap="0.25rem">
-                                    <span style="font-weight: 500;">@expense.Description</span>
-                                    <span style="color: var(--rz-text-secondary); font-size: 0.75rem;">@expense.Id</span>
-                                </RadzenStack>
+                                <span style="font-weight: 500;">@expense.Description</span>
                                 <span style="font-weight: 600; color: var(--rz-danger);">
                                     − @($"{expense.Value.Amount:F2} {expense.Value.Currency}")
                                 </span>

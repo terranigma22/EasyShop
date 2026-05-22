@@ -9,12 +9,12 @@
 <PageContainer>
     <RadzenRow>
         <RadzenColumn>
-            <PageHeader Title="Ingresos" Icon="account_balance" />
+            <PageHeader Title="Entradas" Icon="account_balance" />
         </RadzenColumn>
         <RadzenColumn Style="align-self: center;">
             <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center"
                          JustifyContent="JustifyContent.End" Gap="0.5rem">
-                <RadzenButton Icon="add_circle" ButtonStyle="ButtonStyle.Primary" Text="Nuevo ingreso"
+                <RadzenButton Icon="add_circle" ButtonStyle="ButtonStyle.Primary"
                               Click="@(() => NavigationManager.NavigateTo("/incomes/create"))" />
             </RadzenStack>
         </RadzenColumn>
@@ -22,14 +22,14 @@
 
     @if (_travel == null)
     {
-        <EmptyState Icon="travel" Title="No hay viaje activo" Message="Selecciona un viaje para ver sus ingresos">
+        <EmptyState Icon="travel" Title="No hay viaje activo" Message="Selecciona un viaje para ver sus inentradasgresos">
             <RadzenButton Icon="travel" ButtonStyle="ButtonStyle.Primary" Text="Ir a Viajes"
                           Click="@(() => NavigationManager.NavigateTo("/travels"))" />
         </EmptyState>
     }
     else if (_travel.Incomes.Count == 0)
     {
-        <EmptyState Icon="account_balance" Title="Sin ingresos" Message="Este viaje no tiene ingresos registrados" />
+        <EmptyState Icon="account_balance" Title="Sin entradas" Message="Este viaje no tiene entradas registrados" />
     }
     else
     {
@@ -41,10 +41,7 @@
                         <RadzenCard Variant="Variant.Flat" class="animate-card">
                             <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center"
                                          JustifyContent="JustifyContent.SpaceBetween">
-                                <RadzenStack Gap="0.25rem">
-                                    <span style="font-weight: 500;">@income.Description</span>
-                                    <span style="color: var(--rz-text-secondary); font-size: 0.75rem;">@income.Id</span>
-                                </RadzenStack>
+                                <span style="font-weight: 500;">@income.Description</span>
                                 <span style="font-weight: 600; color: var(--rz-success);">
                                     + @($"{income.Value.Amount:F2} {income.Value.Currency}")
                                 </span>

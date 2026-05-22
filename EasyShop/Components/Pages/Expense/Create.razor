@@ -47,8 +47,10 @@
                 <RadzenRow>
                     <RadzenColumn>
                         <RadzenStack Orientation="Orientation.Horizontal" Gap="1rem">
-                            <RadzenButton Text="Guardar" ButtonType="ButtonType.Submit" ButtonStyle="ButtonStyle.Primary" Icon="save" Click="@HandleSubmit" />
-                            <RadzenButton Text="Cancelar" ButtonStyle="ButtonStyle.Secondary" Icon="close" Click="@(() => NavigationManager.NavigateTo("/expenses"))" />
+                            <RadzenButton Text="Guardar" ButtonType="ButtonType.Submit" ButtonStyle="ButtonStyle.Primary"
+                                          Icon="save" Click="@HandleSubmit" />
+                            <RadzenButton Text="Cancelar" ButtonStyle="ButtonStyle.Secondary" Icon="close"
+                                          Click="@(() => NavigationManager.NavigateTo("/expenses"))" />
                         </RadzenStack>
                     </RadzenColumn>
                 </RadzenRow>

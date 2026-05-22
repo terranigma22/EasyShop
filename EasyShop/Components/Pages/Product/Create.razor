@@ -30,42 +30,47 @@
 
                 <RadzenRow>
                     <RadzenColumn Size="12">
-                        <RadzenFormField Text="Nombre" Style="width:100%;">
-                            <RadzenTextBox @bind-Value="@_name" />
+                        <RadzenFormField Text="Nombre">
+                            <RadzenTextBox @bind-Value="@_name" Style="width:100%;" />
                         </RadzenFormField>
                     </RadzenColumn>
                 </RadzenRow>
 
                 <RadzenRow>
                     <RadzenColumn Size="6">
-                        <RadzenFormField Text="Unidades" Style="width:100%;">
-                            <RadzenNumeric @bind-Value="@_units" Min="0" Step="1" @oninput="@(() => StateHasChanged())" />
+                        <RadzenFormField Text="Unidades">
+                            <RadzenNumeric @bind-Value="@_units" Min="0" Step="1" @oninput="@(() => StateHasChanged())"
+                                           Style="width:100%;" />
                         </RadzenFormField>
                     </RadzenColumn>
                     <RadzenColumn Size="6">
-                        <RadzenFormField Text="Multiplicador" Style="width:100%;">
-                            <RadzenNumeric @bind-Value="@_multiplicator" Min="0" Step="0.01" @oninput="@(() => StateHasChanged())" />
+                        <RadzenFormField Text="Multiplicador">
+                            <RadzenNumeric @bind-Value="@_multiplicator" Min="0" Step="0.01"
+                                           @oninput="@(() => StateHasChanged())" Style="width:100%;" />
                         </RadzenFormField>
                     </RadzenColumn>
                 </RadzenRow>
 
                 <RadzenRow>
                     <RadzenColumn Size="12">
-                        <RadzenFormField Text="@($"Costo total ({_travel!.MoneyToTravel.Currency})")" Style="width:100%;">
-                            <RadzenNumeric @bind-Value="@_totalCostAmount" Min="0" Step="0.01" @oninput="@(() => StateHasChanged())" />
+                        <RadzenFormField Text="@($"Costo total ({_travel!.MoneyToTravel.Currency})")">
+                            <RadzenNumeric @bind-Value="@_totalCostAmount" Min="0" Step="0.01"
+                                           @oninput="@(() => StateHasChanged())" Style="width:100%;" />
                         </RadzenFormField>
                     </RadzenColumn>
                 </RadzenRow>
 
                 <RadzenRow>
                     <RadzenColumn Size="6">
-                        <RadzenFormField Text="@($"Precio venta ({_travel!.MoneyToTravel.Currency})")" Style="width:100%;">
-                            <RadzenNumeric Value="@_unitPrice" Min="0" Step="0.01" ReadOnly="true" Format="N2" />
+                        <RadzenFormField Text="@($"Precio venta ({_travel!.MoneyToTravel.Currency})")">
+                            <RadzenNumeric Value="@_unitPrice" Min="0" Step="0.01" ReadOnly="true" Format="N2"
+                                           Style="width:100%;" />
                         </RadzenFormField>
                     </RadzenColumn>
                     <RadzenColumn Size="6">
-                        <RadzenFormField Text="@($"Precio venta ({_travel!.ChangeValue.Currency})")" Style="width:100%;">
-                            <RadzenNumeric Value="@_unitChangePrice" Min="0" Step="0.01" ReadOnly="true" Format="N2" />
+                        <RadzenFormField Text="@($"Precio venta ({_travel!.ChangeValue.Currency})")">
+                            <RadzenNumeric Value="@_unitChangePrice" Min="0" Step="0.01" ReadOnly="true" Format="N2"
+                                           Style="width:100%;" />
                         </RadzenFormField>
                     </RadzenColumn>
                 </RadzenRow>
@@ -73,8 +78,10 @@
                 <RadzenRow>
                     <RadzenColumn>
                         <RadzenStack Orientation="Orientation.Horizontal" Gap="1rem">
-                            <RadzenButton Text="Guardar" ButtonType="ButtonType.Submit" ButtonStyle="ButtonStyle.Primary" Icon="save" Click="@HandleSubmit" />
-                            <RadzenButton Text="Cancelar" ButtonStyle="ButtonStyle.Secondary" Icon="close" Click="@(() => NavigationManager.NavigateTo("/products"))" />
+                            <RadzenButton Text="Guardar" ButtonType="ButtonType.Submit" ButtonStyle="ButtonStyle.Primary"
+                                          Icon="save" Click="@HandleSubmit" />
+                            <RadzenButton Text="Cancelar" ButtonStyle="ButtonStyle.Secondary" Icon="close"
+                                          Click="@(() => NavigationManager.NavigateTo("/products"))" />
                         </RadzenStack>
                     </RadzenColumn>
                 </RadzenRow>
@@ -123,7 +130,7 @@
             await Handler.HandleAsync(request);
             await TravelState.SetCurrentTravelAsync(_travel.Id);
             NotificationService.Notify(NotificationSeverity.Success, "Producto creado correctamente");
-            NavigationManager.NavigateTo("/travels/products");
+            NavigationManager.NavigateTo("/products");
         }
         catch (Exception ex)
         {
