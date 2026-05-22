@@ -18,17 +18,17 @@
         <RadzenRow Gap="1rem">
 
             <RadzenColumn Size="12">
-                <RadzenCard Variant="Variant.Flat" class="animate-card">
+                <RadzenCard Variant="Variant.Filled">
                     <RadzenStack Orientation="Orientation.Vertical" Gap="1rem">
 
                         <div style="display: flex; justify-content: space-between; padding: 0.25rem 0;">
                             <span>Presupuesto</span>
-                            <span style="font-weight: 500;">@($"{_travel.MoneyToTravel.Amount:F2}          {_travel.MoneyToTravel.Currency}")</span>
+                            <span style="font-weight: 500;">@($"{_travel.MoneyToTravel.Amount:F2}           {_travel.MoneyToTravel.Currency}")</span>
                         </div>
 
                         <div style="display: flex; justify-content: space-between; padding: 0.25rem 0;">
                             <span>Productos</span>
-                            <span style="color: var(--rz-danger);">− @($"{_travel.GetProductsTotal():F2}      {_travel.MoneyToTravel.Currency}")</span>
+                            <span style="color: var(--rz-danger);">− @($"{_travel.GetProductsTotal():F2}          {_travel.MoneyToTravel.Currency}")</span>
                         </div>
 
                         <div style="display: flex; justify-content: space-between; padding: 0.25rem 0;">
@@ -38,13 +38,13 @@
 
                         <div style="display: flex; justify-content: space-between; padding: 0.25rem 0;">
                             <span>Entradas</span>
-                            <span style="color: var(--rz-success);">+ @($"{_travel.GetIncomesTotal():F2}                      {_travel.MoneyToTravel.Currency}")</span>
+                            <span style="color: var(--rz-success);">+ @($"{_travel.GetIncomesTotal():F2}                        {_travel.MoneyToTravel.Currency}")</span>
                         </div>
 
                         <div style="display: flex; justify-content: space-between; padding: 0.25rem 0;">
                             <span>Ganancias</span>
                             <span style="color: var(--rz-success);">
-                                @($"{_travel.GetProfit(_travel.MoneyToTravel.Currency):F2}                     {_travel.MoneyToTravel.Currency}")
+                                @($"{_travel.GetProfit(_travel.MoneyToTravel.Currency):F2}                        {_travel.MoneyToTravel.Currency}")
                             </span>
                         </div>
                         @if (_travel.ChangeValue.Currency != _travel.MoneyToTravel.Currency)
@@ -72,48 +72,51 @@
             <RadzenColumn Size="12">
                 <RadzenCard Variant="Variant.Flat" class="animate-card"
                             @onclick="@(() => NavigationManager.NavigateTo("/products"))" Style="cursor: pointer;">
-                    <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="1rem"
-                                 Style="text-align: center;">
-                        <RadzenButton Icon="inventory_2" ButtonStyle="ButtonStyle.Info" Size="ButtonSize.Large"
-                                      Variant="Variant.Text" class="rz-border-radius-10" />
-                        <span style="font-weight: 600; font-size: 1.5rem;">@_travel.Products.Count</span>
-                        <span style="color: var(--rz-text-secondary);">Productos</span>
+                    <div style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
+                        <div style="display: flex; align-items: center; gap: 1rem;">
+                            <RadzenButton Icon="inventory_2" ButtonStyle="ButtonStyle.Info" Size="ButtonSize.Large"
+                                          Variant="Variant.Text" class="rz-border-radius-10" />
+                            <span style="font-weight: 600; font-size: 1.5rem;">@_travel.Products.Count</span>
+                            <span style="color: var(--rz-text-secondary);">Productos</span>
+                        </div>
                         <span style="font-size: 0.875rem;">
                             @($"{_travel.Products.Sum(p => p.TotalCost.Amount):F2} {_travel.MoneyToTravel.Currency}")
                         </span>
-                    </RadzenStack>
+                    </div>
                 </RadzenCard>
             </RadzenColumn>
 
             <RadzenColumn Size="12">
                 <RadzenCard Variant="Variant.Flat" class="animate-card"
                             @onclick="@(() => NavigationManager.NavigateTo("/expenses"))" Style="cursor: pointer;">
-                    <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="1rem"
-                                 Style="text-align: center;">
-                        <RadzenButton Icon="money_off" ButtonStyle="ButtonStyle.Danger" Size="ButtonSize.Large"
-                                      Variant="Variant.Text" class="rz-border-radius-10" />
-                        <span style="font-weight: 600; font-size: 1.5rem;">@_travel.Expenses.Count</span>
-                        <span style="color: var(--rz-text-secondary);">Gastos</span>
+                    <div style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
+                        <div style="display: flex; align-items: center; gap: 1rem;">
+                            <RadzenButton Icon="money_off" ButtonStyle="ButtonStyle.Danger" Size="ButtonSize.Large"
+                                          Variant="Variant.Text" class="rz-border-radius-10" />
+                            <span style="font-weight: 600; font-size: 1.5rem;">@_travel.Expenses.Count</span>
+                            <span style="color: var(--rz-text-secondary);">Gastos</span>
+                        </div>
                         <span style="font-size: 0.875rem;">
                             @($"{_travel.Expenses.Sum(e => e.Value.Amount):F2} {_travel.MoneyToTravel.Currency}")
                         </span>
-                    </RadzenStack>
+                    </div>
                 </RadzenCard>
             </RadzenColumn>
 
             <RadzenColumn Size="12">
                 <RadzenCard Variant="Variant.Flat" class="animate-card"
                             @onclick="@(() => NavigationManager.NavigateTo("/incomes"))" Style="cursor: pointer;">
-                    <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="1rem"
-                                 Style="text-align: center;">
-                        <RadzenButton Icon="account_balance" ButtonStyle="ButtonStyle.Success" Size="ButtonSize.Large"
-                                      Variant="Variant.Text" class="rz-border-radius-10" />
-                        <span style="font-weight: 600; font-size: 1.5rem;">@_travel.Incomes.Count</span>
-                        <span style="color: var(--rz-text-secondary);">Entradas</span>
+                    <div style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
+                        <div style="display: flex; align-items: center; gap: 1rem;">
+                            <RadzenButton Icon="account_balance" ButtonStyle="ButtonStyle.Success" Size="ButtonSize.Large"
+                                          Variant="Variant.Text" class="rz-border-radius-10" />
+                            <span style="font-weight: 600; font-size: 1.5rem;">@_travel.Incomes.Count</span>
+                            <span style="color: var(--rz-text-secondary);">Entradas</span>
+                        </div>
                         <span style="font-size: 0.875rem;">
                             @($"{_travel.Incomes.Sum(i => i.Value.Amount):F2} {_travel.ChangeValue.Currency}")
                         </span>
-                    </RadzenStack>
+                    </div>
                 </RadzenCard>
             </RadzenColumn>
         </RadzenRow>
