@@ -27,8 +27,13 @@
                     <RadzenIcon Icon="calculate" Style="font-size: 1.25rem; margin-left: 0.5rem;" />
                     <span>@Data.Multiplicator.ToString("F2")</span>
                 </RadzenStack>
-
             </RadzenStack>
+
+            <span @onclick:stopPropagation>
+                <RadzenButton Icon="delete" ButtonStyle="ButtonStyle.Danger"
+                              Size="ButtonSize.Medium" Variant="Variant.Text"
+                              Click="@HandleDelete" />
+            </span>
         </RadzenStack>
     </AnimateFadeIn>
 </RadzenCard>
@@ -40,11 +45,21 @@
 
     [Parameter] public EventCallback<Guid> Click { get; set; }
 
+    [Parameter] public EventCallback<Guid> Delete { get; set; }
+
     private async Task HandleClick()
     {
         if (Click.HasDelegate)
         {
             await Click.InvokeAsync(Data.Id);
+        }
+    }
+
+    private async Task HandleDelete()
+    {
+        if (Delete.HasDelegate)
+        {
+            await Delete.InvokeAsync(Data.Id);
         }
     }
 

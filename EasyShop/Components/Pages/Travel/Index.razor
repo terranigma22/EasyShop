@@ -1,6 +1,7 @@
 ﻿@page "/travels"
 
 @inject GetTravelsHandler GetTravelsHandler
+@inject DeleteTravelHandler DeleteTravelHandler
 @inject TravelStateService TravelState
 @inject NotificationService NotificationService
 
@@ -34,7 +35,8 @@
                 @foreach (var item in _items)
                 {
                     <EasyColumForCard>
-                        <EasyTravelCard Data="item" IsCurrent="item.Id == TravelState.CurrentTravel?.Id" Click="@HandleCardSelected" />
+                        <EasyTravelCard Data="item" IsCurrent="item.Id == TravelState.CurrentTravel?.Id"
+                                       Click="@HandleCardSelected" Delete="@HandleDelete" />
                     </EasyColumForCard>
                 }
             </EasyGridForCards>
@@ -67,6 +69,25 @@
     private async Task HandleCardSelected(Guid id)
     {
         await TravelState.SetCurrentTravelAsync(id);
+    }
+
+    private async Task HandleDelete(Guid id)
+    {
+        var confirmed = await DialogService.Confirm(
+            "¿Estás seguro de eliminar este viaje? Se eliminarán también todos sus productos, gastos e ingresos asociados.",
+            "Eliminar Viaje",
+            new ConfirmOptions { OkButtonText = "Sí", CancelButtonText = "No" });
+
+        if (confirmed == true)
+        {
+            await DeleteTravelHandler.HandleAsync(new DeleteTravelRequest(id));
+
+            if (TravelState.CurrentTravel?.Id == id)
+                TravelState.Clear();
+
+            await LoadTravels();
+            NotificationService.Notify(NotificationSeverity.Success, "Viaje eliminado correctamente");
+        }
     }
 
     async Task Create()
