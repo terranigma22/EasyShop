@@ -1,4 +1,5 @@
 ﻿@page "/"
+
 @using EasyShop.Domain.Primitives
 @using EasyShop.Services
 
@@ -8,7 +9,9 @@
 
     @if (_travel == null)
     {
-        <EmptyState Icon="travel" Title="No hay viaje activo" Message="Selecciona o crea un viaje para comenzar">
+
+        <EmptyState Icon="travel" Title="No hay viajes" Message="Selecciona o crea un viaje para comenzar">
+
             <RadzenButton Icon="travel" ButtonStyle="ButtonStyle.Primary" Text="Ir a Viajes"
                           Click="@(() => NavigationManager.NavigateTo("/travels"))" />
         </EmptyState>
@@ -97,7 +100,7 @@
     }
 </PageContainer>
 
-@code {
+    @code {
     Travel? _travel { get; set; }
 
     decimal? _remaining => _travel?.GetRemaining();
@@ -105,5 +108,8 @@
     protected override void OnInitialized()
     {
         _travel = TravelState.CurrentTravel;
+
+        if (_travel == null)
+            NavigationManager.NavigateTo("/travels");
     }
 }
