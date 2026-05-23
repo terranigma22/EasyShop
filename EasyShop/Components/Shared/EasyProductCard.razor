@@ -1,15 +1,17 @@
 ﻿<RadzenCard Variant="Variant.Flat" class="animate-card" Style="cursor: pointer; position: relative; overflow: hidden;" @onclick="@HandleClick">
     <AnimateFadeIn>
-        <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="1rem" Style="padding-right: 48px;">
-            @if (!string.IsNullOrEmpty(Data.ImageDataUri))
-            {
-                <img src="@Data.ImageDataUri" class="product-card-image" />
-            }
-            else
-            {
+        @if (!string.IsNullOrEmpty(Data.ImageDataUri))
+        {
+            <img src="@Data.ImageDataUri" class="product-card-image" />
+        }
+        else
+        {
+            <div class="product-image-zone">
                 <RadzenIcon Icon="shopping_bag" Style="width: 40px; height: 40px;" />
-            }
-            <RadzenStack Gap="0" Style="flex: 1;">
+            </div>
+        }
+        <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="1rem" Style="padding-right: 48px; padding-left: 64px;">
+            <RadzenStack Gap="0" Style="flex: 1; justify-content: center;">
                 <RadzenText TextStyle="TextStyle.Subtitle1" class="rz-mb-0"><strong>@(Data.Name)</strong></RadzenText>
                 <div style="display: flex; justify-content: space-between;">
                     <span>Unidades</span>
@@ -21,37 +23,13 @@
                 </div>
             </RadzenStack>
         </RadzenStack>
+        <div class="product-delete-zone" @onclick:stopPropagation>
+            <RadzenButton Icon="delete" ButtonStyle="ButtonStyle.Danger"
+                          Size="ButtonSize.Medium" Variant="Variant.Text"
+                          Click="@HandleDelete" />
+        </div>
     </AnimateFadeIn>
-    <div class="product-delete-zone" @onclick:stopPropagation>
-        <RadzenButton Icon="delete" ButtonStyle="ButtonStyle.Danger"
-                      Size="ButtonSize.Medium" Variant="Variant.Text"
-                      Click="@HandleDelete" />
-    </div>
 </RadzenCard>
-
-<style>
-    .product-delete-zone {
-        position: absolute;
-        top: 0;
-        right: 0;
-        height: 100%;
-        width: 48px;
-    }
-    .product-delete-zone .rz-button {
-        height: 100% !important;
-        width: 100% !important;
-        border-radius: 0 !important;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-    }
-    .product-card-image {
-        width: 48px;
-        height: 48px;
-        object-fit: cover;
-        border-radius: 8px;
-    }
-</style>
 
 @code {
     [EditorRequired, Parameter] public Product Data { get; set; }
@@ -72,3 +50,44 @@
             await Delete.InvokeAsync(Data.Id);
     }
 }
+
+<style>
+    .product-delete-zone {
+        position: absolute;
+        top: 0;
+        right: 0;
+        height: 100%;
+        width: 48px;
+    }
+    .product-delete-zone .rz-button {
+        height: 100% !important;
+        width: 100% !important;
+        border-radius: 0 !important;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    .product-card-image {
+        position: absolute;
+        top: 0;
+        left: 0;
+        height: 100%;
+        width: 64px;
+        object-fit: cover;
+        transition: transform 0.2s ease;
+        flex-shrink: 0;
+    }
+    .product-image-zone {
+        position: absolute;
+        top: 0;
+        left: 0;
+        height: 100%;
+        width: 64px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    .animate-card:hover .product-card-image {
+        transform: scale(1.15);
+    }
+</style>
