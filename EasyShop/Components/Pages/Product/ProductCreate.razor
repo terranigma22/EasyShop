@@ -1,0 +1,219 @@
+@page "/products/create"
+
+@using EasyShop.Domain.Primitives
+@using EasyShop.Features.Commons
+@using EasyShop.Features.Products
+@using EasyShop.Services
+
+@inject CreateProductHandler Handler
+@inject TravelStateService TravelState
+@inject NotificationService NotificationService
+
+<RadzenTemplateForm TItem="ProductDto" Data="@_product" Submit="Save">
+    <RadzenStack Gap="1rem">
+        <RadzenRow>
+            <RadzenColumn Size="12">
+                <RadzenFormField Text="Nombre" Style="width: 100%">
+                    <ChildContent>
+                        <RadzenTextBox @bind-Value="@_product.Name" Name="Name" />
+                    </ChildContent>
+                    <Helper>
+                        <RadzenRequiredValidator Component="Name" Text="Nombre requerido" />
+                        <RadzenLengthValidator Component="Name" Min="2" Max="100" Text="Nombre debe tener entre 2 y 100 caracteres" />
+                    </Helper>
+                </RadzenFormField>
+            </RadzenColumn>
+        </RadzenRow>
+
+        <RadzenRow>
+            <RadzenColumn Size="6">
+                <RadzenFormField Text="Unidades" Style="width:100%;">
+                    <ChildContent>
+                        <RadzenNumeric Name="Units" 
+                            @bind-Value="@_product.Units" 
+                            Immediate="true" 
+                            Min="0" Step="1" 
+                            TValue="int" 
+                            Change="OnUnitsChanged" />
+                    </ChildContent>
+                    <Helper>
+                        <RadzenNumericRangeValidator Component="Units" Min="1" Text="Cantidad mínima mayor a 0" />
+                    </Helper>
+                </RadzenFormField>
+            </RadzenColumn>
+            <RadzenColumn Size="6">
+                <RadzenFormField Text="Multiplicador" Style="width:100%;">
+                    <ChildContent>
+                        <RadzenNumeric Name="Multiplicador" 
+                            @bind-Value="@_product.Multiplicator" 
+                            Min="0" Step="0.5" 
+                            TValue="double"
+                            Immediate="true"
+                            Change="@OnMultiplicatorChanged" />
+                    </ChildContent>
+                    <Helper>
+                        <RadzenNumericRangeValidator Component="Multiplicador" Min="0.01" Text="Cantidad mínima mayor a 0.01" />
+                    </Helper>
+                </RadzenFormField>
+            </RadzenColumn>
+        </RadzenRow>
+
+        <RadzenRow>
+            <RadzenColumn Size="12">
+                <RadzenFormField Text="@($"Costo total ({_travel!.MoneyToTravel.Currency})")" Style="width:100%;">
+                    <ChildContent>
+                        <RadzenNumeric Name="TotalCostAmount" 
+                            @ref="focus"
+                            @bind-Value="@_product.TotalCostAmount" 
+                            Min="0" Step="1" 
+                            TValue="decimal"
+                            Immediate="true"
+                            Change="@OnCostChanged" />
+                    </ChildContent>
+                    <Helper>
+                        <RadzenNumericRangeValidator Component="TotalCostAmount" Min="0.01" Text="Cantidad mínima mayor a 0.01" />
+                    </Helper>
+                </RadzenFormField>
+            </RadzenColumn>
+        </RadzenRow>
+
+        <RadzenRow>
+            <RadzenColumn Size="6">
+                <RadzenFormField Text="@($"Precio venta ({_travel!.MoneyToTravel.Currency})")" Style="width:100%;">
+                    <RadzenNumeric Value="@_product.UnitPrice" Min="0" Step="0.01" ReadOnly="true" Format="N2" />
+                </RadzenFormField>
+            </RadzenColumn>
+            <RadzenColumn Size="6">
+                <RadzenFormField Text="@($"Precio venta ({_travel!.ChangeValue.Currency})")" Style="width:100%;">
+                    <RadzenNumeric Value="@_product.UnitChangePrice" Min="0" Step="0.01" ReadOnly="true" Format="N2" />
+                </RadzenFormField>
+            </RadzenColumn>
+        </RadzenRow>
+
+    </RadzenStack>
+
+    <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" JustifyContent="JustifyContent.End"
+                 Gap=".5rem" class="rz-mt-6">
+        <RadzenButton Text="Cancelar" Icon="cancel" ButtonStyle="ButtonStyle.Danger" Click="Cancel" />
+        <RadzenButton Text="Guardar" Icon="save" ButtonStyle="ButtonStyle.Primary" ButtonType="ButtonType.Submit" />
+    </RadzenStack>
+</RadzenTemplateForm>
+
+@code {
+    private Travel? _travel;
+    private ProductDto _product = new ProductDto();
+
+    private string valueCost = "";
+
+    private decimal _unitPrice => _product.Units == 0 ? 0 : (_product.TotalCostAmount / _product.Units) * (decimal)_product.Multiplicator;
+    private decimal _unitChangePrice => _unitPrice * (decimal)(_travel?.ChangeValue.Amount ?? 1);
+
+    RadzenNumeric<decimal> focus;
+
+    protected override void OnInitialized()
+    {
+        _travel = TravelState.CurrentTravel;
+
+        if (_travel != null)
+        {
+            _product.Multiplicator = _travel.Multiplicator;
+        }
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            await focus.FocusAsync();
+        }
+    }
+
+    private void OnUnitsChanged(int value)
+    {
+        try
+        {
+            var unitPrice = _product.Units == 0 ? 0 : (_product.TotalCostAmount / _product.Units) * (decimal)_product.Multiplicator;
+            var unitChangePrice = unitPrice * (decimal)(_travel?.ChangeValue.Amount ?? 1);
+
+            _product.UnitPrice = unitPrice;
+            _product.UnitChangePrice = unitChangePrice;
+        }
+        catch (Exception)
+        {
+        }
+    }
+
+    private void OnMultiplicatorChanged(double value)
+    {
+        try
+        {
+            var unitPrice = _product.Units == 0 ? 0 : (_product.TotalCostAmount / _product.Units) * (decimal)_product.Multiplicator;
+            var unitChangePrice = unitPrice * (decimal)(_travel?.ChangeValue.Amount ?? 1);
+
+            _product.UnitPrice = unitPrice;
+            _product.UnitChangePrice = unitChangePrice;
+        }
+        catch (Exception)
+        {
+        }
+    }
+
+    private void OnCostChanged(decimal value)
+    {
+        try
+        {
+            var unitPrice = _product.Units == 0 ? 0 : (_product.TotalCostAmount / _product.Units) * (decimal)_product.Multiplicator;
+            var unitChangePrice = unitPrice * (decimal)(_travel?.ChangeValue.Amount ?? 1);
+
+            _product.UnitPrice = unitPrice;
+            _product.UnitChangePrice = unitChangePrice;
+        }
+        catch (Exception)
+        {
+        }
+    }
+
+    private async Task Save()
+    {
+        var currency = _travel!.MoneyToTravel.Currency;
+        var changeCurrency = _travel.ChangeValue.Currency;
+
+        var request = new CreateProductRequest(
+            _travel.Id,
+            _product.Name,
+            _product.Units,
+            _product.Multiplicator,
+            new MoneyRequest(_product.TotalCostAmount, currency),
+            new MoneyRequest(_unitPrice, currency),
+            new MoneyRequest(_unitChangePrice, changeCurrency)
+        );
+
+        try
+        {
+            await Handler.HandleAsync(request);
+            await TravelState.SetCurrentTravelAsync(_travel.Id);
+
+            NotificationService.Notify(NotificationSeverity.Success, "Producto creado");
+
+            DialogService.CloseSide(true);
+        }
+        catch (Exception ex)
+        {
+            NotificationService.Notify(NotificationSeverity.Error, "Error al crear el producto", ex.Message);
+        }
+    }
+
+    private void Cancel()
+        => DialogService.CloseSide(false);
+
+    private class ProductDto
+    {
+        public string Name { get; set; } = string.Empty;
+        public int Units { get; set; } = 12;
+        public double Multiplicator { get; set; } = 2.5;
+        public decimal TotalCostAmount { get; set; } = 0m;
+
+        public decimal UnitPrice { get; set; } = 0m;
+        public decimal UnitChangePrice { get; set; } = 0m;
+    }
+}
