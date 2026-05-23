@@ -28,12 +28,20 @@
             <RadzenColumn Size="12">
                 <RadzenFormField Text="Imagen" Style="width: 100%">
                     <ChildContent>
-                       <RadzenFileInput @bind-Value=@photo
+                        <RadzenUpload Multiple="false"
+                                      Auto="false"
+                                      ChooseText="Seleccionar imagen"
+                                      Change="@(args => OnUploadChange(args))"
+                                      MaxFileCount="1"
+                                      Accept=".jpg,.jpeg,.png,.gif" />
+
+                       @* <RadzenFileInput @bind-Value=@photo
                             FileName="" TValue="byte[]" Style="width: 100%"
                             ChooseText="Seleccionar imagen"
                             Accept=".jpg,.jpeg,.png,.gif,.webp"
                             MaxFileSize="10485760"
-                            Change=@(args => OnRadzenFileSelected(args, ""))/>
+                            Change=@(args => OnRadzenFileSelected(args, ""))
+                                         Error="@(args => OnRadzenFileError(args, "FileInput"))" /> *@
                     </ChildContent>
                 </RadzenFormField>
             </RadzenColumn>
@@ -187,6 +195,87 @@
         }
         catch (Exception)
         {
+        }
+    }
+
+    private void OnRadzenFileError(UploadErrorEventArgs args, string name)
+    {
+        try
+        {
+            StateHasChanged();
+        }
+        catch (Exception)
+        {
+        }
+    }
+
+    private async Task OnUploadChange(UploadChangeEventArgs args)
+    {
+        try
+        {
+            foreach (var file in args.Files)
+            {
+                using var stream = file.OpenReadStream(maxAllowedSize: 10 * 1024 * 1024);
+                using var memoryStream = new MemoryStream();
+                await stream.CopyToAsync(memoryStream);
+                var imageBytes = memoryStream.ToArray();
+                
+                // Procesar imagen con SkiaSharp
+                await ProcessImageBytes(imageBytes);
+            }
+        }
+        catch (Exception)
+        {
+        }
+    }
+
+    private async Task ProcessImageBytes(byte[] value)
+    {
+        try
+        {
+            if (value == null || value.Length == 0)
+            {
+                _product.ImageDataUri = null;
+                _previewImage = _product.ImageDataUri;
+                return;
+            }
+        
+            var imageBytes = value;
+        
+            using var original = SKBitmap.Decode(imageBytes);
+            if (original == null) return;
+        
+            int w = original.Width, h = original.Height;
+            const int maxDim = 1200;
+            if (w > maxDim || h > maxDim)
+            {
+                float scale = Math.Min((float)maxDim / w, (float)maxDim / h);
+                w = (int)(w * scale);
+                h = (int)(h * scale);
+            }
+        
+            using var resized = original.Resize(new SKImageInfo(w, h), SKFilterQuality.Medium);
+            using var image = SKImage.FromBitmap(resized);
+        
+            int quality = 85;
+            byte[] result;
+            do
+            {
+                using var data = image.Encode(SKEncodedImageFormat.Jpeg, quality);
+                result = data.ToArray();
+                quality -= 10;
+            } while (result.Length > 100 * 1024 && quality > 10);
+        
+            // PASO 6: Guardar como Base64 (para mostrar y guardar)
+            var finalBase64 = Convert.ToBase64String(result);
+            _product.ImageDataUri = $"data:image/jpeg;base64,{finalBase64}";
+            _previewImage = _product.ImageDataUri;
+        
+            StateHasChanged();
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error: {ex.Message}");
         }
     }
 
