@@ -33,8 +33,7 @@
                             ChooseText="Seleccionar imagen"
                             Accept=".jpg,.jpeg,.png,.gif,.webp"
                             MaxFileSize="10485760"
-                            Change=@(args => OnRadzenFileSelected(args, "FileInput"))
-                            InputAttributes="@(new Dictionary<string,object>(){ { "aria-label", "select file" }})"/>
+                            Change=@(args => OnRadzenFileSelected(args, "FileInput"))/>
                     </ChildContent>
                 </RadzenFormField>
             </RadzenColumn>
