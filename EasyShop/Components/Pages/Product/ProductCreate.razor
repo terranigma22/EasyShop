@@ -26,6 +26,24 @@
         </RadzenRow>
 
         <RadzenRow>
+            <RadzenColumn Size="12">
+                <RadzenFormField Text="Imagen" Style="width: 100%">
+                    <ChildContent>
+                        <InputFile OnChange="@OnFileSelected" accept=".jpg,.jpeg,.png,.gif,.webp" />
+                    </ChildContent>
+                    <Helper>
+                        @if (_previewImage != null)
+                        {
+                            <div style="margin-top: 8px;">
+                                <img src="@_previewImage" class="preview-image" />
+                            </div>
+                        }
+                    </Helper>
+                </RadzenFormField>
+            </RadzenColumn>
+        </RadzenRow>
+
+        <RadzenRow>
             <RadzenColumn Size="6">
                 <RadzenFormField Text="Unidades" Style="width:100%;">
                     <ChildContent>
@@ -102,6 +120,7 @@
 @code {
     private Travel? _travel;
     private ProductDto _product = new ProductDto();
+    private string? _previewImage;
 
     private string valueCost = "";
 
@@ -173,6 +192,21 @@
         }
     }
 
+    private async Task OnFileSelected(InputFileChangeEventArgs e)
+    {
+        var file = e.File;
+        if (file == null) return;
+
+        using var stream = file.OpenReadStream(maxAllowedSize: 5 * 1024 * 1024);
+        using var memoryStream = new MemoryStream();
+        await stream.CopyToAsync(memoryStream);
+        var bytes = memoryStream.ToArray();
+        var base64 = Convert.ToBase64String(bytes);
+        var contentType = file.ContentType;
+        _product.ImageDataUri = $"data:{contentType};base64,{base64}";
+        _previewImage = _product.ImageDataUri;
+    }
+
     private async Task Save()
     {
         var currency = _travel!.MoneyToTravel.Currency;
@@ -185,7 +219,8 @@
             _product.Multiplicator,
             new MoneyRequest(_product.TotalCostAmount, currency),
             new MoneyRequest(_unitPrice, currency),
-            new MoneyRequest(_unitChangePrice, changeCurrency)
+            new MoneyRequest(_unitChangePrice, changeCurrency),
+            _product.ImageDataUri
         );
 
         try
@@ -212,8 +247,18 @@
         public int Units { get; set; } = 12;
         public double Multiplicator { get; set; } = 2.5;
         public decimal TotalCostAmount { get; set; } = 0m;
+        public string? ImageDataUri { get; set; }
 
         public decimal UnitPrice { get; set; } = 0m;
         public decimal UnitChangePrice { get; set; } = 0m;
     }
 }
+
+<style>
+    .preview-image {
+        max-width: 200px;
+        max-height: 200px;
+        border-radius: 8px;
+        margin-top: 4px;
+    }
+</style>

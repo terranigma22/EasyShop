@@ -75,6 +75,7 @@ public class ApplicationDbContext : DbContext
 
             entity.Property(e => e.Name).IsRequired().HasMaxLength(200);
             entity.Property(e => e.TravelId).IsRequired();
+            entity.Property(e => e.ImageDataUri);
         });
 
         modelBuilder.Entity<Expense>(entity =>

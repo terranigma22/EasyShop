@@ -1,7 +1,14 @@
 ﻿<RadzenCard Variant="Variant.Flat" class="animate-card" Style="cursor: pointer; position: relative; overflow: hidden;" @onclick="@HandleClick">
     <AnimateFadeIn>
         <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="1rem" Style="padding-right: 48px;">
-            <RadzenIcon Icon="shopping_bag" Style="width: 40px; height: 40px;" />
+            @if (!string.IsNullOrEmpty(Data.ImageDataUri))
+            {
+                <img src="@Data.ImageDataUri" class="product-card-image" />
+            }
+            else
+            {
+                <RadzenIcon Icon="shopping_bag" Style="width: 40px; height: 40px;" />
+            }
             <RadzenStack Gap="0" Style="flex: 1;">
                 <RadzenText TextStyle="TextStyle.Subtitle1" class="rz-mb-0"><strong>@(Data.Name)</strong></RadzenText>
                 <div style="display: flex; justify-content: space-between;">
@@ -37,6 +44,12 @@
         display: flex;
         align-items: center;
         justify-content: center;
+    }
+    .product-card-image {
+        width: 48px;
+        height: 48px;
+        object-fit: cover;
+        border-radius: 8px;
     }
 </style>
 
