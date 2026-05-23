@@ -1,15 +1,13 @@
-﻿<RadzenCard Variant="Variant.Flat" class="animate-card" Style="cursor: pointer;" @onclick="@HandleClick">
+﻿<RadzenCard Variant="Variant.Flat" class="animate-card" Style="cursor: pointer; position: relative; overflow: hidden;" @onclick="@HandleClick">
     <AnimateFadeIn>
-        <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="1rem">
+        <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="1rem" Style="padding-right: 48px;">
             <RadzenIcon Icon="shopping_bag" Style="width: 40px; height: 40px;" />
             <RadzenStack Gap="0" Style="flex: 1;">
                 <RadzenText TextStyle="TextStyle.Subtitle1" class="rz-mb-0"><strong>@(Data.Name)</strong></RadzenText>
-
                 <div style="display: flex; justify-content: space-between;">
                     <span>Unidades</span>
                     <span>@Data.Units</span>
                 </div>
-
                 <div style="display: flex; justify-content: space-between;">
                     <span>Precio</span>
                     <span style="color: var(--rz-success);">@($"{Data.UnitChangePrice.Amount:F2} {Data.UnitChangePrice.Currency}")</span>
@@ -17,19 +15,47 @@
             </RadzenStack>
         </RadzenStack>
     </AnimateFadeIn>
+    <div class="product-delete-zone" @onclick:stopPropagation>
+        <RadzenButton Icon="delete" ButtonStyle="ButtonStyle.Danger"
+                      Size="ButtonSize.Medium" Variant="Variant.Text"
+                      Click="@HandleDelete" />
+    </div>
 </RadzenCard>
+
+<style>
+    .product-delete-zone {
+        position: absolute;
+        top: 0;
+        right: 0;
+        height: 100%;
+        width: 48px;
+    }
+    .product-delete-zone .rz-button {
+        height: 100% !important;
+        width: 100% !important;
+        border-radius: 0 !important;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+</style>
 
 @code {
     [EditorRequired, Parameter] public Product Data { get; set; }
 
     [Parameter] public EventCallback<Guid> Click { get; set; }
 
+    [Parameter] public EventCallback<Guid> Delete { get; set; }
+
     private async Task HandleClick()
     {
         if (Click.HasDelegate)
-        {
             await Click.InvokeAsync(Data.Id);
-        }
     }
 
+    private async Task HandleDelete()
+    {
+        if (Delete.HasDelegate)
+            await Delete.InvokeAsync(Data.Id);
+    }
 }

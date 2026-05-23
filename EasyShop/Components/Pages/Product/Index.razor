@@ -2,8 +2,10 @@
 
 @using EasyShop.Domain.Models
 @using EasyShop.Services
+@using EasyShop.Features.Products
 
 @inject TravelStateService TravelState
+@inject DeleteProductHandler DeleteProductHandler
 @inject NotificationService NotificationService
 
 <PageContainer>
@@ -39,7 +41,7 @@
                     @foreach (var item in _travel.Products)
                     {
                         <EasyColumForCard>
-                            <EasyProductCard Data="item" />
+                            <EasyProductCard Data="item" Click="@HandleCardSelected" Delete="@HandleDelete" />
                         </EasyColumForCard>
                     }
                 </EasyGridForCards>
@@ -56,6 +58,26 @@
         _travel = TravelState.CurrentTravel;
     }
 
+    private async Task HandleCardSelected(Guid id)
+    {
+    }
+
+    private async Task HandleDelete(Guid id)
+    {
+        var confirmed = await DialogService.Confirm(
+            "¿Estás seguro de eliminar este producto?",
+            "Eliminar Producto",
+            new ConfirmOptions { OkButtonText = "Sí", CancelButtonText = "No" });
+
+        if (confirmed == true)
+        {
+            await DeleteProductHandler.HandleAsync(new DeleteProductRequest(id));
+            await TravelState.SetCurrentTravelAsync(_travel!.Id);
+            _travel = TravelState.CurrentTravel;
+            NotificationService.Notify(NotificationSeverity.Success, "Producto eliminado correctamente");
+        }
+    }
+
     async Task Create()
     {
         var result = await DialogService.OpenSideAsync<ProductCreate>("Nuevo Producto",
@@ -68,5 +90,10 @@
                 CloseDialogOnOverlayClick = true,
                 Position = DialogPosition.Right
             });
+
+        if (result)
+        {
+            _travel = TravelState.CurrentTravel;
+        }
     }
 }

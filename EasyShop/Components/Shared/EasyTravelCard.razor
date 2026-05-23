@@ -1,12 +1,9 @@
-﻿<RadzenCard Variant="Variant.Flat" class="animate-card" Style="cursor: pointer;" @onclick="@HandleClick">
+﻿<RadzenCard Variant="Variant.Flat" class="animate-card" Style="cursor: pointer; position: relative; overflow: hidden;" @onclick="@HandleClick">
     <AnimateFadeIn>
-
-        <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="1rem">
-
+        <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="1rem" Style="padding-right: 48px;">
             <div class="stat-card-icon">
                 <RadzenIcon Icon="check" IconColor="@_iconColor" />
             </div>
-
             <RadzenStack Gap="0" Style="flex: 1;">
                 <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.End" Gap="0.5rem">
                     <RadzenIcon Icon="calendar_month" Style="font-size: 1.25rem;" />
@@ -14,13 +11,10 @@
                         @Data.StartDate.ToString("dd/MM/yyyy") → @Data.EndDate.ToString("dd/MM/yyyy")
                     </span>
                 </RadzenStack>
-
                 <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="0.5rem">
                     <RadzenIcon Icon="payments" Style="font-size: 1.25rem;" />
                     <span>@($"{Data.MoneyToTravel.ToUI()}")</span>
-                    
                 </RadzenStack>
-
                 <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="0.5rem">
                     <RadzenIcon Icon="swap_horiz" Style="font-size: 1.25rem; " />
                     <span>@($"{Data.ChangeValue.ToUI()}")</span>
@@ -28,14 +22,13 @@
                     <span>@Data.Multiplicator.ToString("F2")</span>
                 </RadzenStack>
             </RadzenStack>
-
-            <span @onclick:stopPropagation>
-                <RadzenButton Icon="delete" ButtonStyle="ButtonStyle.Danger"
-                              Size="ButtonSize.Medium" Variant="Variant.Text"
-                              Click="@HandleDelete" />
-            </span>
         </RadzenStack>
     </AnimateFadeIn>
+    <div class="travel-delete-zone" @onclick:stopPropagation>
+        <RadzenButton Icon="delete" ButtonStyle="ButtonStyle.Danger"
+                      Size="ButtonSize.Medium" Variant="Variant.Text"
+                      Click="@HandleDelete" />
+    </div>
 </RadzenCard>
 
 @code {
@@ -50,17 +43,13 @@
     private async Task HandleClick()
     {
         if (Click.HasDelegate)
-        {
             await Click.InvokeAsync(Data.Id);
-        }
     }
 
     private async Task HandleDelete()
     {
         if (Delete.HasDelegate)
-        {
             await Delete.InvokeAsync(Data.Id);
-        }
     }
 
     string _iconColor => IsCurrent
@@ -71,5 +60,20 @@
 <style>
     .stat-card-icon {
         font-size: var(--easysell-text-3xl);
+    }
+    .travel-delete-zone {
+        position: absolute;
+        top: 0;
+        right: 0;
+        height: 100%;
+        width: 48px;
+    }
+    .travel-delete-zone .rz-button {
+        height: 100% !important;
+        width: 100% !important;
+        border-radius: 0 !important;
+        display: flex;
+        align-items: center;
+        justify-content: center;
     }
 </style>

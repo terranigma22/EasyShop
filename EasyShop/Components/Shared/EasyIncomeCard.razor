@@ -1,21 +1,38 @@
-<RadzenCard Variant="Variant.Flat" class="animate-card">
+<RadzenCard Variant="Variant.Flat" class="animate-card" Style="position: relative; overflow: hidden;">
     <AnimateFadeIn>
         <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center"
-                     JustifyContent="JustifyContent.SpaceBetween" Gap="0.5rem">
+                     JustifyContent="JustifyContent.SpaceBetween" Gap="0.5rem"
+                     Style="padding-right: 48px;">
             <span style="font-weight: 500;">@Data.Description</span>
-            <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="0.5rem">
-                <span style="font-weight: 600; color: var(--rz-success);">
-                    + @($"{Data.Value.Amount:F2} {Data.Value.Currency}")
-                </span>
-                <span @onclick:stopPropagation>
-                    <RadzenButton Icon="delete" ButtonStyle="ButtonStyle.Danger"
-                                  Size="ButtonSize.Medium" Variant="Variant.Text"
-                                  Click="@HandleDelete" />
-                </span>
-            </RadzenStack>
+            <span style="font-weight: 600; color: var(--rz-success);">
+                + @($"{Data.Value.Amount:F2} {Data.Value.Currency}")
+            </span>
         </RadzenStack>
     </AnimateFadeIn>
+    <div class="income-delete-zone" @onclick:stopPropagation>
+        <RadzenButton Icon="delete" ButtonStyle="ButtonStyle.Danger"
+                      Size="ButtonSize.Medium" Variant="Variant.Text"
+                      Click="@HandleDelete" />
+    </div>
 </RadzenCard>
+
+<style>
+    .income-delete-zone {
+        position: absolute;
+        top: 0;
+        right: 0;
+        height: 100%;
+        width: 48px;
+    }
+    .income-delete-zone .rz-button {
+        height: 100% !important;
+        width: 100% !important;
+        border-radius: 0 !important;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+</style>
 
 @code {
     [EditorRequired, Parameter] public Income Data { get; set; }
