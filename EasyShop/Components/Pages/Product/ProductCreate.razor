@@ -4,6 +4,7 @@
 @using EasyShop.Features.Commons
 @using EasyShop.Features.Products
 @using EasyShop.Services
+@using SkiaSharp
 
 @inject CreateProductHandler Handler
 @inject TravelStateService TravelState
@@ -194,37 +195,67 @@
 
     private async Task OnFileSelected(InputFileChangeEventArgs e)
     {
-        var file = e.File;
-        if (file == null) return;
+        try
+        {
+            var file = e.File;
+            if (file == null) return;
 
-        using var stream = file.OpenReadStream(maxAllowedSize: 5 * 1024 * 1024);
-        using var memoryStream = new MemoryStream();
-        await stream.CopyToAsync(memoryStream);
-        var bytes = memoryStream.ToArray();
-        var base64 = Convert.ToBase64String(bytes);
-        var contentType = file.ContentType;
-        _product.ImageDataUri = $"data:{contentType};base64,{base64}";
-        _previewImage = _product.ImageDataUri;
+            using var stream = file.OpenReadStream(maxAllowedSize: 10 * 1024 * 1024);
+            using var memoryStream = new MemoryStream();
+            await stream.CopyToAsync(memoryStream);
+            var bytes = memoryStream.ToArray();
+
+            using var original = SKBitmap.Decode(bytes);
+            if (original == null) return;
+
+            int w = original.Width, h = original.Height;
+            const int maxDim = 1200;
+            if (w > maxDim || h > maxDim)
+            {
+                float scale = Math.Min((float)maxDim / w, (float)maxDim / h);
+                w = (int)(w * scale);
+                h = (int)(h * scale);
+            }
+
+            using var resized = original.Resize(new SKImageInfo(w, h), SKFilterQuality.Medium);
+            using var image = SKImage.FromBitmap(resized);
+
+            int quality = 85;
+            byte[] result;
+            do
+            {
+                using var data = image.Encode(SKEncodedImageFormat.Jpeg, quality);
+                result = data.ToArray();
+                quality -= 10;
+            } while (result.Length > 200 * 1024 && quality > 20);
+
+            var base64 = Convert.ToBase64String(result);
+            _product.ImageDataUri = $"data:image/jpeg;base64,{base64}";
+            _previewImage = _product.ImageDataUri;
+        }
+        catch (Exception)
+        {
+        }
     }
 
     private async Task Save()
     {
-        var currency = _travel!.MoneyToTravel.Currency;
-        var changeCurrency = _travel.ChangeValue.Currency;
-
-        var request = new CreateProductRequest(
-            _travel.Id,
-            _product.Name,
-            _product.Units,
-            _product.Multiplicator,
-            new MoneyRequest(_product.TotalCostAmount, currency),
-            new MoneyRequest(_unitPrice, currency),
-            new MoneyRequest(_unitChangePrice, changeCurrency),
-            _product.ImageDataUri
-        );
-
         try
         {
+            var currency = _travel!.MoneyToTravel.Currency;
+            var changeCurrency = _travel.ChangeValue.Currency;
+
+            var request = new CreateProductRequest(
+                _travel.Id,
+                _product.Name,
+                _product.Units,
+                _product.Multiplicator,
+                new MoneyRequest(_product.TotalCostAmount, currency),
+                new MoneyRequest(_unitPrice, currency),
+                new MoneyRequest(_unitChangePrice, changeCurrency),
+                _product.ImageDataUri
+            );
+
             await Handler.HandleAsync(request);
             await TravelState.SetCurrentTravelAsync(_travel.Id);
 
