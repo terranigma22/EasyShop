@@ -1,34 +1,32 @@
 ﻿<RadzenCard Variant="Variant.Flat" class="animate-card" Style="cursor: pointer; position: relative; overflow: hidden;" @onclick="@HandleClick">
-    <AnimateFadeIn>
-        @if (!string.IsNullOrEmpty(Data.ImageDataUri))
-        {
-            <img src="@Data.ImageDataUri" class="product-card-image" />
-        }
-        else
-        {
-            <div class="product-image-zone">
-                <RadzenIcon Icon="shopping_bag" Style="width: 40px; height: 40px;" />
-            </div>
-        }
-        <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="1rem" Style="padding-right: 48px; padding-left: 64px;">
-            <RadzenStack Gap="0" Style="flex: 1; justify-content: center;">
-                <RadzenText TextStyle="TextStyle.Subtitle1" class="rz-mb-0"><strong>@(Data.Name)</strong></RadzenText>
-                <div style="display: flex; justify-content: space-between;">
-                    <span>Unidades</span>
-                    <span>@Data.Units</span>
-                </div>
-                <div style="display: flex; justify-content: space-between;">
-                    <span>Precio</span>
-                    <span style="color: var(--rz-success);">@($"{Data.UnitChangePrice.Amount:F2} {Data.UnitChangePrice.Currency}")</span>
-                </div>
-            </RadzenStack>
-        </RadzenStack>
-        <div class="product-delete-zone" @onclick:stopPropagation>
-            <RadzenButton Icon="delete" ButtonStyle="ButtonStyle.Danger"
-                          Size="ButtonSize.Medium" Variant="Variant.Text"
-                          Click="@HandleDelete" />
+    @if (!string.IsNullOrEmpty(Data.ImageDataUri))
+    {
+        <img src="@Data.ImageDataUri" class="product-card-image" />
+    }
+    else
+    {
+        <div class="product-image-zone">
+            <RadzenIcon Icon="shopping_bag" Style="width: 40px; height: 40px;" />
         </div>
-    </AnimateFadeIn>
+    }
+    <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="1rem" Style="padding-right: 48px; padding-left: 64px;">
+        <RadzenStack Gap="0" Style="flex: 1; justify-content: center;">
+            <RadzenText TextStyle="TextStyle.Subtitle1" class="rz-mb-0"><strong>@(Data.Name)</strong></RadzenText>
+            <div style="display: flex; justify-content: space-between;">
+                <span>Unidades</span>
+                <span>@Data.Units</span>
+            </div>
+            <div style="display: flex; justify-content: space-between;">
+                <span>Precio</span>
+                <span style="color: var(--rz-success);">@($"{Data.UnitChangePrice.Amount:F2} {Data.UnitChangePrice.Currency}")</span>
+            </div>
+        </RadzenStack>
+    </RadzenStack>
+    <div class="product-delete-zone" @onclick:stopPropagation>
+        <RadzenButton Icon="delete" ButtonStyle="ButtonStyle.Danger"
+                      Size="ButtonSize.Medium" Variant="Variant.Text"
+                      Click="@HandleDelete" />
+    </div>
 </RadzenCard>
 
 @code {

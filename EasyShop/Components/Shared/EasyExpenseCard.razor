@@ -1,14 +1,12 @@
 <RadzenCard Variant="Variant.Flat" class="animate-card" Style="position: relative; overflow: hidden;">
-    <AnimateFadeIn>
-        <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center"
-                     JustifyContent="JustifyContent.SpaceBetween" Gap="0.5rem"
-                     Style="padding-right: 48px;">
-            <span style="font-weight: 500;">@Data.Description</span>
-            <span style="font-weight: 600; color: var(--rz-danger);">
-                − @($"{Data.Value.Amount:F2} {Data.Value.Currency}")
-            </span>
-        </RadzenStack>
-    </AnimateFadeIn>
+    <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center"
+                 JustifyContent="JustifyContent.SpaceBetween" Gap="0.5rem"
+                 Style="padding-right: 48px;">
+        <span style="font-weight: 500;">@Data.Description</span>
+        <span style="font-weight: 600; color: var(--rz-danger);">
+            − @($"{Data.Value.Amount:F2} {Data.Value.Currency}")
+        </span>
+    </RadzenStack>
     <div class="expense-delete-zone" @onclick:stopPropagation>
         <RadzenButton Icon="delete" ButtonStyle="ButtonStyle.Danger"
                       Size="ButtonSize.Medium" Variant="Variant.Text"
