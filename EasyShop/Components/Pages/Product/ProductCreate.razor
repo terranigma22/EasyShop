@@ -34,15 +34,16 @@
                                       Change="@(args => OnUploadChange(args))"
                                       MaxFileCount="1"
                                       Accept=".jpg,.jpeg,.png,.gif" />
-
-                       @* <RadzenFileInput @bind-Value=@photo
-                            FileName="" TValue="byte[]" Style="width: 100%"
-                            ChooseText="Seleccionar imagen"
-                            Accept=".jpg,.jpeg,.png,.gif,.webp"
-                            MaxFileSize="10485760"
-                            Change=@(args => OnRadzenFileSelected(args, ""))
-                                         Error="@(args => OnRadzenFileError(args, "FileInput"))" /> *@
+                        
                     </ChildContent>
+                    <Helper>
+                        @if (!string.IsNullOrEmpty(_previewImage))
+                        {
+                            <div style="margin-top: 8px; text-align: center;">
+                                <img src="@_previewImage" class="preview-image" alt="Vista previa" />
+                            </div>
+                        }
+                    </Helper>
                 </RadzenFormField>
             </RadzenColumn>
         </RadzenRow>
@@ -213,6 +214,14 @@
     {
         try
         {
+            if (args.Files == null || args.Files.Count() == 0)
+            {
+                _product.ImageDataUri = null;
+                _previewImage = _product.ImageDataUri;
+        
+                return;                
+            }
+
             foreach (var file in args.Files)
             {
                 using var stream = file.OpenReadStream(maxAllowedSize: 10 * 1024 * 1024);
@@ -270,8 +279,6 @@
             var finalBase64 = Convert.ToBase64String(result);
             _product.ImageDataUri = $"data:image/jpeg;base64,{finalBase64}";
             _previewImage = _product.ImageDataUri;
-        
-            StateHasChanged();
         }
         catch (Exception ex)
         {
