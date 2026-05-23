@@ -41,7 +41,9 @@ internal static class DependencyContainer
 
         services.AddScoped<CreateProductHandler>();
         services.AddScoped<CreateExpenseHandler>();
+        services.AddScoped<DeleteExpenseHandler>();
         services.AddScoped<CreateIncomeHandler>();
+        services.AddScoped<DeleteIncomeHandler>();
 
         return services;
     }

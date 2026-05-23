@@ -1,0 +1,30 @@
+<RadzenCard Variant="Variant.Flat" class="animate-card">
+    <AnimateFadeIn>
+        <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center"
+                     JustifyContent="JustifyContent.SpaceBetween" Gap="0.5rem">
+            <span style="font-weight: 500;">@Data.Description</span>
+            <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="0.5rem">
+                <span style="font-weight: 600; color: var(--rz-danger);">
+                    − @($"{Data.Value.Amount:F2} {Data.Value.Currency}")
+                </span>
+                <span @onclick:stopPropagation>
+                    <RadzenButton Icon="delete" ButtonStyle="ButtonStyle.Danger"
+                                  Size="ButtonSize.Medium" Variant="Variant.Text"
+                                  Click="@HandleDelete" />
+                </span>
+            </RadzenStack>
+        </RadzenStack>
+    </AnimateFadeIn>
+</RadzenCard>
+
+@code {
+    [EditorRequired, Parameter] public Expense Data { get; set; }
+
+    [Parameter] public EventCallback<Guid> Delete { get; set; }
+
+    private async Task HandleDelete()
+    {
+        if (Delete.HasDelegate)
+            await Delete.InvokeAsync(Data.Id);
+    }
+}

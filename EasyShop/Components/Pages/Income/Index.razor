@@ -2,8 +2,11 @@
 
 @using EasyShop.Domain.Models
 @using EasyShop.Services
+@using EasyShop.Features.Incomes
 
 @inject TravelStateService TravelState
+@inject DeleteIncomeHandler DeleteIncomeHandler
+@inject NotificationService NotificationService
 
 <PageContainer>
     <RadzenRow>
@@ -38,15 +41,7 @@
                     @foreach (var item in _travel.Incomes)
                     {
                         <EasyColumForCard>
-                            <RadzenCard Variant="Variant.Flat" class="animate-card">
-                                <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center"
-                                             JustifyContent="JustifyContent.SpaceBetween">
-                                    <span style="font-weight: 500;">@item.Description</span>
-                                    <span style="font-weight: 600; color: var(--rz-success);">
-                                        + @($"{item.Value.Amount:F2} {item.Value.Currency}")
-                                    </span>
-                                </RadzenStack>
-                            </RadzenCard>
+                            <EasyIncomeCard Data="item" Delete="@HandleDelete" />
                         </EasyColumForCard>
                     }
                 </EasyGridForCards>
@@ -63,6 +58,22 @@
         _travel = TravelState.CurrentTravel;
     }
 
+    private async Task HandleDelete(Guid id)
+    {
+        var confirmed = await DialogService.Confirm(
+            "¿Estás seguro de eliminar esta entrada?",
+            "Eliminar Entrada",
+            new ConfirmOptions { OkButtonText = "Sí", CancelButtonText = "No" });
+
+        if (confirmed == true)
+        {
+            await DeleteIncomeHandler.HandleAsync(new DeleteIncomeRequest(id));
+            await TravelState.SetCurrentTravelAsync(_travel!.Id);
+            _travel = TravelState.CurrentTravel;
+            NotificationService.Notify(NotificationSeverity.Success, "Entrada eliminada correctamente");
+        }
+    }
+
     async Task Create()
     {
         var result = await DialogService.OpenSideAsync<IncomeCreate>("Nueva Entrada",
@@ -75,5 +86,10 @@
                 CloseDialogOnOverlayClick = true,
                 Position = DialogPosition.Right
             });
+
+        if (result)
+        {
+            _travel = TravelState.CurrentTravel;
+        }
     }
 }

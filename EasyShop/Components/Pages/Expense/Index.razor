@@ -2,8 +2,10 @@
 
 @using EasyShop.Domain.Models
 @using EasyShop.Services
+@using EasyShop.Features.Expenses
 
 @inject TravelStateService TravelState
+@inject DeleteExpenseHandler DeleteExpenseHandler
 @inject NotificationService NotificationService
 
 <PageContainer>
@@ -39,15 +41,7 @@
                     @foreach (var item in _travel.Expenses)
                     {
                         <EasyColumForCard>
-                            <RadzenCard Variant="Variant.Flat" class="animate-card">
-                                <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center"
-                                             JustifyContent="JustifyContent.SpaceBetween">
-                                    <span style="font-weight: 500;">@item.Description</span>
-                                    <span style="font-weight: 600; color: var(--rz-danger);">
-                                        − @($"{item.Value.Amount:F2} {item.Value.Currency}")
-                                    </span>
-                                </RadzenStack>
-                            </RadzenCard>
+                            <EasyExpenseCard Data="item" Delete="@HandleDelete" />
                         </EasyColumForCard>
                     }
                 </EasyGridForCards>
@@ -64,6 +58,22 @@
         _travel = TravelState.CurrentTravel;
     }
 
+    private async Task HandleDelete(Guid id)
+    {
+        var confirmed = await DialogService.Confirm(
+            "¿Estás seguro de eliminar este gasto?",
+            "Eliminar Gasto",
+            new ConfirmOptions { OkButtonText = "Sí", CancelButtonText = "No" });
+
+        if (confirmed == true)
+        {
+            await DeleteExpenseHandler.HandleAsync(new DeleteExpenseRequest(id));
+            await TravelState.SetCurrentTravelAsync(_travel!.Id);
+            _travel = TravelState.CurrentTravel;
+            NotificationService.Notify(NotificationSeverity.Success, "Gasto eliminado correctamente");
+        }
+    }
+
     async Task Create()
     {
         var result = await DialogService.OpenSideAsync<ExpenseCreate>("Nuevo Gasto",
@@ -76,5 +86,10 @@
                 CloseDialogOnOverlayClick = true,
                 Position = DialogPosition.Right
             });
+
+        if (result)
+        {
+            _travel = TravelState.CurrentTravel;
+        }
     }
 }
