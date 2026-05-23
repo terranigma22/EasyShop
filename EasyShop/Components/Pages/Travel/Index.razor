@@ -1,5 +1,7 @@
 ﻿@page "/travels"
 
+@using EasyShop.Features.Travels
+
 @inject GetTravelsHandler GetTravelsHandler
 @inject DeleteTravelHandler DeleteTravelHandler
 @inject TravelStateService TravelState
@@ -25,7 +27,10 @@
     }
     else if (_items.Count == 0)
     {
-        <EmptyState Icon="travel" Title="No hay viajes" Message="Crea tu primer viaje para comenzar" />
+        <EmptyState Icon="travel" Title="No hay viajes" Message="Crea tu primer viaje para comenzar">
+            <RadzenButton Icon="add_circle" ButtonStyle="ButtonStyle.Primary" Text="Crear primer viaje"
+                              Click="@Create" />
+        </EmptyState>
     }
     else
     {

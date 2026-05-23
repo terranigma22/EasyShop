@@ -31,7 +31,10 @@
     }
     else if (_travel.Expenses.Count == 0)
     {
-        <EmptyState Icon="money_off" Title="Sin gastos" Message="Este viaje no tiene gastos registrados" />
+        <EmptyState Icon="money_off" Title="Sin gastos" Message="Este viaje no tiene gastos registrados">
+            <RadzenButton Icon="add_circle" ButtonStyle="ButtonStyle.Primary" Text="Crear primer gasto"
+                              Click="@Create" />
+        </EmptyState>
     }
     else
     {

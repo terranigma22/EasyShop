@@ -1,9 +1,6 @@
 @page "/incomes/create"
 
-@using EasyShop.Domain.Primitives
-@using EasyShop.Features.Commons
 @using EasyShop.Features.Incomes
-@using EasyShop.Services
 
 @inject CreateIncomeHandler Handler
 @inject TravelStateService TravelState
@@ -27,8 +24,11 @@
             <RadzenColumn Size="12">
                 <RadzenFormField Text="@($"Valor ({_travel!.MoneyToTravel.Currency})")" Style="width: 100%">
                     <ChildContent>
-                        <RadzenNumeric @bind-Value="@_income.Amount" Min="0" Step="0.01" Name="Amount" />
+                        <RadzenNumeric @bind-Value="@_income.Amount" Min="0" Step="1" Name="Amount" />
                     </ChildContent>
+                    <Helper>
+                        <RadzenNumericRangeValidator Component="Amount" Min="0.01" Text="Valor mínimo mayor a 0.01" />
+                    </Helper>
                 </RadzenFormField>
             </RadzenColumn>
         </RadzenRow>

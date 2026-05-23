@@ -31,7 +31,10 @@
     }
     else if (_travel.Incomes.Count == 0)
     {
-        <EmptyState Icon="account_balance" Title="Sin entradas" Message="Este viaje no tiene entradas registradas" />
+        <EmptyState Icon="account_balance" Title="Sin entradas" Message="Este viaje no tiene entradas registradas">
+            <RadzenButton Icon="add_circle" ButtonStyle="ButtonStyle.Primary" Text="Crear primera entrada"
+                              Click="@Create" />
+        </EmptyState>
     }
     else
     {

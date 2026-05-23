@@ -31,7 +31,10 @@
     }
     else if (_travel.Products.Count == 0)
     {
-        <EmptyState Icon="inventory_2" Title="Sin productos" Message="Este viaje no tiene productos registrados" />
+        <EmptyState Icon="inventory_2" Title="Sin productos" Message="Este viaje no tiene productos registrados">
+            <RadzenButton Icon="add_circle" ButtonStyle="ButtonStyle.Primary" Text="Crear primer producto"
+                          Click="@Create" />
+        </EmptyState>
     }
     else
     {
