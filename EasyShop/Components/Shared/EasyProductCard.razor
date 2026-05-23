@@ -2,15 +2,15 @@
     <AnimateFadeIn>
         <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="1rem">
             <RadzenIcon Icon="shopping_bag" Style="width: 40px; height: 40px;" />
-            <RadzenStack Gap="0">
+            <RadzenStack Gap="0" Style="flex: 1;">
                 <RadzenText TextStyle="TextStyle.Subtitle1" class="rz-mb-0"><strong>@(Data.Name)</strong></RadzenText>
 
-                <div style="display: flex; justify-content: space-between; padding: 0.25rem 0;">
+                <div style="display: flex; justify-content: space-between;">
                     <span>Unidades</span>
                     <span>@Data.Units</span>
                 </div>
 
-                <div style="display: flex; justify-content: space-between; padding: 0.25rem 0;">
+                <div style="display: flex; justify-content: space-between;">
                     <span>Precio</span>
                     <span style="color: var(--rz-success);">@($"{Data.UnitChangePrice.Amount:F2} {Data.UnitChangePrice.Currency}")</span>
                 </div>
