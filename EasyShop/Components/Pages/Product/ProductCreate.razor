@@ -26,25 +26,26 @@
 
         <RadzenRow>
             <RadzenColumn Size="12">
-                <RadzenFormField Text="Imagen" Style="width: 100%">
-                    <ChildContent>
-                        <RadzenUpload Multiple="false"
-                                      Auto="false"
-                                      ChooseText="Seleccionar imagen"
-                                      Change="@(args => OnUploadChange(args))"
-                                      MaxFileCount="1"
-                                      Accept=".jpg,.jpeg,.png,.gif" />
-                        
-                    </ChildContent>
-                    <Helper>
-                        @if (!string.IsNullOrEmpty(_previewImage))
-                        {
-                            <div style="margin-top: 8px; text-align: center;">
-                                <img src="@_previewImage" class="preview-image" alt="Vista previa" />
-                            </div>
-                        }
-                    </Helper>
-                </RadzenFormField>
+
+                <RadzenButton Text="Seleccionar imagen"
+                              Icon="image"
+                              ButtonStyle="ButtonStyle.Base"
+                              Style="width: 100%"
+                              Click="@(args => SelectAndProcessImage())" />
+
+                @if (!string.IsNullOrEmpty(_previewImage))
+                {
+                    <RadzenButton Text="Eliminar imagen"
+                                  Icon="delete"
+                                  ButtonStyle="ButtonStyle.Danger"
+                                  Style="width: 100%;margin-top: 8px;"
+                                  Click="RemoveImage" />
+
+                    <div style="margin-top: 8px; text-align: center;">
+                        <img src="@_previewImage" class="preview-image" alt="Vista previa" />
+                    </div>
+                }
+
             </RadzenColumn>
         </RadzenRow>
 
@@ -210,26 +211,38 @@
         }
     }
 
-    private async Task OnUploadChange(UploadChangeEventArgs args)
+    public void RemoveImage()
     {
         try
         {
-            if (args.Files == null || args.Files.Count() == 0)
-            {
-                _product.ImageDataUri = null;
-                _previewImage = _product.ImageDataUri;
-        
-                return;                
-            }
+            _product.ImageDataUri = null;
+            _previewImage = _product.ImageDataUri;
+        }
+        catch (Exception)
+        {
+        }
+    }
 
-            foreach (var file in args.Files)
+    public async Task SelectAndProcessImage()
+    {
+        try
+        {
+            // 1. Usar FilePicker de MAUI
+            var result = await FilePicker.Default.PickAsync(new PickOptions
             {
-                using var stream = file.OpenReadStream(maxAllowedSize: 10 * 1024 * 1024);
+                PickerTitle = "Selecciona una imagen",
+                FileTypes = FilePickerFileType.Images
+            });
+
+            if (result != null)
+            {
+                // 2. Abrir el stream del archivo seleccionado
+                var stream = await result.OpenReadAsync();
                 using var memoryStream = new MemoryStream();
                 await stream.CopyToAsync(memoryStream);
                 var imageBytes = memoryStream.ToArray();
-                
-                // Procesar imagen con SkiaSharp
+
+                // 3. Aquí procesas los bytes con SkiaSharp (tu método ProcessImage)
                 await ProcessImageBytes(imageBytes);
             }
         }
@@ -280,73 +293,8 @@
             _product.ImageDataUri = $"data:image/jpeg;base64,{finalBase64}";
             _previewImage = _product.ImageDataUri;
         }
-        catch (Exception ex)
+        catch (Exception)
         {
-            Console.WriteLine($"Error: {ex.Message}");
-        }
-    }
-
-    private async Task OnRadzenFileSelected(byte[] value, string name)
-    {
-        try
-        {
-            if (value == null || value.Length == 0)
-            {
-                _product.ImageDataUri = null;
-                _previewImage = _product.ImageDataUri;
-                return;
-            }
-        
-            // PASO 1: Convertir el byte[] a string UTF-8
-            // Este string tiene formato: "data:image/jpeg;base64,/9j/4AAQSkZJRg..."
-            var base64DataUri = System.Text.Encoding.UTF8.GetString(value);
-        
-            // PASO 2: Extraer solo la parte Base64 (después de la coma)
-            // El formato es: "data:image/jpeg;base64,ABCDEF1234..."
-            var commaIndex = base64DataUri.IndexOf(',');
-            if (commaIndex == -1) return;
-        
-            var base64String = base64DataUri.Substring(commaIndex + 1);
-        
-            // PASO 3: Convertir Base64 a bytes de imagen REALES
-            var imageBytes = Convert.FromBase64String(base64String);
-        
-            // PASO 4: Ahora sí, decodificar con SkiaSharp
-            using var original = SKBitmap.Decode(imageBytes);
-            if (original == null) return;
-        
-            // PASO 5: Procesar la imagen (redimensionar, comprimir)
-            int w = original.Width, h = original.Height;
-            const int maxDim = 1200;
-            if (w > maxDim || h > maxDim)
-            {
-                float scale = Math.Min((float)maxDim / w, (float)maxDim / h);
-                w = (int)(w * scale);
-                h = (int)(h * scale);
-            }
-        
-            using var resized = original.Resize(new SKImageInfo(w, h), SKFilterQuality.Medium);
-            using var image = SKImage.FromBitmap(resized);
-        
-            int quality = 85;
-            byte[] result;
-            do
-            {
-                using var data = image.Encode(SKEncodedImageFormat.Jpeg, quality);
-                result = data.ToArray();
-                quality -= 10;
-            } while (result.Length > 100 * 1024 && quality > 10);
-        
-            // PASO 6: Guardar como Base64 (para mostrar y guardar)
-            var finalBase64 = Convert.ToBase64String(result);
-            _product.ImageDataUri = $"data:image/jpeg;base64,{finalBase64}";
-            _previewImage = _product.ImageDataUri;
-        
-            StateHasChanged();
-        }
-        catch (Exception ex)
-        {
-            Console.WriteLine($"Error: {ex.Message}");
         }
     }
 
@@ -401,7 +349,7 @@
     .preview-image {
         max-width: 200px;
         max-height: 200px;
-        border-radius: 8px;
+        border-radius: 1rem;
         margin-top: 4px;
     }
 </style>
