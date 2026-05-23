@@ -68,7 +68,7 @@
             <RadzenColumn Size="6">
                 <RadzenFormField Text="Multiplicador" Style="width:100%;">
                     <ChildContent>
-                        <RadzenNumeric Name="Multiplicador" 
+                        <RadzenNumeric Name="Multiplicator" 
                             @bind-Value="@_product.Multiplicator" 
                             Min="0" Step="0.5" 
                             TValue="double"
@@ -76,7 +76,7 @@
                             Change="@OnMultiplicatorChanged" />
                     </ChildContent>
                     <Helper>
-                        <RadzenNumericRangeValidator Component="Multiplicador" Min="0.01" Text="Cantidad mínima mayor a 0.01" />
+                        <RadzenNumericRangeValidator Component="Multiplicator" Min="0.01" Text="Cantidad mínima mayor a 0.01" />
                     </Helper>
                 </RadzenFormField>
             </RadzenColumn>
@@ -227,6 +227,13 @@
     {
         try
         {
+            // Solicitar permiso de lectura de forma proactiva
+            var status = await Permissions.RequestAsync<Permissions.StorageRead>();
+            if (status != PermissionStatus.Granted)
+            {
+                return;
+            }
+
             // 1. Usar FilePicker de MAUI
             var result = await FilePicker.Default.PickAsync(new PickOptions
             {
