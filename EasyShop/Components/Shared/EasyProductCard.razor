@@ -1,7 +1,7 @@
 ﻿<RadzenCard Variant="Variant.Flat" class="animate-card" Style="cursor: pointer; position: relative; overflow: hidden;" @onclick="@HandleClick">
     @if (!string.IsNullOrEmpty(Data.ImageDataUri))
     {
-        <img src="@Data.ImageDataUri" class="product-card-image" />
+        <img src="@Data.ImageDataUri" class="product-card-image" @onclick:stopPropagation @onclick="ShowPreview" />
     }
     else
     {
@@ -29,12 +29,22 @@
     </div>
 </RadzenCard>
 
+@if (_showPreview)
+{
+    <div class="image-overlay" @onclick="ClosePreview">
+        <span class="image-overlay-close">&times;</span>
+        <img src="@Data.ImageDataUri" class="image-overlay-content" @onclick:stopPropagation />
+    </div>
+}
+
 @code {
     [EditorRequired, Parameter] public Product Data { get; set; }
 
     [Parameter] public EventCallback<Guid> Click { get; set; }
 
     [Parameter] public EventCallback<Guid> Delete { get; set; }
+
+    private bool _showPreview;
 
     private async Task HandleClick()
     {
@@ -46,6 +56,16 @@
     {
         if (Delete.HasDelegate)
             await Delete.InvokeAsync(Data.Id);
+    }
+
+    private void ShowPreview()
+    {
+        _showPreview = true;
+    }
+
+    private void ClosePreview()
+    {
+        _showPreview = false;
     }
 }
 
@@ -87,5 +107,52 @@
     }
     .animate-card:hover .product-card-image {
         transform: scale(1.15);
+    }
+
+    .image-overlay {
+        position: fixed;
+        inset: 0;
+        background: rgba(0, 0, 0, 0.8);
+        z-index: 9999;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        animation: fadeIn 0.2s ease;
+    }
+
+    .image-overlay-content {
+        max-width: 90vw;
+        max-height: 90vh;
+        object-fit: contain;
+        border-radius: 8px;
+        cursor: default;
+        animation: scaleIn 0.25s ease;
+    }
+
+    .image-overlay-close {
+        position: absolute;
+        top: 16px;
+        right: 24px;
+        font-size: 36px;
+        color: #fff;
+        cursor: pointer;
+        line-height: 1;
+        opacity: 0.8;
+        transition: opacity 0.2s;
+    }
+
+    .image-overlay-close:hover {
+        opacity: 1;
+    }
+
+    @@keyframes fadeIn {
+        from { opacity: 0; }
+        to { opacity: 1; }
+    }
+
+    @@keyframes scaleIn {
+        from { transform: scale(0.9); opacity: 0; }
+        to { transform: scale(1); opacity: 1; }
     }
 </style>
