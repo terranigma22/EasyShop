@@ -40,6 +40,7 @@ internal static class DependencyContainer
         services.AddScoped<GetTravelHandler>();
 
         services.AddScoped<CreateProductHandler>();
+        services.AddScoped<UpdateProductHandler>();
         services.AddScoped<DeleteProductHandler>();
         services.AddScoped<CreateExpenseHandler>();
         services.AddScoped<DeleteExpenseHandler>();

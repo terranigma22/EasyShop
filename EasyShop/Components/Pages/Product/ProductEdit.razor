@@ -1,9 +1,7 @@
-@page "/products/create"
-
 @using EasyShop.Features.Products
 @using EasyShop.Services
 
-@inject CreateProductHandler Handler
+@inject UpdateProductHandler Handler
 @inject TravelStateService TravelState
 @inject NotificationService NotificationService
 
@@ -75,7 +73,7 @@
                             Change="@OnMultiplicatorChanged" />
                     </ChildContent>
                     <Helper>
-                        <RadzenNumericRangeValidator Component="Multiplicator" Min="0.01" Text="Cantidad mínima mayor a 0" />
+                        <RadzenNumericRangeValidator Component="Multiplicator" Min="0.01" Text="Cantidad mínima mayor a 0.01" />
                     </Helper>
                 </RadzenFormField>
             </RadzenColumn>
@@ -86,7 +84,6 @@
                 <RadzenFormField Text="@($"Costo total ({_travel!.MoneyToTravel.Currency})")" Style="width:100%;">
                     <ChildContent>
                         <RadzenNumeric Name="TotalCostAmount"
-                            @ref="focus"
                             @bind-Value="@_product.TotalCostAmount" 
                             Min="0" Step="1" 
                             TValue="decimal"
@@ -103,12 +100,23 @@
         <RadzenRow>
             <RadzenColumn Size="6">
                 <RadzenFormField Text="@($"Precio venta ({_travel!.MoneyToTravel.Currency})")" Style="width:100%;">
-                    <RadzenNumeric Value="@_product.UnitPrice" Min="0" Step="1" ReadOnly="true" Format="N2" />
+                    <ChildContent>
+                        <RadzenNumeric @bind-Value="@_product.UnitPrice" Min="0" Step="1" Format="N2" Name="SellPrice" />
+                    </ChildContent>
+                    <Helper>
+                        <RadzenNumericRangeValidator Component="SellPrice" Min="0.01" Text="Cantidad mínima mayor a 0" />
+                    </Helper>
                 </RadzenFormField>
             </RadzenColumn>
             <RadzenColumn Size="6">
                 <RadzenFormField Text="@($"Precio venta ({_travel!.ChangeValue.Currency})")" Style="width:100%;">
-                    <RadzenNumeric Value="@_product.UnitChangePrice" Min="0" Step="1" ReadOnly="true" Format="N2" />
+                    <ChildContent>
+                        <RadzenNumeric @ref="focus" @bind-Value="@_product.UnitChangePrice" Min="0" Step="1" Format="N2" Name="SellChangePrice" />
+                    </ChildContent>
+                    <Helper>
+                        <RadzenNumericRangeValidator Component="SellChangePrice" Min="0.01" Text="Cantidad mínima mayor a 0" />
+                    </Helper>
+                    
                 </RadzenFormField>
             </RadzenColumn>
         </RadzenRow>
@@ -123,11 +131,11 @@
 </RadzenTemplateForm>
 
 @code {
+    [Parameter] public Guid ProductId { get; set; }
+
     private Travel? _travel;
     private ProductDto _product = new ProductDto();
     private string? _previewImage;
-
-    private string valueCost = "";
 
     private decimal _unitPrice => _product.Units == 0 ? 0 : (_product.TotalCostAmount / _product.Units) * (decimal)_product.Multiplicator;
     private decimal _unitChangePrice => _unitPrice * (decimal)(_travel?.ChangeValue.Amount ?? 1);
@@ -140,7 +148,18 @@
 
         if (_travel != null)
         {
-            _product.Multiplicator = _travel.Multiplicator;
+            var existing = _travel.Products.FirstOrDefault(p => p.Id == ProductId);
+            if (existing != null)
+            {
+                _product.Name = existing.Name;
+                _product.Units = existing.Units;
+                _product.Multiplicator = existing.Multiplicator;
+                _product.TotalCostAmount = existing.TotalCost.Amount;
+                _product.ImageDataUri = existing.ImageDataUri;
+                _product.UnitPrice = existing.UnitPrice.Amount;
+                _product.UnitChangePrice = existing.UnitChangePrice.Amount;
+                _previewImage = existing.ImageDataUri;
+            }
         }
     }
 
@@ -156,11 +175,8 @@
     {
         try
         {
-            var unitPrice = _product.Units == 0 ? 0 : (_product.TotalCostAmount / _product.Units) * (decimal)_product.Multiplicator;
-            var unitChangePrice = unitPrice * (decimal)(_travel?.ChangeValue.Amount ?? 1);
-
-            _product.UnitPrice = unitPrice;
-            _product.UnitChangePrice = unitChangePrice;
+            _product.UnitPrice = _unitPrice;
+            _product.UnitChangePrice = _unitChangePrice;
         }
         catch (Exception)
         {
@@ -171,11 +187,8 @@
     {
         try
         {
-            var unitPrice = _product.Units == 0 ? 0 : (_product.TotalCostAmount / _product.Units) * (decimal)_product.Multiplicator;
-            var unitChangePrice = unitPrice * (decimal)(_travel?.ChangeValue.Amount ?? 1);
-
-            _product.UnitPrice = unitPrice;
-            _product.UnitChangePrice = unitChangePrice;
+            _product.UnitPrice = _unitPrice;
+            _product.UnitChangePrice = _unitChangePrice;
         }
         catch (Exception)
         {
@@ -186,22 +199,8 @@
     {
         try
         {
-            var unitPrice = _product.Units == 0 ? 0 : (_product.TotalCostAmount / _product.Units) * (decimal)_product.Multiplicator;
-            var unitChangePrice = unitPrice * (decimal)(_travel?.ChangeValue.Amount ?? 1);
-
-            _product.UnitPrice = unitPrice;
-            _product.UnitChangePrice = unitChangePrice;
-        }
-        catch (Exception)
-        {
-        }
-    }
-
-    private void OnRadzenFileError(UploadErrorEventArgs args, string name)
-    {
-        try
-        {
-            StateHasChanged();
+            _product.UnitPrice = _unitPrice;
+            _product.UnitChangePrice = _unitChangePrice;
         }
         catch (Exception)
         {
@@ -224,14 +223,6 @@
     {
         try
         {
-            // Solicitar permiso de lectura de forma proactiva
-            // var status = await Permissions.RequestAsync<Permissions.StorageRead>();
-            // if (status != PermissionStatus.Granted)
-            // {
-            //     return;
-            // }
-
-            // 1. Usar FilePicker de MAUI
             var result = await FilePicker.Default.PickAsync(new PickOptions
             {
                 PickerTitle = "Selecciona una imagen",
@@ -240,13 +231,11 @@
 
             if (result != null)
             {
-                // 2. Abrir el stream del archivo seleccionado
                 var stream = await result.OpenReadAsync();
                 using var memoryStream = new MemoryStream();
                 await stream.CopyToAsync(memoryStream);
                 var imageBytes = memoryStream.ToArray();
 
-                // 3. Aquí procesas los bytes con SkiaSharp (tu método ProcessImage)
                 var uri = await SKHelper.ProcessImageBytesToUri(imageBytes);
 
                 _product.ImageDataUri = uri;
@@ -265,27 +254,25 @@
             var currency = _travel!.MoneyToTravel.Currency;
             var changeCurrency = _travel.ChangeValue.Currency;
 
-            var request = new CreateProductRequest(
-                _travel.Id,
+            var request = new UpdateProductRequest(
+                ProductId,
                 _product.Name,
                 _product.Units,
                 _product.Multiplicator,
                 new MoneyRequest(_product.TotalCostAmount, currency),
-                new MoneyRequest(_unitPrice, currency),
-                new MoneyRequest(_unitChangePrice, changeCurrency),
+                new MoneyRequest(_product.UnitPrice, currency),
+                new MoneyRequest(_product.UnitChangePrice, changeCurrency),
                 _product.ImageDataUri
             );
 
             await Handler.HandleAsync(request);
             await TravelState.SetCurrentTravelAsync(_travel.Id);
 
-            //NotificationService.Notify(NotificationSeverity.Success, "Producto creado");
-
             DialogService.CloseSide(true);
         }
         catch (Exception ex)
         {
-            NotificationService.Notify(NotificationSeverity.Error, "Error al crear el producto", ex.Message);
+            NotificationService.Notify(NotificationSeverity.Error, "Error al actualizar el producto", ex.Message);
         }
     }
 

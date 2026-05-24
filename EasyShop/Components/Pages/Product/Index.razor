@@ -63,6 +63,21 @@
 
     private async Task HandleCardSelected(Guid id)
     {
+        var result = await DialogService.OpenSideAsync<ProductEdit>("Editar Producto",
+            new Dictionary<string, object?> { { "ProductId", id } },
+            new SideDialogOptions
+            {
+                Width = "600px",
+                ShowClose = false,
+                ShowMask = true,
+                CloseDialogOnOverlayClick = true,
+                Position = DialogPosition.Right
+            });
+
+        if (result)
+        {
+            _travel = TravelState.CurrentTravel;
+        }
     }
 
     private async Task HandleDelete(Guid id)

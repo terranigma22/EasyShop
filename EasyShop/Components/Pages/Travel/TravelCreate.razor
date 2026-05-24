@@ -38,7 +38,7 @@
                                        TValue="double" />
                     </ChildContent>
                     <Helper>
-                        <RadzenNumericRangeValidator Component="Multiplicator" Min="0.01" Text="Cantidad mínima mayor a 0.01" />
+                        <RadzenNumericRangeValidator Component="Multiplicator" Min="0.01" Text="Cantidad mínima mayor a 0" />
                     </Helper>
 
                 </RadzenFormField>
@@ -68,7 +68,12 @@
         <RadzenRow>
             <RadzenColumn Size="8">
                 <RadzenFormField Text="Valor de cambio" Style="width:100%;">
-                    <RadzenNumeric @bind-Value="@_travel.ChangeValueAmount" Min="0" Step="0.01" />
+                    <ChildContent>
+                        <RadzenNumeric @bind-Value="@_travel.ChangeValueAmount" Min="0" Step="1" Name="ChangeValueAmount" />
+                    </ChildContent>
+                    <Helper>
+                        <RadzenNumericRangeValidator Component="ChangeValueAmount" Min="0.01" Text="Cantidad mínima mayor a 0" />
+                    </Helper>
                 </RadzenFormField>
             </RadzenColumn>
             <RadzenColumn Size="4">
