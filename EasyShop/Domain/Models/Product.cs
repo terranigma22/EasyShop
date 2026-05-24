@@ -11,6 +11,7 @@ public class Product : BaseEntity
     public Money TotalCost { get; set; } = new Money(0m, CurrencyCode.USD);
     public Money UnitPrice { get; set; } = new Money(0m, CurrencyCode.USD);
     public Money UnitChangePrice { get; set; } = new Money(0m, CurrencyCode.USD);
+    public string? Description { get; set; }
     public string? ImageDataUri { get; set; }
 
     public decimal GetUnitCost() 
@@ -18,7 +19,7 @@ public class Product : BaseEntity
 
     private Product() { }
 
-    public static Product New(Guid travelId, string name, int units, double multiplicator, Money totalCost, Money unitPrice, Money unitChangePrice, string? imageDataUri = null)
+    public static Product New(Guid travelId, string name, int units, double multiplicator, Money totalCost, Money unitPrice, Money unitChangePrice, string? imageDataUri = null, string? description = null)
     {
         return new Product
         {
@@ -29,7 +30,8 @@ public class Product : BaseEntity
             TotalCost = totalCost,
             UnitPrice = unitPrice,
             UnitChangePrice = unitChangePrice,
-            ImageDataUri = imageDataUri
+            ImageDataUri = imageDataUri,
+            Description = description
         };
     }
 

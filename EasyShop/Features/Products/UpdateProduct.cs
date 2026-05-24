@@ -14,7 +14,8 @@ public sealed record UpdateProductRequest(
     MoneyRequest TotalCost,
     MoneyRequest UnitPrice,
     MoneyRequest UnitChangePrice,
-    string? ImageDataUri
+    string? ImageDataUri,
+    string? Description
 );
 
 public sealed class UpdateProductHandler
@@ -36,6 +37,7 @@ public sealed class UpdateProductHandler
         product.UnitPrice = new Money(request.UnitPrice.Amount, request.UnitPrice.Currency);
         product.UnitChangePrice = new Money(request.UnitChangePrice.Amount, request.UnitChangePrice.Currency);
         product.ImageDataUri = request.ImageDataUri;
+        product.Description = request.Description;
         product.UpdatedAt = DomainHelpers.Now;
 
         await _db.SaveChangesAsync(ct);

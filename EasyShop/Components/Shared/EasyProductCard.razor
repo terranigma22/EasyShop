@@ -12,6 +12,10 @@
     <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="1rem" Style="padding-right: 48px; padding-left: 64px;">
         <RadzenStack Gap="0" Style="flex: 1; justify-content: center;">
             <RadzenText TextStyle="TextStyle.Subtitle1" class="rz-mb-0"><strong>@(Data.Name)</strong></RadzenText>
+            @if (!string.IsNullOrEmpty(Data.Description))
+            {
+                <span style="font-size: 0.85rem; color: var(--rz-text-secondary); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">@Data.Description</span>
+            }
             <div style="display: flex; justify-content: space-between;">
                 <span>Unidades</span>
                 <span>@Data.Units</span>

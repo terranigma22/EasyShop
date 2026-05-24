@@ -23,6 +23,16 @@
 
         <RadzenRow>
             <RadzenColumn Size="12">
+                <RadzenFormField Text="Descripción" Style="width: 100%">
+                    <ChildContent>
+                        <RadzenTextBox @bind-Value="@_product.Description" Name="Description" MaxLength="100" />
+                    </ChildContent>
+                </RadzenFormField>
+            </RadzenColumn>
+        </RadzenRow>
+
+        <RadzenRow>
+            <RadzenColumn Size="12">
 
                 <RadzenButton Text="Seleccionar imagen"
                               Icon="image"
@@ -156,6 +166,7 @@
                 _product.Multiplicator = existing.Multiplicator;
                 _product.TotalCostAmount = existing.TotalCost.Amount;
                 _product.ImageDataUri = existing.ImageDataUri;
+                _product.Description = existing.Description;
                 _product.UnitPrice = existing.UnitPrice.Amount;
                 _product.UnitChangePrice = existing.UnitChangePrice.Amount;
                 _previewImage = existing.ImageDataUri;
@@ -262,7 +273,8 @@
                 new MoneyRequest(_product.TotalCostAmount, currency),
                 new MoneyRequest(_product.UnitPrice, currency),
                 new MoneyRequest(_product.UnitChangePrice, changeCurrency),
-                _product.ImageDataUri
+                _product.ImageDataUri,
+                _product.Description
             );
 
             await Handler.HandleAsync(request);
@@ -286,6 +298,7 @@
         public double Multiplicator { get; set; } = 2.5;
         public decimal TotalCostAmount { get; set; } = 0m;
         public string? ImageDataUri { get; set; }
+        public string? Description { get; set; }
 
         public decimal UnitPrice { get; set; } = 0m;
         public decimal UnitChangePrice { get; set; } = 0m;
