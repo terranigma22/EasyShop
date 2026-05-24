@@ -119,7 +119,7 @@
             var id = await Handler.HandleAsync(request);
             await TravelState.SetCurrentTravelAsync(id);
 
-            NotificationService.Notify(NotificationSeverity.Success, "Viaje creado");
+            //NotificationService.Notify(NotificationSeverity.Success, "Viaje creado");
 
             DialogService.CloseSide(true);
         }

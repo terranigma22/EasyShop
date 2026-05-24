@@ -71,7 +71,7 @@
             await Handler.HandleAsync(request);
             await TravelState.SetCurrentTravelAsync(_travel.Id);
 
-            NotificationService.Notify(NotificationSeverity.Success, "Gasto creado");
+            //NotificationService.Notify(NotificationSeverity.Success, "Gasto creado");
 
             DialogService.CloseSide(true);
         }

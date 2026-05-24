@@ -65,7 +65,7 @@
             await Handler.HandleAsync(request);
             await TravelState.SetCurrentTravelAsync(_travel.Id);
 
-            NotificationService.Notify(NotificationSeverity.Success, "Entrada creada");
+            //NotificationService.Notify(NotificationSeverity.Success, "Entrada creada");
 
             DialogService.CloseSide(true);
         }
