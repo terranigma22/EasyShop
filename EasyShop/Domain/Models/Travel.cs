@@ -19,7 +19,7 @@ public class Travel : BaseEntity
         => Expenses.Sum(e => e.Value.Amount);
 
     public decimal GetProductsTotal()
-        => Products.Sum(p => p.TotalCost.Amount);
+        => Products.Where(p => p.Status == ProductStatus.Purchased).Sum(p => p.TotalCost.Amount);
 
     public decimal GetIncomesTotal()
         => Incomes.Sum(i => i.Value.Amount);
@@ -30,7 +30,7 @@ public class Travel : BaseEntity
         => MoneyToTravel.Amount - GetExpensesTotal() - GetProductsTotal() + GetIncomesTotal();
 
     decimal GetProductsProfit()
-        => Products.Sum(p => p.GetProfit());
+        => Products.Where(p => p.Status == ProductStatus.Purchased).Sum(p => p.GetProfit());
 
     public decimal GetProfit(CurrencyCode currency)
     {

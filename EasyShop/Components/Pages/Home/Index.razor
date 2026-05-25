@@ -75,8 +75,8 @@
             <RadzenColumn Size="12">
                 <StatCard Title="Productos"
                           Icon="inventory_2" IconColor="@Colors.Info"
-                          Value="@_travel.Products.Count"
-                          Subtitle="@($"{_travel.Products.Sum(p => p.TotalCost.Amount):F2} {_travel.MoneyToTravel.Currency}")"
+                           Value="@_travel.Products.Count(p => p.Status == ProductStatus.Purchased)"
+                           Subtitle="@($"{_travel.Products.Where(p => p.Status == ProductStatus.Purchased).Sum(p => p.TotalCost.Amount):F2} {_travel.MoneyToTravel.Currency}")"
                           Click="@(() => NavigationManager.NavigateTo("/products"))" />
             </RadzenColumn>
 

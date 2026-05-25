@@ -1,5 +1,6 @@
 @page "/products/create"
 
+@using EasyShop.Domain.Models
 @using EasyShop.Features.Products
 @using EasyShop.Services
 
@@ -132,6 +133,8 @@
 </RadzenTemplateForm>
 
 @code {
+    [Parameter] public ProductStatus InitialStatus { get; set; } = ProductStatus.InCart;
+
     private Travel? _travel;
     private ProductDto _product = new ProductDto();
     private string? _previewImage;
@@ -282,7 +285,7 @@
                 new MoneyRequest(_product.TotalCostAmount, currency),
                 new MoneyRequest(_unitPrice, currency),
                 new MoneyRequest(_unitChangePrice, changeCurrency),
-                ProductStatus.InCart,
+                InitialStatus,
                 _product.ImageDataUri,
                 _product.Description
             );

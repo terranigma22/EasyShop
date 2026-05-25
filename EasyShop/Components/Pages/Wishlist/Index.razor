@@ -1,0 +1,128 @@
+@page "/wishlist"
+
+@using EasyShop.Domain.Models
+@using EasyShop.Services
+@using EasyShop.Features.Products
+@using EasyShop.Components.Pages.Product
+
+@inject TravelStateService TravelState
+@inject DeleteProductHandler DeleteProductHandler
+@inject SetProductStatusHandler SetProductStatusHandler
+@inject NotificationService NotificationService
+
+<PageContainer>
+    <RadzenRow>
+        <RadzenColumn>
+            <PageHeader Title="@($"Deseados: {_travel?.Products.Count(p => p.Status == ProductStatus.Wishlisted)}")"
+                        Icon="favorite" />
+        </RadzenColumn>
+        <RadzenColumn Style="align-self: center;">
+            <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center"
+                         JustifyContent="JustifyContent.End" Gap="0.5rem">
+                <RadzenButton Icon="add_circle" ButtonStyle="ButtonStyle.Primary"
+                              Click="@Create" />
+            </RadzenStack>
+        </RadzenColumn>
+    </RadzenRow>
+
+    @if (_travel == null)
+    {
+        <EmptyState Icon="travel" Title="No hay viaje activo" Message="Selecciona un viaje para ver sus productos deseados">
+            <RadzenButton Icon="travel" ButtonStyle="ButtonStyle.Primary" Text="Ir a Viajes"
+                          Click="@(() => NavigationManager.NavigateTo("/travels"))" />
+        </EmptyState>
+    }
+    else if (_travel.Products.Count(p => p.Status == ProductStatus.Wishlisted) == 0)
+    {
+        <EmptyState Icon="favorite" Title="Sin deseados" Message="Este viaje no tiene productos en lista de deseados">
+            <RadzenButton Icon="add_circle" ButtonStyle="ButtonStyle.Primary" Text="Agregar primer deseo"
+                          Click="@Create" />
+        </EmptyState>
+    }
+    else
+    {
+        <ListContainer>
+            <AnimateFadeIn>
+                <EasyGridForCards>
+                    @foreach (var item in _travel.Products.Where(p => p.Status == ProductStatus.Wishlisted))
+                    {
+                        <EasyColumForCard>
+                            <EasyWishlistCard Data="item" Click="@HandleCardSelected" Delete="@HandleDelete" AddToCart="@HandleAddToCart" />
+                        </EasyColumForCard>
+                    }
+                </EasyGridForCards>
+            </AnimateFadeIn>
+        </ListContainer>
+    }
+</PageContainer>
+
+@code {
+    Travel? _travel;
+
+    protected override void OnInitialized()
+    {
+        _travel = TravelState.CurrentTravel;
+    }
+
+    private async Task HandleCardSelected(Guid id)
+    {
+        var result = await DialogService.OpenSideAsync<ProductEdit>("Editar Producto",
+            new Dictionary<string, object?> { { "ProductId", id } },
+            new SideDialogOptions
+            {
+                Width = "600px",
+                ShowClose = false,
+                ShowMask = true,
+                CloseDialogOnOverlayClick = true,
+                Position = DialogPosition.Right
+            });
+
+        if (result is not null && result == true)
+        {
+            _travel = TravelState.CurrentTravel;
+        }
+    }
+
+    private async Task HandleDelete(Guid id)
+    {
+        var confirmed = await DialogService.Confirm(
+            "¿Estás seguro de eliminar este producto?",
+            "Eliminar Producto",
+            new ConfirmOptions { OkButtonText = "Sí", CancelButtonText = "No" });
+
+        if (confirmed == true)
+        {
+            await DeleteProductHandler.HandleAsync(new DeleteProductRequest(id));
+            await TravelState.SetCurrentTravelAsync(_travel!.Id);
+            _travel = TravelState.CurrentTravel;
+            NotificationService.Notify(NotificationSeverity.Success, "Producto eliminado correctamente");
+        }
+    }
+
+    private async Task HandleAddToCart(Guid id)
+    {
+        await SetProductStatusHandler.HandleAsync(new SetProductStatusRequest(id, ProductStatus.InCart));
+        await TravelState.SetCurrentTravelAsync(_travel!.Id);
+        _travel = TravelState.CurrentTravel;
+        NotificationService.Notify(NotificationSeverity.Success, "Producto agregado al carrito");
+    }
+
+    async Task Create()
+    {
+        var result = await DialogService.OpenSideAsync<ProductCreate>("Nuevo Deseo",
+            new Dictionary<string, object?> { { "InitialStatus", ProductStatus.Wishlisted } },
+            new SideDialogOptions
+            {
+                Width = "600px",
+                ShowClose = false,
+                ShowMask = true,
+                CloseDialogOnOverlayClick = true,
+                Position = DialogPosition.Right
+            });
+
+        if (result)
+        {
+            _travel = TravelState.CurrentTravel;
+        }
+    }
+}
