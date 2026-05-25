@@ -90,7 +90,7 @@
                 Position = DialogPosition.Right
             });
 
-        if (result)
+        if (result is not null && result == true)
         {
             _travel = TravelState.CurrentTravel;
         }

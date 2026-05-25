@@ -19,35 +19,14 @@
             <RadzenButton Icon="shopping_cart_checkout" ButtonStyle="ButtonStyle.Success"
                           Text="@($"Comprar todo ({_cartItems.Count})")" Click="@HandlePurchaseAll" />
         </RadzenStack>
-        <RadzenCard Variant="Variant.Flat" Style="overflow: hidden;">
+        <EasyGridForCards>
             @foreach (var item in _cartItems)
             {
-                <div style="display: flex; align-items: center; padding: 0.75rem 1rem; border-bottom: 1px solid var(--rz-border-color); gap: 1rem;">
-                    @if (!string.IsNullOrEmpty(item.ImageDataUri))
-                    {
-                        <img src="@item.ImageDataUri" style="width: 48px; height: 48px; object-fit: cover; border-radius: 8px; flex-shrink: 0;" />
-                    }
-                    else
-                    {
-                        <div style="width: 48px; height: 48px; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
-                            <RadzenIcon Icon="shopping_bag" Style="font-size: 1.5rem; color: var(--rz-text-secondary);" />
-                        </div>
-                    }
-                    <div style="flex: 1; min-width: 0;">
-                        <RadzenText TextStyle="TextStyle.Subtitle2"><strong>@item.Name</strong></RadzenText>
-                        @if (!string.IsNullOrEmpty(item.Description))
-                        {
-                            <span style="font-size: 0.8rem; color: var(--rz-text-secondary); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; display: block;">@item.Description</span>
-                        }
-                        <span style="font-size: 0.8rem;">Unidades: @item.Units</span>
-                    </div>
-                    <div style="text-align: right; flex-shrink: 0;">
-                        <RadzenText TextStyle="TextStyle.Subtitle2" Style="color: var(--rz-success);">@($"{item.UnitChangePrice.Amount:F2} {item.UnitChangePrice.Currency}")</RadzenText>
-                    </div>
-                    <RadzenButton Icon="shopping_cart_checkout" ButtonStyle="ButtonStyle.Success" Size="ButtonSize.Small" Variant="Variant.Text" Click="@(() => HandlePurchaseItem(item.Id))" />
-                </div>
+                <EasyColumForCard>
+                    <EasyCartItem Data="item" Purchase="@HandlePurchaseItem" />
+                </EasyColumForCard>
             }
-        </RadzenCard>
+        </EasyGridForCards>
         <RadzenCard Variant="Variant.Flat" Style="padding: 1rem;">
             <div style="display: flex; justify-content: space-between; align-items: center;">
                 <RadzenText TextStyle="TextStyle.H5"><strong>Total</strong></RadzenText>
@@ -79,8 +58,8 @@
         if (_travel != null)
         {
             _cartItems = _travel.Products.Where(p => p.Status == ProductStatus.InCart).ToList();
-            _total = _cartItems.Sum(p => p.UnitChangePrice.Amount);
-            _currency = _travel.ChangeValue.Currency.ToString();
+            _total = _cartItems.Sum(p => p.TotalCost.Amount);
+            _currency = _travel.MoneyToTravel.Currency.ToString();
         }
     }
 

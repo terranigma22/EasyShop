@@ -1,0 +1,162 @@
+﻿<RadzenCard Variant="Variant.Flat" class="animate-card" Style="cursor: pointer; position: relative; overflow: hidden;" @onclick="@ShowPreview">
+    @if (!string.IsNullOrEmpty(Data.ImageDataUri))
+    {
+        <img src="@Data.ImageDataUri" class="cart-item-image" @onclick:stopPropagation @onclick="ShowPreview" />
+    }
+    else
+    {
+        <div class="cart-item-image-zone">
+            <RadzenIcon Icon="shopping_bag" Style="width: 40px; height: 40px;" />
+        </div>
+    }
+    <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="1rem" Style="padding-right: 48px; padding-left: 64px;">
+        <RadzenStack Gap="0" Style="flex: 1; justify-content: center;">
+            <RadzenText TextStyle="TextStyle.Subtitle1" class="rz-mb-0"><strong>@(Data.Name)</strong></RadzenText>
+            @if (!string.IsNullOrEmpty(Data.Description))
+            {
+                <span style="font-size: 0.85rem; color: var(--rz-text-secondary); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">@Data.Description</span>
+            }
+            <div style="display: flex; justify-content: space-between;">
+                <span>Unidades</span>
+                <span>@Data.Units</span>
+            </div>
+            <div style="display: flex; justify-content: space-between;">
+                <span>Costo total</span>
+                <span>@($"{Data.TotalCost.Amount:F2} {Data.TotalCost.Currency}")</span>
+            </div>
+            <div style="display: flex; justify-content: space-between;">
+                <span>Precio venta</span>
+                <span style="color: var(--rz-success);">@($"{Data.UnitChangePrice.Amount:F2} {Data.UnitChangePrice.Currency}")</span>
+            </div>
+        </RadzenStack>
+    </RadzenStack>
+    <div class="cart-item-action-zone" @onclick:stopPropagation>
+        <RadzenButton Icon="shopping_cart_checkout" ButtonStyle="ButtonStyle.Success"
+                      Size="ButtonSize.Medium" Variant="Variant.Text"
+                      Click="@HandlePurchase" />
+    </div>
+</RadzenCard>
+
+@if (_showPreview)
+{
+    <div class="cart-item-overlay" @onclick="ClosePreview">
+        <span class="cart-item-overlay-close">&times;</span>
+        <img src="@Data.ImageDataUri" class="cart-item-overlay-content" @onclick:stopPropagation />
+    </div>
+}
+
+@code {
+    [EditorRequired, Parameter] public Product Data { get; set; }
+
+    [Parameter] public EventCallback<Guid> Purchase { get; set; }
+
+    private bool _showPreview;
+
+    private async Task HandlePurchase()
+    {
+        if (Purchase.HasDelegate)
+            await Purchase.InvokeAsync(Data.Id);
+    }
+
+    private void ShowPreview()
+    {
+        if (!string.IsNullOrEmpty(Data.ImageDataUri))
+            _showPreview = true;
+    }
+
+    private void ClosePreview()
+    {
+        _showPreview = false;
+    }
+}
+
+<style>
+    .cart-item-action-zone {
+        position: absolute;
+        top: 0;
+        right: 0;
+        height: 100%;
+        width: 48px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    .cart-item-action-zone .rz-button {
+        height: 100% !important;
+        width: 100% !important;
+        border-radius: 0 !important;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    .cart-item-image {
+        position: absolute;
+        top: 0;
+        left: 0;
+        height: 100%;
+        width: 64px;
+        object-fit: cover;
+        transition: transform 0.2s ease;
+        flex-shrink: 0;
+    }
+    .cart-item-image-zone {
+        position: absolute;
+        top: 0;
+        left: 0;
+        height: 100%;
+        width: 64px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    .animate-card:hover .cart-item-image {
+        transform: scale(1.15);
+    }
+
+    .cart-item-overlay {
+        position: fixed;
+        inset: 0;
+        background: rgba(0, 0, 0, 0.8);
+        z-index: 9999;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        animation: fadeIn 0.2s ease;
+    }
+
+    .cart-item-overlay-content {
+        max-width: 90vw;
+        max-height: 90vh;
+        object-fit: contain;
+        border-radius: 8px;
+        cursor: default;
+        animation: scaleIn 0.25s ease;
+    }
+
+    .cart-item-overlay-close {
+        position: absolute;
+        top: 16px;
+        right: 24px;
+        font-size: 36px;
+        color: #fff;
+        cursor: pointer;
+        line-height: 1;
+        opacity: 0.8;
+        transition: opacity 0.2s;
+    }
+
+    .cart-item-overlay-close:hover {
+        opacity: 1;
+    }
+
+    @@keyframes fadeIn {
+        from { opacity: 0; }
+        to { opacity: 1; }
+    }
+
+    @@keyframes scaleIn {
+        from { transform: scale(0.9); opacity: 0; }
+        to { transform: scale(1); opacity: 1; }
+    }
+</style>

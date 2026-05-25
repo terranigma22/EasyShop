@@ -103,10 +103,7 @@
                 Position = DialogPosition.Right
             });
 
-            if (result is null)
-                return; return;
-
-            if (result)
+            if (result is not null && result == true)
             {
                 await TravelState.SetCurrentTravelAsync(TravelState.CurrentTravel!.Id);
             }
