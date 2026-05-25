@@ -1,5 +1,4 @@
-﻿<RadzenCard Variant="Variant.Outlined" Style="@_cardStyle"
-    @onclick="@ToggleSelection">
+﻿<RadzenCard Variant="Variant.Outlined" Style="@_cardStyle" @onclick="@ToggleSelection">
 
     <div style="display: flex; align-items: center; gap: 0.75rem; min-height: 64px;">
         @if (!string.IsNullOrEmpty(Data.ImageDataUri))
@@ -64,8 +63,8 @@
 
     void UpdateCardStyle()
     {
-        _cardStyle = "position: relative; overflow: hidden; cursor: pointer;"
-            + (_isSelected ? "outline: 2px solid var(--rz-primary);" : "");
+        _cardStyle = "cursor: pointer;"
+            + (_isSelected ? "background: color-mix(in srgb, var(--rz-primary) 12%, var(--rz-base));" : "");
     }
 
     private void ShowPreview()

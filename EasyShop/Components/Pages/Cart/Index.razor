@@ -12,19 +12,19 @@
 
 <PageContainer>
     <RadzenRow>
-            <RadzenColumn>
-                <PageHeader Title="@($"Carrito: {_cartItems.Count}")"
-                            Icon="shopping_cart_checkout" />
-            </RadzenColumn>
-            <RadzenColumn Style="align-self: center;">
-                <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center"
-                             JustifyContent="JustifyContent.End" Gap="0.5rem">
-                    <RadzenButton Icon="close" ButtonStyle="ButtonStyle.Base" Click="@Cancel" Variant="Variant.Text"/>
-                </RadzenStack>
-            </RadzenColumn>
+        <RadzenColumn>
+            <PageHeader Title="@($"Carrito: {_cartItems.Count}")"
+                        Icon="shopping_cart_checkout" />
+        </RadzenColumn>
+        <RadzenColumn Style="align-self: center;">
+            <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center"
+                         JustifyContent="JustifyContent.End" Gap="0.5rem">
+                <RadzenButton Icon="close" ButtonStyle="ButtonStyle.Base" Variant="Variant.Text"
+                              Click="@(() => NavigationManager.NavigateTo("/products"))" />
+            </RadzenStack>
+        </RadzenColumn>
     </RadzenRow>
 
-    <RadzenStack Gap="1rem">
     @if (_cartItems.Count == 0)
     {
         <EmptyState Icon="shopping_cart" Title="Carrito vacío"
@@ -33,49 +33,67 @@
     else
     {
         <RadzenStack Orientation="Orientation.Horizontal" Gap="0.5rem">
-            <RadzenButton Icon="shopping_cart_checkout" ButtonStyle="ButtonStyle.Success"
-                          Text="@($"Todo ({_cartItems.Count})")" Click="@ShowConfirmPurchaseAll" />
             @if (_selectedItems.Count > 0)
             {
                 <RadzenButton Icon="shopping_cart_checkout" ButtonStyle="ButtonStyle.Primary"
-                              Text="@($"{_selectedItems.Count}")" Click="@ShowConfirmPurchaseSelected" />
+                              Text="@($"Comprar ({_selectedItems.Count})")" Click="@ShowConfirmPurchaseSelected" />
                 <RadzenButton Icon="delete" ButtonStyle="ButtonStyle.Danger"
-                              Text="@($"{_selectedItems.Count}")" Click="@ShowConfirmDeleteSelected" />
+                              Text="@($"Eliminar ({_selectedItems.Count})")" Click="@ShowConfirmDeleteSelected" />
+            }
+            else
+            {
+                <RadzenButton Icon="shopping_cart_checkout" ButtonStyle="ButtonStyle.Success"
+                              Text="@($"Todo ({_cartItems.Count})")" Click="@ShowConfirmPurchaseAll" />
             }
         </RadzenStack>
 
-        @if (_selectedItems.Count > 0)
-        {
-            <RadzenCard Variant="Variant.Flat" Style="padding: 0.5rem 1rem;">
-                <div style="display: flex; justify-content: space-between; align-items: center;">
-                    <RadzenText TextStyle="TextStyle.Subtitle2">Seleccionados: @_selectedItems.Count</RadzenText>
-                    <RadzenText TextStyle="TextStyle.Subtitle2" Style="color: var(--rz-primary);">
-                        <strong>Costo: @($"{_selectedTotal:F2} {_currency}")</strong>
-                    </RadzenText>
-                </div>
-            </RadzenCard>
-        }
-
-        <EasyGridForCards>
-            @foreach (var item in _cartItems)
-            {
-                <EasyColumForCard>
-                    <EasyCartItem Data="item"
-                                  IsSelected="@_selectedItems.Contains(item.Id)"
-                                  IsSelectedChanged="@((value) => HandleSelectionChanged(item.Id, value))" />
-                </EasyColumForCard>
-            }
-        </EasyGridForCards>
+        <div class="cart-grid-scroll">
+            <EasyGridForCards>
+                @foreach (var item in _cartItems)
+                {
+                    <EasyColumForCard>
+                        <EasyCartItem Data="item"
+                                      IsSelected="@_selectedItems.Contains(item.Id)"
+                                      IsSelectedChanged="@((value) => HandleSelectionChanged(item.Id, value))" />
+                    </EasyColumForCard>
+                }
+            </EasyGridForCards>
+        </div>
 
         <RadzenCard Variant="Variant.Flat" Style="padding: 1rem;">
-            <div style="display: flex; justify-content: space-between; align-items: center;">
-                <RadzenText TextStyle="TextStyle.H5"><strong>Total carrito</strong></RadzenText>
+            <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+                <div>
+                    <RadzenText TextStyle="TextStyle.H5"><strong>Total carrito</strong></RadzenText>
+                    @if (_selectedItems.Count > 0)
+                    {
+                        <RadzenText TextStyle="TextStyle.Subtitle2" Style="color: var(--rz-primary);">
+                            @_selectedItems.Count seleccionados — @($"{_selectedTotal:F2} {_currency}")
+                        </RadzenText>
+                    }
+                </div>
                 <RadzenText TextStyle="TextStyle.H5" Style="color: var(--rz-success);"><strong>@($"{_total:F2} {_currency}")</strong></RadzenText>
             </div>
         </RadzenCard>
     }
-</RadzenStack>
 </PageContainer>
+
+<style>
+    .cart-page {
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        max-width: var(--easysell-content-max-width);
+        margin: 0 auto;
+        width: 100%;
+        padding: 0 var(--easysell-space-4);
+        gap: 1rem;
+    }
+    .cart-grid-scroll {
+        flex: 1;
+        overflow-y: auto;
+        min-height: 0;
+    }
+</style>
 
 @code {
     Travel? _travel;
@@ -176,5 +194,4 @@
         NavigationManager.NavigateTo("/products");
     }
 
-    void Cancel() => NavigationManager.NavigateTo("/products");
 }
