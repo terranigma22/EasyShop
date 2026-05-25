@@ -1,20 +1,26 @@
-﻿<RadzenCard Variant="Variant.Flat" class="animate-card" Style="cursor: pointer; position: relative; overflow: hidden;" @onclick="@ShowPreview">
-    @if (!string.IsNullOrEmpty(Data.ImageDataUri))
-    {
-        <img src="@Data.ImageDataUri" class="cart-item-image" @onclick:stopPropagation @onclick="ShowPreview" />
-    }
-    else
-    {
-        <div class="cart-item-image-zone">
-            <RadzenIcon Icon="shopping_bag" Style="width: 40px; height: 40px;" />
-        </div>
-    }
-    <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="1rem" Style="padding-right: 48px; padding-left: 64px;">
-        <RadzenStack Gap="0" Style="flex: 1; justify-content: center;">
+﻿<RadzenCard Variant="Variant.Flat"
+    Style="@_cardStyle">
+
+    <div class="cart-item-check-zone" @onclick:stopPropagation>
+        <RadzenCheckBox @bind-Value="@_isSelected" TValue="bool" Change="@HandleSelectionChanged" />
+    </div>
+
+    <div style="display: flex; align-items: center; gap: 0.75rem; padding-right: 96px; padding-left: 40px; min-height: 64px;">
+        @if (!string.IsNullOrEmpty(Data.ImageDataUri))
+        {
+            <img src="@Data.ImageDataUri" class="cart-item-image-square" @onclick:stopPropagation @onclick="ShowPreview" />
+        }
+        else
+        {
+            <div class="cart-item-image-square-fallback">
+                <RadzenIcon Icon="shopping_bag" Style="width: 24px; height: 24px;" />
+            </div>
+        }
+        <div style="flex: 1; min-width: 0;">
             <RadzenText TextStyle="TextStyle.Subtitle1" class="rz-mb-0"><strong>@(Data.Name)</strong></RadzenText>
             @if (!string.IsNullOrEmpty(Data.Description))
             {
-                <span style="font-size: 0.85rem; color: var(--rz-text-secondary); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">@Data.Description</span>
+                <span style="font-size: 0.85rem; color: var(--rz-text-secondary); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; display: block;">@Data.Description</span>
             }
             <div style="display: flex; justify-content: space-between;">
                 <span>Unidades</span>
@@ -24,13 +30,13 @@
                 <span>Costo total</span>
                 <span>@($"{Data.TotalCost.Amount:F2} {Data.TotalCost.Currency}")</span>
             </div>
-            <div style="display: flex; justify-content: space-between;">
-                <span>Precio venta</span>
-                <span style="color: var(--rz-success);">@($"{Data.UnitChangePrice.Amount:F2} {Data.UnitChangePrice.Currency}")</span>
-            </div>
-        </RadzenStack>
-    </RadzenStack>
+        </div>
+    </div>
+
     <div class="cart-item-action-zone" @onclick:stopPropagation>
+        <RadzenButton Icon="delete" ButtonStyle="ButtonStyle.Danger"
+                      Size="ButtonSize.Medium" Variant="Variant.Text"
+                      Click="@HandleDelete" />
         <RadzenButton Icon="shopping_cart_checkout" ButtonStyle="ButtonStyle.Success"
                       Size="ButtonSize.Medium" Variant="Variant.Text"
                       Click="@HandlePurchase" />
@@ -50,12 +56,45 @@
 
     [Parameter] public EventCallback<Guid> Purchase { get; set; }
 
+    [Parameter] public EventCallback<Guid> Delete { get; set; }
+
+    [Parameter] public bool IsSelected { get; set; }
+
+    [Parameter] public EventCallback<bool> IsSelectedChanged { get; set; }
+
+    private bool _isSelected;
     private bool _showPreview;
+    private string _cardStyle = "";
+
+    protected override void OnInitialized()
+    {
+        _isSelected = IsSelected;
+        UpdateCardStyle();
+    }
+
+    private async Task HandleSelectionChanged(bool value)
+    {
+        _isSelected = value;
+        UpdateCardStyle();
+        await IsSelectedChanged.InvokeAsync(value);
+    }
+
+    void UpdateCardStyle()
+    {
+        _cardStyle = "position: relative; overflow: hidden;"
+            + (_isSelected ? "outline: 2px solid var(--rz-primary);" : "");
+    }
 
     private async Task HandlePurchase()
     {
         if (Purchase.HasDelegate)
             await Purchase.InvokeAsync(Data.Id);
+    }
+
+    private async Task HandleDelete()
+    {
+        if (Delete.HasDelegate)
+            await Delete.InvokeAsync(Data.Id);
     }
 
     private void ShowPreview()
@@ -71,46 +110,54 @@
 }
 
 <style>
+    .cart-item-check-zone {
+        position: absolute;
+        top: 0;
+        left: 0;
+        height: 100%;
+        width: 40px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 1;
+    }
+
     .cart-item-action-zone {
         position: absolute;
         top: 0;
         right: 0;
         height: 100%;
-        width: 48px;
+        width: 96px;
         display: flex;
         align-items: center;
-        justify-content: center;
     }
     .cart-item-action-zone .rz-button {
         height: 100% !important;
-        width: 100% !important;
+        width: 48px !important;
         border-radius: 0 !important;
         display: flex;
         align-items: center;
         justify-content: center;
-    }
-    .cart-item-image {
-        position: absolute;
-        top: 0;
-        left: 0;
-        height: 100%;
-        width: 64px;
-        object-fit: cover;
-        transition: transform 0.2s ease;
         flex-shrink: 0;
     }
-    .cart-item-image-zone {
-        position: absolute;
-        top: 0;
-        left: 0;
-        height: 100%;
-        width: 64px;
+
+    .cart-item-image-square {
+        width: 48px;
+        height: 48px;
+        object-fit: cover;
+        border-radius: 8px;
+        flex-shrink: 0;
+        cursor: pointer;
+    }
+    .cart-item-image-square-fallback {
+        width: 48px;
+        height: 48px;
+        border-radius: 8px;
+        flex-shrink: 0;
         display: flex;
         align-items: center;
         justify-content: center;
-    }
-    .animate-card:hover .cart-item-image {
-        transform: scale(1.15);
+        background: var(--rz-base-200);
     }
 
     .cart-item-overlay {
