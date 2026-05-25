@@ -1,6 +1,12 @@
 ﻿<RadzenCard Variant="Variant.Outlined" Style="@_cardStyle" @onclick="@ToggleSelection">
 
-    <div style="display: flex; align-items: center; gap: 0.75rem; min-height: 64px;">
+    <div class="cart-delete-zone" @onclick:stopPropagation>
+        <RadzenButton Icon="delete" ButtonStyle="ButtonStyle.Danger"
+                      Size="ButtonSize.Medium" Variant="Variant.Text"
+                      Click="@HandleDelete" />
+    </div>
+
+    <div style="display: flex; align-items: center; gap: 0.75rem; min-height: 64px; padding-right: 48px;">
         @if (!string.IsNullOrEmpty(Data.ImageDataUri))
         {
             <img src="@Data.ImageDataUri" class="cart-item-image-square" @onclick:stopPropagation @onclick="ShowPreview" />
@@ -25,11 +31,6 @@
                 <span>Costo total</span>
                 <span>@($"{Data.TotalCost.Amount:F2} {Data.TotalCost.Currency}")</span>
             </div>
-        </div>
-        <div class="cart-delete-zone" @onclick:stopPropagation>
-            <RadzenButton Icon="delete" ButtonStyle="ButtonStyle.Danger"
-                          Size="ButtonSize.Medium" Variant="Variant.Text"
-                          Click="@HandleDelete" />
         </div>
     </div>
 </RadzenCard>
@@ -70,7 +71,7 @@
 
     void UpdateCardStyle()
     {
-        _cardStyle = "cursor: pointer;"
+        _cardStyle = "position: relative; cursor: pointer;"
             + (_isSelected ? "background: color-mix(in srgb, var(--rz-primary) 12%, var(--rz-base));" : "");
     }
 
@@ -94,6 +95,16 @@
 
 <style>
     .cart-delete-zone {
+        position: absolute;
+        top: 0;
+        right: 0;
+        height: 100%;
+        width: 48px;
+    }
+    .cart-delete-zone .rz-button {
+        height: 100% !important;
+        width: 100% !important;
+        border-radius: 0 !important;
         display: flex;
         align-items: center;
         justify-content: center;
