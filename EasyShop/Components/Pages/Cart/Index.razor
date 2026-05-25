@@ -1,3 +1,5 @@
+@page "/cart"
+
 @using EasyShop.Domain.Models
 @using EasyShop.Services
 @using EasyShop.Features.Products
@@ -8,7 +10,21 @@
 @inject DeleteProductHandler DeleteProductHandler
 @inject NotificationService NotificationService
 
-<RadzenStack Gap="1rem">
+<PageContainer>
+    <RadzenRow>
+            <RadzenColumn>
+                <PageHeader Title="@($"Carrito: {_cartItems.Count}")"
+                            Icon="shopping_cart_checkout" />
+            </RadzenColumn>
+            <RadzenColumn Style="align-self: center;">
+                <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center"
+                             JustifyContent="JustifyContent.End" Gap="0.5rem">
+                    <RadzenButton Icon="close" ButtonStyle="ButtonStyle.Base" Click="@Cancel" Variant="Variant.Text"/>
+                </RadzenStack>
+            </RadzenColumn>
+    </RadzenRow>
+
+    <RadzenStack Gap="1rem">
     @if (_cartItems.Count == 0)
     {
         <EmptyState Icon="shopping_cart" Title="Carrito vacío"
@@ -18,13 +34,13 @@
     {
         <RadzenStack Orientation="Orientation.Horizontal" Gap="0.5rem">
             <RadzenButton Icon="shopping_cart_checkout" ButtonStyle="ButtonStyle.Success"
-                          Text="@($"Todo ({_cartItems.Count})")" Click="@HandlePurchaseAll" />
+                          Text="@($"Todo ({_cartItems.Count})")" Click="@ShowConfirmPurchaseAll" />
             @if (_selectedItems.Count > 0)
             {
                 <RadzenButton Icon="shopping_cart_checkout" ButtonStyle="ButtonStyle.Primary"
-                              Text="@($"{_selectedItems.Count}")" Click="@HandlePurchaseSelected" />
+                              Text="@($"{_selectedItems.Count}")" Click="@ShowConfirmPurchaseSelected" />
                 <RadzenButton Icon="delete" ButtonStyle="ButtonStyle.Danger"
-                              Text="@($"{_selectedItems.Count}")" Click="@HandleDeleteSelected" />
+                              Text="@($"{_selectedItems.Count}")" Click="@ShowConfirmDeleteSelected" />
             }
         </RadzenStack>
 
@@ -59,6 +75,7 @@
         </RadzenCard>
     }
 </RadzenStack>
+</PageContainer>
 
 @code {
     Travel? _travel;
@@ -86,6 +103,36 @@
         }
     }
 
+    async Task ShowConfirmPurchaseAll()
+    {
+        var confirmed = await DialogService.Confirm(
+            $"¿Comprar los {_cartItems.Count} productos en el carrito?",
+            "Comprar todo",
+            new ConfirmOptions { OkButtonText = "Sí", CancelButtonText = "No" });
+        if (confirmed == true)
+            await HandlePurchaseAll();
+    }
+
+    async Task ShowConfirmPurchaseSelected()
+    {
+        var confirmed = await DialogService.Confirm(
+            $"¿Comprar los {_selectedItems.Count} productos seleccionados?",
+            "Comprar seleccionados",
+            new ConfirmOptions { OkButtonText = "Sí", CancelButtonText = "No" });
+        if (confirmed == true)
+            await HandlePurchaseSelected();
+    }
+
+    async Task ShowConfirmDeleteSelected()
+    {
+        var confirmed = await DialogService.Confirm(
+            $"¿Eliminar los {_selectedItems.Count} productos seleccionados?",
+            "Eliminar seleccionados",
+            new ConfirmOptions { OkButtonText = "Sí", CancelButtonText = "No" });
+        if (confirmed == true)
+            await HandleDeleteSelected();
+    }
+
     void HandleSelectionChanged(Guid productId, bool selected)
     {
         if (selected) _selectedItems.Add(productId);
@@ -97,61 +144,37 @@
 
     async Task HandlePurchaseSelected()
     {
-        var confirmed = await DialogService.Confirm(
-            $"¿Comprar los {_selectedItems.Count} productos seleccionados?",
-            "Comprar seleccionados",
-            new ConfirmOptions { OkButtonText = "Sí", CancelButtonText = "No" });
-
-        if (confirmed == true)
+        foreach (var id in _selectedItems.ToList())
         {
-            foreach (var id in _selectedItems.ToList())
-            {
-                await SetProductStatusHandler.HandleAsync(new SetProductStatusRequest(id, ProductStatus.Purchased));
-            }
-            await TravelState.SetCurrentTravelAsync(_travel!.Id);
-            _travel = TravelState.CurrentTravel;
-            LoadCart();
-            _changed = true;
-            NotificationService.Notify(NotificationSeverity.Success, "Productos comprados");
+            await SetProductStatusHandler.HandleAsync(new SetProductStatusRequest(id, ProductStatus.Purchased));
         }
+        await TravelState.SetCurrentTravelAsync(_travel!.Id);
+        _travel = TravelState.CurrentTravel;
+        LoadCart();
+        _changed = true;
+        NotificationService.Notify(NotificationSeverity.Success, "Productos comprados");
     }
 
     async Task HandleDeleteSelected()
     {
-        var confirmed = await DialogService.Confirm(
-            $"¿Eliminar los {_selectedItems.Count} productos seleccionados?",
-            "Eliminar seleccionados",
-            new ConfirmOptions { OkButtonText = "Sí", CancelButtonText = "No" });
-
-        if (confirmed == true)
+        foreach (var id in _selectedItems.ToList())
         {
-            foreach (var id in _selectedItems.ToList())
-            {
-                await DeleteProductHandler.HandleAsync(new DeleteProductRequest(id));
-            }
-            await TravelState.SetCurrentTravelAsync(_travel!.Id);
-            _travel = TravelState.CurrentTravel;
-            LoadCart();
-            _changed = true;
-            NotificationService.Notify(NotificationSeverity.Success, "Productos eliminados");
+            await DeleteProductHandler.HandleAsync(new DeleteProductRequest(id));
         }
+        await TravelState.SetCurrentTravelAsync(_travel!.Id);
+        _travel = TravelState.CurrentTravel;
+        LoadCart();
+        _changed = true;
+        NotificationService.Notify(NotificationSeverity.Success, "Productos eliminados");
     }
 
     async Task HandlePurchaseAll()
     {
-        var confirmed = await DialogService.Confirm(
-            $"¿Comprar los {_cartItems.Count} productos en el carrito?",
-            "Comprar todo",
-            new ConfirmOptions { OkButtonText = "Sí", CancelButtonText = "No" });
-
-        if (confirmed == true)
-        {
-            await PurchaseCartHandler.HandleAsync(new PurchaseCartRequest(_travel!.Id));
-            await TravelState.SetCurrentTravelAsync(_travel.Id);
-            _changed = true;
-            DialogService.CloseSide(true);
-        }
+        await PurchaseCartHandler.HandleAsync(new PurchaseCartRequest(_travel!.Id));
+        await TravelState.SetCurrentTravelAsync(_travel.Id);
+        _changed = true;
+        NavigationManager.NavigateTo("/products");
     }
 
-    void Cancel() => DialogService.CloseSide(_changed);
+    void Cancel() => NavigationManager.NavigateTo("/products");
 }

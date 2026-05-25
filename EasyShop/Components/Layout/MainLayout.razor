@@ -30,7 +30,7 @@
 
                     <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center"
                                  JustifyContent="JustifyContent.End" Gap="1rem">
-                        @if (TravelState.CurrentTravel != null)
+                        @if (TravelState.CurrentTravel != null && _cartCount > 0)
                         {
                             <RadzenButton Text="@_cartCount.ToString()" Icon="shopping_cart_checkout" ButtonStyle="ButtonStyle.Base" Click="@OpenCart" class="rz-border-radius-10" />
                         }
@@ -88,29 +88,9 @@
         _cartCount = TravelState.CurrentTravel?.Products.Count(p => p.Status == EasyShop.Domain.Models.ProductStatus.InCart) ?? 0;
     }
 
-    async Task OpenCart()
+    void OpenCart()
     {
-        try
-        {
-            var result = await DialogService.OpenSideAsync<EasyShop.Components.Pages.Cart.Index>("Carrito",
-            null,
-            new SideDialogOptions
-            {
-                Width = "600px",
-                ShowClose = true,
-                ShowMask = true,
-                CloseDialogOnOverlayClick = true,
-                Position = DialogPosition.Right
-            });
-
-            if (result is not null && result == true)
-            {
-                await TravelState.SetCurrentTravelAsync(TravelState.CurrentTravel!.Id);
-            }
-        }
-        catch (Exception)
-        {
-        }
+        NavigationManager.NavigateTo("/cart");
     }
 
     private void OnClick()

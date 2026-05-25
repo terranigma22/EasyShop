@@ -11,7 +11,7 @@
 <PageContainer>
     <RadzenRow>
         <RadzenColumn>
-            <PageHeader Title="@($"Productos comprados: {_travel?.Products.Count(p => p.Status == ProductStatus.Purchased)}")" Icon="inventory_2" />
+            <PageHeader Title="@($"Productos: {_travel?.Products.Count(p => p.Status == ProductStatus.Purchased)}")" Icon="inventory_2" />
         </RadzenColumn>
         <RadzenColumn Style="align-self: center;">
             <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center"
