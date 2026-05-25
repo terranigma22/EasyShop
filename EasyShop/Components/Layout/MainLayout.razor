@@ -32,8 +32,7 @@
                                  JustifyContent="JustifyContent.End" Gap="1rem">
                         @if (TravelState.CurrentTravel != null)
                         {
-
-                            <RadzenButton Text="@_cartCount.ToString()" Icon="shopping_cart_checkout" ButtonStyle="ButtonStyle.Base" Click="@OpenCart" />
+                            <RadzenButton Text="@_cartCount.ToString()" Icon="shopping_cart_checkout" ButtonStyle="ButtonStyle.Base" Click="@OpenCart" class="rz-border-radius-10" />
                         }
                         <RadzenAppearanceToggle LightTheme="material" DarkTheme="material-dark" />
                     </RadzenStack>
@@ -91,20 +90,29 @@
 
     async Task OpenCart()
     {
-        var result = await DialogService.OpenSideAsync<EasyShop.Components.Pages.Cart.Index>("Carrito",
+        try
+        {
+            var result = await DialogService.OpenSideAsync<EasyShop.Components.Pages.Cart.Index>("Carrito",
             null,
             new SideDialogOptions
             {
                 Width = "600px",
-                ShowClose = false,
+                ShowClose = true,
                 ShowMask = true,
                 CloseDialogOnOverlayClick = true,
                 Position = DialogPosition.Right
             });
 
-        if (result)
+            if (result is null)
+                return; return;
+
+            if (result)
+            {
+                await TravelState.SetCurrentTravelAsync(TravelState.CurrentTravel!.Id);
+            }
+        }
+        catch (Exception)
         {
-            await TravelState.SetCurrentTravelAsync(TravelState.CurrentTravel!.Id);
         }
     }
 

@@ -2,7 +2,6 @@
 
 @using EasyShop.Features.Products
 @using EasyShop.Services
-@using EasyShop.Domain.Models
 
 @inject CreateProductHandler Handler
 @inject TravelStateService TravelState
@@ -29,19 +28,6 @@
                 <RadzenFormField Text="Descripción" Style="width: 100%">
                     <ChildContent>
                         <RadzenTextBox @bind-Value="@_product.Description" Name="Description" MaxLength="100" />
-                    </ChildContent>
-                </RadzenFormField>
-            </RadzenColumn>
-        </RadzenRow>
-
-        <RadzenRow>
-            <RadzenColumn Size="12">
-                <RadzenFormField Text="Destino" Style="width: 100%">
-                    <ChildContent>
-                        <div style="display: flex; gap: 0.5rem;">
-                            <RadzenButton ButtonStyle="ButtonStyle.Secondary" Variant="@(_status == ProductStatus.InCart ? Variant.Filled : Variant.Outlined)" Icon="add_shopping_cart" Text="Al carrito" Click="@(() => { _status = ProductStatus.InCart; })" Style="flex: 1" />
-                            <RadzenButton ButtonStyle="ButtonStyle.Secondary" Variant="@(_status == ProductStatus.Purchased ? Variant.Filled : Variant.Outlined)" Icon="check_circle" Text="Comprado" Click="@(() => { _status = ProductStatus.Purchased; })" Style="flex: 1" />
-                        </div>
                     </ChildContent>
                 </RadzenFormField>
             </RadzenColumn>
@@ -149,7 +135,6 @@
     private Travel? _travel;
     private ProductDto _product = new ProductDto();
     private string? _previewImage;
-    private ProductStatus _status = ProductStatus.InCart;
 
     private string valueCost = "";
 
@@ -297,7 +282,7 @@
                 new MoneyRequest(_product.TotalCostAmount, currency),
                 new MoneyRequest(_unitPrice, currency),
                 new MoneyRequest(_unitChangePrice, changeCurrency),
-                _status,
+                ProductStatus.InCart,
                 _product.ImageDataUri,
                 _product.Description
             );
@@ -339,4 +324,6 @@
         border-radius: 1rem;
         margin-top: 4px;
     }
+
+
 </style>
