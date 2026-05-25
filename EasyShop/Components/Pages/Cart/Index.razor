@@ -1,0 +1,114 @@
+@using EasyShop.Domain.Models
+@using EasyShop.Services
+@using EasyShop.Features.Products
+
+@inject TravelStateService TravelState
+@inject PurchaseCartHandler PurchaseCartHandler
+@inject SetProductStatusHandler SetProductStatusHandler
+@inject NotificationService NotificationService
+
+<RadzenStack Gap="1rem">
+    @if (_cartItems.Count == 0)
+    {
+        <EmptyState Icon="shopping_cart" Title="Carrito vacío"
+                    Message="Agrega productos al carrito desde la sección de productos" />
+    }
+    else
+    {
+        <RadzenStack Orientation="Orientation.Horizontal" Gap="0.5rem">
+            <RadzenButton Icon="shopping_cart_checkout" ButtonStyle="ButtonStyle.Success"
+                          Text="@($"Comprar todo ({_cartItems.Count})")" Click="@HandlePurchaseAll" />
+        </RadzenStack>
+        <RadzenCard Variant="Variant.Flat" Style="overflow: hidden;">
+            @foreach (var item in _cartItems)
+            {
+                <div style="display: flex; align-items: center; padding: 0.75rem 1rem; border-bottom: 1px solid var(--rz-border-color); gap: 1rem;">
+                    @if (!string.IsNullOrEmpty(item.ImageDataUri))
+                    {
+                        <img src="@item.ImageDataUri" style="width: 48px; height: 48px; object-fit: cover; border-radius: 8px; flex-shrink: 0;" />
+                    }
+                    else
+                    {
+                        <div style="width: 48px; height: 48px; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+                            <RadzenIcon Icon="shopping_bag" Style="font-size: 1.5rem; color: var(--rz-text-secondary);" />
+                        </div>
+                    }
+                    <div style="flex: 1; min-width: 0;">
+                        <RadzenText TextStyle="TextStyle.Subtitle2"><strong>@item.Name</strong></RadzenText>
+                        @if (!string.IsNullOrEmpty(item.Description))
+                        {
+                            <span style="font-size: 0.8rem; color: var(--rz-text-secondary); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; display: block;">@item.Description</span>
+                        }
+                        <span style="font-size: 0.8rem;">Unidades: @item.Units</span>
+                    </div>
+                    <div style="text-align: right; flex-shrink: 0;">
+                        <RadzenText TextStyle="TextStyle.Subtitle2" Style="color: var(--rz-success);">@($"{item.UnitChangePrice.Amount:F2} {item.UnitChangePrice.Currency}")</RadzenText>
+                    </div>
+                    <RadzenButton Icon="shopping_cart_checkout" ButtonStyle="ButtonStyle.Success" Size="ButtonSize.Small" Variant="Variant.Text" Click="@(() => HandlePurchaseItem(item.Id))" />
+                </div>
+            }
+        </RadzenCard>
+        <RadzenCard Variant="Variant.Flat" Style="padding: 1rem;">
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+                <RadzenText TextStyle="TextStyle.H5"><strong>Total</strong></RadzenText>
+                <RadzenText TextStyle="TextStyle.H5" Style="color: var(--rz-success);"><strong>@($"{_total:F2} {_currency}")</strong></RadzenText>
+            </div>
+        </RadzenCard>
+    }
+
+    <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" JustifyContent="JustifyContent.End" Gap=".5rem" class="rz-mt-4">
+        <RadzenButton Text="Cerrar" Icon="close" ButtonStyle="ButtonStyle.Danger" Click="@Cancel" />
+    </RadzenStack>
+</RadzenStack>
+
+@code {
+    Travel? _travel;
+    List<Product> _cartItems = new();
+    decimal _total;
+    string _currency = "USD";
+    bool _changed;
+
+    protected override void OnInitialized()
+    {
+        LoadCart();
+    }
+
+    void LoadCart()
+    {
+        _travel = TravelState.CurrentTravel;
+        if (_travel != null)
+        {
+            _cartItems = _travel.Products.Where(p => p.Status == ProductStatus.InCart).ToList();
+            _total = _cartItems.Sum(p => p.UnitChangePrice.Amount);
+            _currency = _travel.ChangeValue.Currency.ToString();
+        }
+    }
+
+    async Task HandlePurchaseItem(Guid productId)
+    {
+        await SetProductStatusHandler.HandleAsync(new SetProductStatusRequest(productId, ProductStatus.Purchased));
+        await TravelState.SetCurrentTravelAsync(_travel!.Id);
+        _travel = TravelState.CurrentTravel;
+        LoadCart();
+        _changed = true;
+        NotificationService.Notify(NotificationSeverity.Success, "Producto comprado");
+    }
+
+    async Task HandlePurchaseAll()
+    {
+        var confirmed = await DialogService.Confirm(
+            $"¿Comprar los {_cartItems.Count} productos en el carrito?",
+            "Comprar todo",
+            new ConfirmOptions { OkButtonText = "Sí", CancelButtonText = "No" });
+
+        if (confirmed == true)
+        {
+            await PurchaseCartHandler.HandleAsync(new PurchaseCartRequest(_travel!.Id));
+            await TravelState.SetCurrentTravelAsync(_travel.Id);
+            _changed = true;
+            DialogService.CloseSide(true);
+        }
+    }
+
+    void Cancel() => DialogService.CloseSide(_changed);
+}

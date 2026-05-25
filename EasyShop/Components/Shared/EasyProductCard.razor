@@ -26,6 +26,18 @@
             </div>
         </RadzenStack>
     </RadzenStack>
+    <div class="product-action-zone" @onclick:stopPropagation>
+        @if (Data.Status == EasyShop.Domain.Models.ProductStatus.InCart)
+        {
+            <RadzenButton Icon="shopping_cart_checkout" ButtonStyle="ButtonStyle.Success"
+                          Size="ButtonSize.Medium" Variant="Variant.Text"
+                          Click="@HandlePurchase" />
+        }
+        else
+        {
+            <RadzenIcon Icon="check_circle" Style="color: var(--rz-success); font-size: 1.5rem;" />
+        }
+    </div>
     <div class="product-delete-zone" @onclick:stopPropagation>
         <RadzenButton Icon="delete" ButtonStyle="ButtonStyle.Danger"
                       Size="ButtonSize.Medium" Variant="Variant.Text"
@@ -48,6 +60,8 @@
 
     [Parameter] public EventCallback<Guid> Delete { get; set; }
 
+    [Parameter] public EventCallback<Guid> Purchase { get; set; }
+
     private bool _showPreview;
 
     private async Task HandleClick()
@@ -60,6 +74,12 @@
     {
         if (Delete.HasDelegate)
             await Delete.InvokeAsync(Data.Id);
+    }
+
+    private async Task HandlePurchase()
+    {
+        if (Purchase.HasDelegate)
+            await Purchase.InvokeAsync(Data.Id);
     }
 
     private void ShowPreview()
@@ -82,6 +102,24 @@
         width: 48px;
     }
     .product-delete-zone .rz-button {
+        height: 100% !important;
+        width: 100% !important;
+        border-radius: 0 !important;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    .product-action-zone {
+        position: absolute;
+        top: 0;
+        right: 48px;
+        height: 100%;
+        width: 48px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    .product-action-zone .rz-button {
         height: 100% !important;
         width: 100% !important;
         border-radius: 0 !important;

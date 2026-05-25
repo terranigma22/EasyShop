@@ -11,11 +11,11 @@
 
         <ChildContent>
             <RadzenRow JustifyContent="JustifyContent.Start" AlignItems="AlignItems.Center" Gap="0">
-                <RadzenColumn Size="10">
+                <RadzenColumn Size="8">
                     <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center">
                         <RadzenSidebarToggle Click="@(() => sidebarExpanded = !sidebarExpanded)"
                                              Icon="space_dashboard" />
-                        <RadzenLabel Text="EasyShop" />
+                        @* <RadzenLabel Text="EasyShop" /> *@
                         @if (TravelState.CurrentTravel != null)
                         {
                             <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="0.25rem" Style="margin-left: 1rem;">
@@ -27,10 +27,28 @@
                         }
                     </RadzenStack>
                 </RadzenColumn>
-                <RadzenColumn Size="2">
+                <RadzenColumn Size="4">
 
                     <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center"
                                  JustifyContent="JustifyContent.End" Gap="1rem">
+                        @if (TravelState.CurrentTravel != null)
+                        {
+
+                            <RadzenButton Text="@_cartCount.ToString()" Icon="shopping_cart_checkout" ButtonStyle="ButtonStyle.Base" Click="@OpenCart" />
+
+                            @* <div style="position: relative; display: inline-block;">
+
+                                <RadzenButton Icon="shopping_cart_checkout" ButtonStyle="ButtonStyle.Base" Size="ButtonSize.Medium" Variant="Variant.Text"
+                                              Click="@OpenCart" />
+                                @if (_cartCount > 0)
+                                {
+                                    <RadzenBadge BadgeStyle="BadgeStyle.Danger" Variant="Variant.Outlined"
+                                                 Style="position: absolute; top: 2px; right: 2px; font-size: 0.7rem; min-width: 18px; height: 18px; line-height: 18px; padding: 0 5px;">
+                                        @_cartCount
+                                    </RadzenBadge>
+                                }
+                            </div> *@
+                        }
                         <RadzenAppearanceToggle LightTheme="material" DarkTheme="material-dark" />
                     </RadzenStack>
                 </RadzenColumn>
@@ -69,13 +87,39 @@
 
 @code {
     bool sidebarExpanded = false;
+    int _cartCount;
 
     protected override async Task OnInitializedAsync()
     {
         sidebarExpanded = false;
         await TravelState.LoadLastTravelAsync();
+        UpdateCartCount();
+        TravelState.OnTravelChanged += () => { UpdateCartCount(); StateHasChanged(); };
+        StateHasChanged();
+    }
 
-        TravelState.OnTravelChanged += StateHasChanged; 
+    void UpdateCartCount()
+    {
+        _cartCount = TravelState.CurrentTravel?.Products.Count(p => p.Status == EasyShop.Domain.Models.ProductStatus.InCart) ?? 0;
+    }
+
+    async Task OpenCart()
+    {
+        var result = await DialogService.OpenSideAsync<EasyShop.Components.Pages.Cart.Index>("Carrito",
+            null,
+            new SideDialogOptions
+            {
+                Width = "600px",
+                ShowClose = false,
+                ShowMask = true,
+                CloseDialogOnOverlayClick = true,
+                Position = DialogPosition.Right
+            });
+
+        if (result)
+        {
+            await TravelState.SetCurrentTravelAsync(TravelState.CurrentTravel!.Id);
+        }
     }
 
     private void OnClick()

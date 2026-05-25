@@ -6,6 +6,7 @@
 
 @inject TravelStateService TravelState
 @inject DeleteProductHandler DeleteProductHandler
+@inject SetProductStatusHandler SetProductStatusHandler
 @inject NotificationService NotificationService
 
 <PageContainer>
@@ -19,6 +20,17 @@
                 <RadzenButton Icon="add_circle" ButtonStyle="ButtonStyle.Primary"
                               Click="@Create" />
             </RadzenStack>
+        </RadzenColumn>
+    </RadzenRow>
+    <RadzenRow>
+        <RadzenColumn>
+            <RadzenSelectBar @bind-Value="@_filter" TValue="ProductStatus?" class="rz-mb-3">
+                <Items>
+                    <RadzenSelectBarItem Text="@($"Todos ({_travel?.Products.Count})")" Value="@((ProductStatus?)null)" />
+                    <RadzenSelectBarItem Text="@($"En carrito ({_travel?.Products.Count(p => p.Status == ProductStatus.InCart)})")" Value="@ProductStatus.InCart" />
+                    <RadzenSelectBarItem Text="@($"Comprados ({_travel?.Products.Count(p => p.Status == ProductStatus.Purchased)})")" Value="@ProductStatus.Purchased" />
+                </Items>
+            </RadzenSelectBar>
         </RadzenColumn>
     </RadzenRow>
 
@@ -41,10 +53,10 @@
         <ListContainer>
             <AnimateFadeIn>
                 <EasyGridForCards>
-                    @foreach (var item in _travel.Products)
+                    @foreach (var item in _travel.Products.Where(p => _filter == null || p.Status == _filter))
                     {
                         <EasyColumForCard>
-                            <EasyProductCard Data="item" Click="@HandleCardSelected" Delete="@HandleDelete" />
+                            <EasyProductCard Data="item" Click="@HandleCardSelected" Delete="@HandleDelete" Purchase="@HandlePurchase" />
                         </EasyColumForCard>
                     }
                 </EasyGridForCards>
@@ -55,6 +67,7 @@
 
 @code {
     Travel? _travel;
+    ProductStatus? _filter;
 
     protected override void OnInitialized()
     {
@@ -78,6 +91,14 @@
         {
             _travel = TravelState.CurrentTravel;
         }
+    }
+
+    private async Task HandlePurchase(Guid id)
+    {
+        await SetProductStatusHandler.HandleAsync(new SetProductStatusRequest(id, ProductStatus.Purchased));
+        await TravelState.SetCurrentTravelAsync(_travel!.Id);
+        _travel = TravelState.CurrentTravel;
+        NotificationService.Notify(NotificationSeverity.Success, "Producto comprado");
     }
 
     private async Task HandleDelete(Guid id)

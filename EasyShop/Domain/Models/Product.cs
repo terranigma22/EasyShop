@@ -13,13 +13,14 @@ public class Product : BaseEntity
     public Money UnitChangePrice { get; set; } = new Money(0m, CurrencyCode.USD);
     public string? Description { get; set; }
     public string? ImageDataUri { get; set; }
+    public ProductStatus Status { get; set; } = ProductStatus.InCart;
 
     public decimal GetUnitCost() 
         => Units == 0 ? 0 : TotalCost.Amount / Units;
 
     private Product() { }
 
-    public static Product New(Guid travelId, string name, int units, double multiplicator, Money totalCost, Money unitPrice, Money unitChangePrice, string? imageDataUri = null, string? description = null)
+    public static Product New(Guid travelId, string name, int units, double multiplicator, Money totalCost, Money unitPrice, Money unitChangePrice, ProductStatus status, string? imageDataUri = null, string? description = null)
     {
         return new Product
         {
@@ -31,7 +32,8 @@ public class Product : BaseEntity
             UnitPrice = unitPrice,
             UnitChangePrice = unitChangePrice,
             ImageDataUri = imageDataUri,
-            Description = description
+            Description = description,
+            Status = status
         };
     }
 

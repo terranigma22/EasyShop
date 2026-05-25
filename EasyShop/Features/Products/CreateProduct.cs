@@ -13,6 +13,7 @@ public sealed record CreateProductRequest(
     MoneyRequest TotalCost,
     MoneyRequest UnitPrice,
     MoneyRequest UnitChangePrice,
+    ProductStatus Status,
     string? ImageDataUri,
     string? Description
 );
@@ -32,6 +33,7 @@ public sealed class CreateProductHandler
             new Money(request.TotalCost.Amount, request.TotalCost.Currency),
             new Money(request.UnitPrice.Amount, request.UnitPrice.Currency),
             new Money(request.UnitChangePrice.Amount, request.UnitChangePrice.Currency),
+            request.Status,
             request.ImageDataUri,
             request.Description
         );
