@@ -1,11 +1,7 @@
-﻿<RadzenCard Variant="Variant.Flat"
-    Style="@_cardStyle">
+﻿<RadzenCard Variant="Variant.Outlined" Style="@_cardStyle"
+    @onclick="@ToggleSelection">
 
-    <div class="cart-item-check-zone" @onclick:stopPropagation>
-        <RadzenCheckBox @bind-Value="@_isSelected" TValue="bool" Change="@HandleSelectionChanged" />
-    </div>
-
-    <div style="display: flex; align-items: center; gap: 0.75rem; padding-right: 96px; padding-left: 40px; min-height: 64px;">
+    <div style="display: flex; align-items: center; gap: 0.75rem; min-height: 64px;">
         @if (!string.IsNullOrEmpty(Data.ImageDataUri))
         {
             <img src="@Data.ImageDataUri" class="cart-item-image-square" @onclick:stopPropagation @onclick="ShowPreview" />
@@ -32,15 +28,6 @@
             </div>
         </div>
     </div>
-
-    <div class="cart-item-action-zone" @onclick:stopPropagation>
-        <RadzenButton Icon="delete" ButtonStyle="ButtonStyle.Danger"
-                      Size="ButtonSize.Medium" Variant="Variant.Text"
-                      Click="@HandleDelete" />
-        <RadzenButton Icon="shopping_cart_checkout" ButtonStyle="ButtonStyle.Success"
-                      Size="ButtonSize.Medium" Variant="Variant.Text"
-                      Click="@HandlePurchase" />
-    </div>
 </RadzenCard>
 
 @if (_showPreview)
@@ -53,10 +40,6 @@
 
 @code {
     [EditorRequired, Parameter] public Product Data { get; set; }
-
-    [Parameter] public EventCallback<Guid> Purchase { get; set; }
-
-    [Parameter] public EventCallback<Guid> Delete { get; set; }
 
     [Parameter] public bool IsSelected { get; set; }
 
@@ -72,29 +55,17 @@
         UpdateCardStyle();
     }
 
-    private async Task HandleSelectionChanged(bool value)
+    private void ToggleSelection()
     {
-        _isSelected = value;
+        _isSelected = !_isSelected;
         UpdateCardStyle();
-        await IsSelectedChanged.InvokeAsync(value);
+        IsSelectedChanged.InvokeAsync(_isSelected);
     }
 
     void UpdateCardStyle()
     {
         _cardStyle = "position: relative; overflow: hidden;"
             + (_isSelected ? "outline: 2px solid var(--rz-primary);" : "");
-    }
-
-    private async Task HandlePurchase()
-    {
-        if (Purchase.HasDelegate)
-            await Purchase.InvokeAsync(Data.Id);
-    }
-
-    private async Task HandleDelete()
-    {
-        if (Delete.HasDelegate)
-            await Delete.InvokeAsync(Data.Id);
     }
 
     private void ShowPreview()
@@ -110,37 +81,6 @@
 }
 
 <style>
-    .cart-item-check-zone {
-        position: absolute;
-        top: 0;
-        left: 0;
-        height: 100%;
-        width: 40px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        z-index: 1;
-    }
-
-    .cart-item-action-zone {
-        position: absolute;
-        top: 0;
-        right: 0;
-        height: 100%;
-        width: 96px;
-        display: flex;
-        align-items: center;
-    }
-    .cart-item-action-zone .rz-button {
-        height: 100% !important;
-        width: 48px !important;
-        border-radius: 0 !important;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        flex-shrink: 0;
-    }
-
     .cart-item-image-square {
         width: 48px;
         height: 48px;

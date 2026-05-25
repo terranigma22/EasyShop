@@ -18,11 +18,13 @@
     {
         <RadzenStack Orientation="Orientation.Horizontal" Gap="0.5rem">
             <RadzenButton Icon="shopping_cart_checkout" ButtonStyle="ButtonStyle.Success"
-                          Text="@($"Comprar todo ({_cartItems.Count})")" Click="@HandlePurchaseAll" />
+                          Text="@($"Todo ({_cartItems.Count})")" Click="@HandlePurchaseAll" />
             @if (_selectedItems.Count > 0)
             {
+                <RadzenButton Icon="shopping_cart_checkout" ButtonStyle="ButtonStyle.Primary"
+                              Text="@($"{_selectedItems.Count}")" Click="@HandlePurchaseSelected" />
                 <RadzenButton Icon="delete" ButtonStyle="ButtonStyle.Danger"
-                              Text="@($"Eliminar ({_selectedItems.Count})")" Click="@HandleDeleteSelected" />
+                              Text="@($"{_selectedItems.Count}")" Click="@HandleDeleteSelected" />
             }
         </RadzenStack>
 
@@ -43,8 +45,6 @@
             {
                 <EasyColumForCard>
                     <EasyCartItem Data="item"
-                                  Purchase="@HandlePurchaseItem"
-                                  Delete="@HandleDeleteItem"
                                   IsSelected="@_selectedItems.Contains(item.Id)"
                                   IsSelectedChanged="@((value) => HandleSelectionChanged(item.Id, value))" />
                 </EasyColumForCard>
@@ -58,10 +58,6 @@
             </div>
         </RadzenCard>
     }
-
-    <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" JustifyContent="JustifyContent.End" Gap=".5rem" class="rz-mt-4">
-        <RadzenButton Text="Cerrar" Icon="close" ButtonStyle="ButtonStyle.Danger" Click="@Cancel" />
-    </RadzenStack>
 </RadzenStack>
 
 @code {
@@ -99,31 +95,24 @@
             .Sum(p => p.TotalCost.Amount);
     }
 
-    async Task HandlePurchaseItem(Guid productId)
-    {
-        await SetProductStatusHandler.HandleAsync(new SetProductStatusRequest(productId, ProductStatus.Purchased));
-        await TravelState.SetCurrentTravelAsync(_travel!.Id);
-        _travel = TravelState.CurrentTravel;
-        LoadCart();
-        _changed = true;
-        NotificationService.Notify(NotificationSeverity.Success, "Producto comprado");
-    }
-
-    async Task HandleDeleteItem(Guid productId)
+    async Task HandlePurchaseSelected()
     {
         var confirmed = await DialogService.Confirm(
-            "¿Eliminar este producto del carrito?",
-            "Eliminar",
+            $"¿Comprar los {_selectedItems.Count} productos seleccionados?",
+            "Comprar seleccionados",
             new ConfirmOptions { OkButtonText = "Sí", CancelButtonText = "No" });
 
         if (confirmed == true)
         {
-            await DeleteProductHandler.HandleAsync(new DeleteProductRequest(productId));
+            foreach (var id in _selectedItems.ToList())
+            {
+                await SetProductStatusHandler.HandleAsync(new SetProductStatusRequest(id, ProductStatus.Purchased));
+            }
             await TravelState.SetCurrentTravelAsync(_travel!.Id);
             _travel = TravelState.CurrentTravel;
             LoadCart();
             _changed = true;
-            NotificationService.Notify(NotificationSeverity.Success, "Producto eliminado");
+            NotificationService.Notify(NotificationSeverity.Success, "Productos comprados");
         }
     }
 
