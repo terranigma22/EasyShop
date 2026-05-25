@@ -80,6 +80,14 @@
                           Click="@(() => NavigationManager.NavigateTo("/products"))" />
             </RadzenColumn>
 
+            <RadzenColumn Size="12">
+                <StatCard Title="Deseados"
+                          Icon="inventory_2" IconColor="@Colors.WarningLight"
+                          Value="@_travel.Products.Count(p => p.Status == ProductStatus.Wishlisted)"
+                          Subtitle="@($"{_travel.Products.Where(p => p.Status == ProductStatus.Wishlisted).Sum(p => p.TotalCost.Amount):F2} {_travel.MoneyToTravel.Currency}")"
+                          Click="@(() => NavigationManager.NavigateTo("/wishlist"))" />
+            </RadzenColumn>
+
 
             <RadzenColumn Size="12">
                 <StatCard Title="Gastos"

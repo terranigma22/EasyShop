@@ -31,7 +31,7 @@
                                  JustifyContent="JustifyContent.End" Gap="1rem">
                         @if (TravelState.CurrentTravel != null && _cartCount > 0)
                         {
-                            <RadzenButton Text="@_cartCount.ToString()" Icon="shopping_cart_checkout" ButtonStyle="ButtonStyle.Base" Click="@OpenCart" class="rz-border-radius-10" />
+                            <RadzenButton Text="@_cartCount.ToString()" Icon="shopping_cart_checkout" ButtonStyle="ButtonStyle.Primary" Variant="Variant.Filled" Click="@OpenCart" class="rz-border-radius-10" />
                         }
                         <RadzenAppearanceToggle LightTheme="material" DarkTheme="material-dark" />
                     </RadzenStack>
