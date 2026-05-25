@@ -10,7 +10,7 @@
 @inject DeleteProductHandler DeleteProductHandler
 @inject NotificationService NotificationService
 
-<PageContainer>
+<div class="cart-page">
     <RadzenRow>
         <RadzenColumn>
             <PageHeader Title="@($"Carrito: {_cartItems.Count}")"
@@ -25,6 +25,7 @@
         </RadzenColumn>
     </RadzenRow>
 
+    <RadzenStack Gap="1rem" Style="flex: 1; display: flex; flex-direction: column; min-height: 0;">
     @if (_cartItems.Count == 0)
     {
         <EmptyState Icon="shopping_cart" Title="Carrito vacío"
@@ -32,20 +33,25 @@
     }
     else
     {
-        <RadzenStack Orientation="Orientation.Horizontal" Gap="0.5rem">
-            @if (_selectedItems.Count > 0)
-            {
-                <RadzenButton Icon="shopping_cart_checkout" ButtonStyle="ButtonStyle.Primary"
-                              Text="@($"Comprar ({_selectedItems.Count})")" Click="@ShowConfirmPurchaseSelected" />
-                <RadzenButton Icon="delete" ButtonStyle="ButtonStyle.Danger"
-                              Text="@($"Eliminar ({_selectedItems.Count})")" Click="@ShowConfirmDeleteSelected" />
-            }
-            else
-            {
-                <RadzenButton Icon="shopping_cart_checkout" ButtonStyle="ButtonStyle.Success"
-                              Text="@($"Todo ({_cartItems.Count})")" Click="@ShowConfirmPurchaseAll" />
-            }
-        </RadzenStack>
+        <RadzenCard Variant="Variant.Flat" Style="padding: 1rem;">
+            <div style="display: flex; flex-direction: column; gap: 0.75rem;">
+                <div style="display: flex; justify-content: space-between; align-items: center;">
+                    <RadzenButton Icon="shopping_cart_checkout" ButtonStyle="ButtonStyle.Success"
+                                  Text="@($"Comprar ({_cartItems.Count})")"
+                                  Click="@ShowConfirmPurchaseAll" />
+                    <RadzenText TextStyle="TextStyle.Subtitle1"><strong>@($"{_total:F2} {_currency}")</strong></RadzenText>
+                </div>
+                <div style="display: flex; justify-content: space-between; align-items: center;">
+                    <RadzenButton Icon="shopping_cart_checkout" ButtonStyle="ButtonStyle.Primary"
+                                  Text="@($"Comprar ({_selectedItems.Count})")"
+                                  Click="@ShowConfirmPurchaseSelected"
+                                  Disabled="@(_selectedItems.Count == 0)" />
+                    <RadzenText TextStyle="TextStyle.Subtitle2" Style="color: var(--rz-primary);">
+                        @($"{_selectedTotal:F2} {_currency}")
+                    </RadzenText>
+                </div>
+            </div>
+        </RadzenCard>
 
         <div class="cart-grid-scroll">
             <EasyGridForCards>
@@ -54,39 +60,25 @@
                     <EasyColumForCard>
                         <EasyCartItem Data="item"
                                       IsSelected="@_selectedItems.Contains(item.Id)"
-                                      IsSelectedChanged="@((value) => HandleSelectionChanged(item.Id, value))" />
+                                      IsSelectedChanged="@((value) => HandleSelectionChanged(item.Id, value))"
+                                      Delete="@HandleDeleteCartItem" />
                     </EasyColumForCard>
                 }
             </EasyGridForCards>
         </div>
-
-        <RadzenCard Variant="Variant.Flat" Style="padding: 1rem;">
-            <div style="display: flex; justify-content: space-between; align-items: flex-start;">
-                <div>
-                    <RadzenText TextStyle="TextStyle.H5"><strong>Total carrito</strong></RadzenText>
-                    @if (_selectedItems.Count > 0)
-                    {
-                        <RadzenText TextStyle="TextStyle.Subtitle2" Style="color: var(--rz-primary);">
-                            @_selectedItems.Count seleccionados — @($"{_selectedTotal:F2} {_currency}")
-                        </RadzenText>
-                    }
-                </div>
-                <RadzenText TextStyle="TextStyle.H5" Style="color: var(--rz-success);"><strong>@($"{_total:F2} {_currency}")</strong></RadzenText>
-            </div>
-        </RadzenCard>
     }
-</PageContainer>
+    </RadzenStack>
+</div>
 
 <style>
     .cart-page {
-        height: 100%;
-        display: flex;
-        flex-direction: column;
         max-width: var(--easysell-content-max-width);
         margin: 0 auto;
         width: 100%;
-        padding: 0 var(--easysell-space-4);
-        gap: 1rem;
+        padding: 0;
+        height: 100%;
+        display: flex;
+        flex-direction: column;
     }
     .cart-grid-scroll {
         flex: 1;
@@ -141,14 +133,20 @@
             await HandlePurchaseSelected();
     }
 
-    async Task ShowConfirmDeleteSelected()
+    async Task HandleDeleteCartItem(Guid id)
     {
         var confirmed = await DialogService.Confirm(
-            $"¿Eliminar los {_selectedItems.Count} productos seleccionados?",
-            "Eliminar seleccionados",
+            "¿Eliminar este producto del carrito?",
+            "Eliminar",
             new ConfirmOptions { OkButtonText = "Sí", CancelButtonText = "No" });
         if (confirmed == true)
-            await HandleDeleteSelected();
+        {
+            await DeleteProductHandler.HandleAsync(new DeleteProductRequest(id));
+            await TravelState.SetCurrentTravelAsync(_travel!.Id);
+            _travel = TravelState.CurrentTravel;
+            LoadCart();
+            NotificationService.Notify(NotificationSeverity.Success, "Producto eliminado del carrito");
+        }
     }
 
     void HandleSelectionChanged(Guid productId, bool selected)
@@ -171,19 +169,6 @@
         LoadCart();
         _changed = true;
         NotificationService.Notify(NotificationSeverity.Success, "Productos comprados");
-    }
-
-    async Task HandleDeleteSelected()
-    {
-        foreach (var id in _selectedItems.ToList())
-        {
-            await DeleteProductHandler.HandleAsync(new DeleteProductRequest(id));
-        }
-        await TravelState.SetCurrentTravelAsync(_travel!.Id);
-        _travel = TravelState.CurrentTravel;
-        LoadCart();
-        _changed = true;
-        NotificationService.Notify(NotificationSeverity.Success, "Productos eliminados");
     }
 
     async Task HandlePurchaseAll()

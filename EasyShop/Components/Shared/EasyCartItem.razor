@@ -26,6 +26,11 @@
                 <span>@($"{Data.TotalCost.Amount:F2} {Data.TotalCost.Currency}")</span>
             </div>
         </div>
+        <div class="cart-delete-zone" @onclick:stopPropagation>
+            <RadzenButton Icon="delete" ButtonStyle="ButtonStyle.Danger"
+                          Size="ButtonSize.Medium" Variant="Variant.Text"
+                          Click="@HandleDelete" />
+        </div>
     </div>
 </RadzenCard>
 
@@ -43,6 +48,8 @@
     [Parameter] public bool IsSelected { get; set; }
 
     [Parameter] public EventCallback<bool> IsSelectedChanged { get; set; }
+
+    [Parameter] public EventCallback<Guid> Delete { get; set; }
 
     private bool _isSelected;
     private bool _showPreview;
@@ -67,6 +74,12 @@
             + (_isSelected ? "background: color-mix(in srgb, var(--rz-primary) 12%, var(--rz-base));" : "");
     }
 
+    private async Task HandleDelete()
+    {
+        if (Delete.HasDelegate)
+            await Delete.InvokeAsync(Data.Id);
+    }
+
     private void ShowPreview()
     {
         if (!string.IsNullOrEmpty(Data.ImageDataUri))
@@ -80,6 +93,11 @@
 }
 
 <style>
+    .cart-delete-zone {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
     .cart-item-image-square {
         width: 48px;
         height: 48px;
