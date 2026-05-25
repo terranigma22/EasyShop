@@ -95,16 +95,22 @@
             await DeleteProductHandler.HandleAsync(new DeleteProductRequest(id));
             await TravelState.SetCurrentTravelAsync(_travel!.Id);
             _travel = TravelState.CurrentTravel;
-            NotificationService.Notify(NotificationSeverity.Success, "Producto eliminado correctamente");
         }
     }
 
     private async Task HandleAddToCart(Guid id)
     {
-        await SetProductStatusHandler.HandleAsync(new SetProductStatusRequest(id, ProductStatus.InCart));
-        await TravelState.SetCurrentTravelAsync(_travel!.Id);
-        _travel = TravelState.CurrentTravel;
-        NotificationService.Notify(NotificationSeverity.Success, "Producto agregado al carrito");
+        var confirmed = await DialogService.Confirm(
+            "¿Estás seguro de agregar este producto al carrito?",
+            "Agregar al Carrito",
+            new ConfirmOptions { OkButtonText = "Sí", CancelButtonText = "No" });
+
+        if (confirmed == true)
+        {
+            await SetProductStatusHandler.HandleAsync(new SetProductStatusRequest(id, ProductStatus.InCart));
+            await TravelState.SetCurrentTravelAsync(_travel!.Id);
+            _travel = TravelState.CurrentTravel;
+        }
     }
 
     async Task Create()

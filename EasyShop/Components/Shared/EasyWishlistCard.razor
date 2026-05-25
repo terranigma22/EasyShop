@@ -23,16 +23,20 @@
                 <span>@Data.Units</span>
             </div>
             <div style="display: flex; justify-content: space-between;">
+                <span>Costo</span>
+                <span>@($"{Data.TotalCost.Amount:F2} {Data.TotalCost.Currency}")</span>
+            </div>
+            <div style="display: flex; justify-content: space-between;">
                 <span>Precio</span>
                 <span style="color: var(--rz-success);">@($"{Data.UnitChangePrice.Amount:F2} {Data.UnitChangePrice.Currency}")</span>
             </div>
             <div style="display: flex; justify-content: flex-end; gap: 0.5rem; margin-top: 0.25rem;">
                 <RadzenButton Icon="add_shopping_cart" ButtonStyle="ButtonStyle.Primary"
-                              Size="ButtonSize.Small" Variant="Variant.Text"
+                              Size="ButtonSize.Small" Variant="Variant.Outlined"
                               Text="Agregar al carrito"
                               Click="@HandleAddToCart" @onclick:stopPropagation/>
                 <RadzenButton Icon="delete" ButtonStyle="ButtonStyle.Danger"
-                              Size="ButtonSize.Small" Variant="Variant.Text"
+                              Size="ButtonSize.Small" Variant="Variant.Outlined"
                               Click="@HandleDelete" @onclick:stopPropagation/>
             </div>
         </RadzenStack>
