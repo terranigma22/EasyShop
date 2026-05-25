@@ -15,7 +15,6 @@
                     <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center">
                         <RadzenSidebarToggle Click="@(() => sidebarExpanded = !sidebarExpanded)"
                                              Icon="space_dashboard" />
-                        @* <RadzenLabel Text="EasyShop" /> *@
                         @if (TravelState.CurrentTravel != null)
                         {
                             <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="0.25rem" Style="margin-left: 1rem;">
@@ -35,19 +34,6 @@
                         {
 
                             <RadzenButton Text="@_cartCount.ToString()" Icon="shopping_cart_checkout" ButtonStyle="ButtonStyle.Base" Click="@OpenCart" />
-
-                            @* <div style="position: relative; display: inline-block;">
-
-                                <RadzenButton Icon="shopping_cart_checkout" ButtonStyle="ButtonStyle.Base" Size="ButtonSize.Medium" Variant="Variant.Text"
-                                              Click="@OpenCart" />
-                                @if (_cartCount > 0)
-                                {
-                                    <RadzenBadge BadgeStyle="BadgeStyle.Danger" Variant="Variant.Outlined"
-                                                 Style="position: absolute; top: 2px; right: 2px; font-size: 0.7rem; min-width: 18px; height: 18px; line-height: 18px; padding: 0 5px;">
-                                        @_cartCount
-                                    </RadzenBadge>
-                                }
-                            </div> *@
                         }
                         <RadzenAppearanceToggle LightTheme="material" DarkTheme="material-dark" />
                     </RadzenStack>

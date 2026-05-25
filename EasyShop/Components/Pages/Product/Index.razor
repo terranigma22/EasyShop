@@ -6,13 +6,12 @@
 
 @inject TravelStateService TravelState
 @inject DeleteProductHandler DeleteProductHandler
-@inject SetProductStatusHandler SetProductStatusHandler
 @inject NotificationService NotificationService
 
 <PageContainer>
     <RadzenRow>
         <RadzenColumn>
-            <PageHeader Title="@($"Productos: {_travel?.Products.Count}")" Icon="inventory_2" />
+            <PageHeader Title="@($"Productos comprados: {_travel?.Products.Count(p => p.Status == ProductStatus.Purchased)}")" Icon="inventory_2" />
         </RadzenColumn>
         <RadzenColumn Style="align-self: center;">
             <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center"
@@ -22,18 +21,6 @@
             </RadzenStack>
         </RadzenColumn>
     </RadzenRow>
-    <RadzenRow>
-        <RadzenColumn>
-            <RadzenSelectBar @bind-Value="@_filter" TValue="ProductStatus?" class="rz-mb-3">
-                <Items>
-                    <RadzenSelectBarItem Text="@($"Todos ({_travel?.Products.Count})")" Value="@((ProductStatus?)null)" />
-                    <RadzenSelectBarItem Text="@($"En carrito ({_travel?.Products.Count(p => p.Status == ProductStatus.InCart)})")" Value="@ProductStatus.InCart" />
-                    <RadzenSelectBarItem Text="@($"Comprados ({_travel?.Products.Count(p => p.Status == ProductStatus.Purchased)})")" Value="@ProductStatus.Purchased" />
-                </Items>
-            </RadzenSelectBar>
-        </RadzenColumn>
-    </RadzenRow>
-
     @if (_travel == null)
     {
         <EmptyState Icon="travel" Title="No hay viaje activo" Message="Selecciona un viaje para ver sus productos">
@@ -41,7 +28,7 @@
                           Click="@(() => NavigationManager.NavigateTo("/travels"))" />
         </EmptyState>
     }
-    else if (_travel.Products.Count == 0)
+    else if (_travel.Products.Count(p => p.Status == ProductStatus.Purchased) == 0)
     {
         <EmptyState Icon="inventory_2" Title="Sin productos" Message="Este viaje no tiene productos registrados">
             <RadzenButton Icon="add_circle" ButtonStyle="ButtonStyle.Primary" Text="Crear primer producto"
@@ -53,10 +40,10 @@
         <ListContainer>
             <AnimateFadeIn>
                 <EasyGridForCards>
-                    @foreach (var item in _travel.Products.Where(p => _filter == null || p.Status == _filter))
+                    @foreach (var item in _travel.Products.Where(p => p.Status == ProductStatus.Purchased))
                     {
                         <EasyColumForCard>
-                            <EasyProductCard Data="item" Click="@HandleCardSelected" Delete="@HandleDelete" Purchase="@HandlePurchase" />
+                            <EasyProductCard Data="item" Click="@HandleCardSelected" Delete="@HandleDelete" />
                         </EasyColumForCard>
                     }
                 </EasyGridForCards>
@@ -67,7 +54,6 @@
 
 @code {
     Travel? _travel;
-    ProductStatus? _filter;
 
     protected override void OnInitialized()
     {
@@ -91,14 +77,6 @@
         {
             _travel = TravelState.CurrentTravel;
         }
-    }
-
-    private async Task HandlePurchase(Guid id)
-    {
-        await SetProductStatusHandler.HandleAsync(new SetProductStatusRequest(id, ProductStatus.Purchased));
-        await TravelState.SetCurrentTravelAsync(_travel!.Id);
-        _travel = TravelState.CurrentTravel;
-        NotificationService.Notify(NotificationSeverity.Success, "Producto comprado");
     }
 
     private async Task HandleDelete(Guid id)
