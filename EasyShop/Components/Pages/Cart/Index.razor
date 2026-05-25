@@ -145,7 +145,6 @@
             await TravelState.SetCurrentTravelAsync(_travel!.Id);
             _travel = TravelState.CurrentTravel;
             LoadCart();
-            NotificationService.Notify(NotificationSeverity.Success, "Producto eliminado del carrito");
         }
     }
 
@@ -168,7 +167,6 @@
         _travel = TravelState.CurrentTravel;
         LoadCart();
         _changed = true;
-        NotificationService.Notify(NotificationSeverity.Success, "Productos comprados");
     }
 
     async Task HandlePurchaseAll()

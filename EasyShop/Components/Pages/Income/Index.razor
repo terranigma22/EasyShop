@@ -73,7 +73,6 @@
             await DeleteIncomeHandler.HandleAsync(new DeleteIncomeRequest(id));
             await TravelState.SetCurrentTravelAsync(_travel!.Id);
             _travel = TravelState.CurrentTravel;
-            NotificationService.Notify(NotificationSeverity.Success, "Entrada eliminada correctamente");
         }
     }
 

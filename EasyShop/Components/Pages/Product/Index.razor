@@ -91,7 +91,6 @@
             await DeleteProductHandler.HandleAsync(new DeleteProductRequest(id));
             await TravelState.SetCurrentTravelAsync(_travel!.Id);
             _travel = TravelState.CurrentTravel;
-            NotificationService.Notify(NotificationSeverity.Success, "Producto eliminado correctamente");
         }
     }
 

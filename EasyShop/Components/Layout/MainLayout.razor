@@ -13,8 +13,7 @@
             <RadzenRow JustifyContent="JustifyContent.Start" AlignItems="AlignItems.Center" Gap="0">
                 <RadzenColumn Size="8">
                     <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center">
-                        <RadzenSidebarToggle Click="@(() => sidebarExpanded = !sidebarExpanded)"
-                                             Icon="space_dashboard" />
+                        <RadzenSidebarToggle Click="@(() => sidebarExpanded = !sidebarExpanded)"/>
                         @if (TravelState.CurrentTravel != null)
                         {
                             <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="0.25rem">
@@ -31,7 +30,7 @@
                                  JustifyContent="JustifyContent.End" Gap="1rem">
                         @if (TravelState.CurrentTravel != null && _cartCount > 0)
                         {
-                            <RadzenButton Text="@_cartCount.ToString()" Icon="shopping_cart_checkout" ButtonStyle="ButtonStyle.Primary" Variant="Variant.Filled" Click="@OpenCart" class="rz-border-radius-10" />
+                            <RadzenButton Text="@_cartCount.ToString()" Icon="shopping_cart_checkout" ButtonStyle="ButtonStyle.Secondary" Variant="Variant.Filled" Click="@OpenCart" class="rz-border-radius-10" />
                         }
                         <RadzenAppearanceToggle LightTheme="material" DarkTheme="material-dark" />
                     </RadzenStack>
