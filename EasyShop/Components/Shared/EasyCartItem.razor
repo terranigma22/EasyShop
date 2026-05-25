@@ -1,4 +1,4 @@
-﻿<RadzenCard Variant="Variant.Outlined" Style="@_cardStyle" @onclick="@ToggleSelection">
+﻿<RadzenCard Variant="Variant.Outlined" class="animate-card" Style="@_cardStyle" @onclick="@ToggleSelection">
 
     <div class="cart-delete-zone" @onclick:stopPropagation>
         <RadzenButton Icon="delete" ButtonStyle="ButtonStyle.Danger"
@@ -6,17 +6,18 @@
                       Click="@HandleDelete" />
     </div>
 
-    <div style="display: flex; align-items: center; gap: 0.75rem; min-height: 64px; padding-right: 48px;">
-        @if (!string.IsNullOrEmpty(Data.ImageDataUri))
-        {
-            <img src="@Data.ImageDataUri" class="cart-item-image-square" @onclick:stopPropagation @onclick="ShowPreview" />
-        }
-        else
-        {
-            <div class="cart-item-image-square-fallback">
-                <RadzenIcon Icon="shopping_bag" Style="width: 24px; height: 24px;" />
-            </div>
-        }
+    @if (!string.IsNullOrEmpty(Data.ImageDataUri))
+    {
+        <img src="@Data.ImageDataUri" class="product-card-image" @onclick:stopPropagation @onclick="ShowPreview" />
+    }
+    else
+    {
+        <div class="product-image-zone">
+            <RadzenIcon Icon="shopping_bag" Style="width: 40px; height: 40px;" />
+        </div>
+    }
+
+    <div style="display: flex; align-items: center; gap: 0.75rem; min-height: 64px; padding-right: 48px; padding-left: 64px;">
         <div style="flex: 1; min-width: 0;">
             <RadzenText TextStyle="TextStyle.Subtitle1" class="rz-mb-0"><strong>@(Data.Name)</strong></RadzenText>
             @if (!string.IsNullOrEmpty(Data.Description))
@@ -71,7 +72,7 @@
 
     void UpdateCardStyle()
     {
-        _cardStyle = "position: relative; cursor: pointer;"
+        _cardStyle = "position: relative; cursor: pointer; overflow: hidden;"
             + (_isSelected ? "background: color-mix(in srgb, var(--rz-primary) 12%, var(--rz-base));" : "");
     }
 
@@ -109,23 +110,28 @@
         align-items: center;
         justify-content: center;
     }
-    .cart-item-image-square {
-        width: 48px;
-        height: 48px;
+    .product-card-image {
+        position: absolute;
+        top: 0;
+        left: 0;
+        height: 100%;
+        width: 64px;
         object-fit: cover;
-        border-radius: 8px;
+        transition: transform 0.2s ease;
         flex-shrink: 0;
-        cursor: pointer;
     }
-    .cart-item-image-square-fallback {
-        width: 48px;
-        height: 48px;
-        border-radius: 8px;
-        flex-shrink: 0;
+    .product-image-zone {
+        position: absolute;
+        top: 0;
+        left: 0;
+        height: 100%;
+        width: 64px;
         display: flex;
         align-items: center;
         justify-content: center;
-        background: var(--rz-base-200);
+    }
+    .animate-card:hover .product-card-image {
+        transform: scale(1.15);
     }
 
     .cart-item-overlay {

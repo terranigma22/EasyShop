@@ -17,8 +17,7 @@
                                              Icon="space_dashboard" />
                         @if (TravelState.CurrentTravel != null)
                         {
-                            <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="0.25rem" Style="margin-left: 1rem;">
-                                <RadzenIcon Icon="arrow_forward_ios" Style="font-size: 0.875rem; color: var(--rz-text-secondary);" />
+                            <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="0.25rem">
                                 <RadzenBadge BadgeStyle="BadgeStyle.Base" Style="font-size: 0.75rem;">
                                     @TravelState.CurrentTravel.StartDate.ToString("dd/MM") → @TravelState.CurrentTravel.EndDate.ToString("dd/MM")
                                 </RadzenBadge>
