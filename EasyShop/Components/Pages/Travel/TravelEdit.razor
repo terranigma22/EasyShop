@@ -1,0 +1,289 @@
+@using EasyShop.Domain.Primitives
+@using EasyShop.Features.Travels
+@using EasyShop.Features.Commons
+@using EasyShop.Services
+
+@inject UpdateTravelHandler Handler
+@inject TravelStateService TravelState
+@inject NotificationService NotificationService
+
+<RadzenTemplateForm TItem="TravelDto" Data="@_travel" Submit="Save">
+    <RadzenStack Gap="1rem">
+        <RadzenRow>
+            <RadzenColumn Size="6">
+                <RadzenFormField Text="Fecha de inicio" Style="width: 100%">
+                    <ChildContent>
+                        <RadzenDatePicker @bind-Value="@_travel.StartDate" DateFormat="dd/MM/yyyy" />
+                    </ChildContent>
+                </RadzenFormField>
+            </RadzenColumn>
+
+            <RadzenColumn Size="6">
+                <RadzenFormField Text="Fecha de fin" Style="width: 100%">
+                    <ChildContent>
+                        <RadzenDatePicker @bind-Value="@_travel.EndDate" DateFormat="dd/MM/yyyy" />
+                    </ChildContent>
+                </RadzenFormField>
+            </RadzenColumn>
+        </RadzenRow>
+
+        <RadzenRow>
+            <RadzenColumn Size="12">
+                <RadzenFormField Text="Multiplicador" Style="width:100%;">
+                    <ChildContent>
+                        <RadzenNumeric Name="Multiplicator"
+                                       @bind-Value="@_travel.Multiplicator"
+                                       Min="0" Step="0.5"
+                                       TValue="double" />
+                    </ChildContent>
+                    <Helper>
+                        <RadzenNumericRangeValidator Component="Multiplicator" Min="0.01" Text="Cantidad mínima mayor a 0" />
+                    </Helper>
+
+                </RadzenFormField>
+            </RadzenColumn>
+        </RadzenRow>
+
+        <RadzenRow>
+            <RadzenColumn Size="8">
+                <RadzenFormField Text="Presupuesto" Style="width:100%;">
+
+                    <ChildContent>
+                        <RadzenNumeric @bind-Value="@_travel.MoneyToTravelAmount" Min="0" Step="100" Name="MoneyToTravel" />
+                    </ChildContent>
+                    <Helper>
+                        <RadzenNumericRangeValidator Component="MoneyToTravel" Min="1" Text="Cantidad mínima mayor a 1" />
+                    </Helper>
+                </RadzenFormField>
+            </RadzenColumn>
+            <RadzenColumn Size="4">
+                <RadzenFormField Text="Moneda" Style="width:100%;">
+                    <RadzenDropDown @bind-Value="@_travel.MoneyToTravelCurrency"
+                                    Data="@CurrencyOptions" TextProperty="Text" ValueProperty="Value" />
+                </RadzenFormField>
+            </RadzenColumn>
+        </RadzenRow>
+
+        <RadzenRow>
+            <RadzenColumn Size="8">
+                <RadzenFormField Text="Valor de cambio" Style="width:100%;">
+                    <ChildContent>
+                        <RadzenNumeric @bind-Value="@_travel.ChangeValueAmount" Min="0" Step="1" Name="ChangeValueAmount" Immediate="true" TValue="decimal" Change="ValueAmountChanged" />
+                    </ChildContent>
+                    <Helper>
+                        <RadzenNumericRangeValidator Component="ChangeValueAmount" Min="0.01" Text="Cantidad mínima mayor a 0" />
+                    </Helper>
+                </RadzenFormField>
+            </RadzenColumn>
+            <RadzenColumn Size="4">
+                <RadzenFormField Text="Moneda" Style="width:100%;">
+                    <RadzenDropDown @bind-Value="@_travel.ChangeValueCurrency"
+                                    Data="@CurrencyOptions" TextProperty="Text" ValueProperty="Value" />
+                </RadzenFormField>
+            </RadzenColumn>
+        </RadzenRow>
+
+    </RadzenStack>
+
+    @if (_hasProducts)
+    {
+        <RadzenStack Gap=".5rem" class="rz-mt-4">
+            <RadzenButton Text="Recalcular precios" Icon="calculate" ButtonStyle="ButtonStyle.Warning" Style="width: 100%" Click="Recalculate" />
+
+            <RadzenFormField Text="Vista previa de producto" Style="width:100%;">
+                <RadzenDropDown @bind-Value="@_selectedProductId"
+                                Data="@_productOptions"
+                                TextProperty="DisplayName" ValueProperty="Id"
+                                Placeholder="Seleccionar producto..." />
+            </RadzenFormField>
+
+            @if (_selectedProduct != null)
+            {
+                <RadzenCard Variant="Variant.Flat" Style="padding: 0.75rem;">
+                    <RadzenStack Gap="0.25rem">
+                        <span style="font-weight: 600;">@_selectedProduct.Name</span>
+                        <span style="font-size: 0.85rem;">
+                            Precio venta (@_selectedProduct.UnitPrice.Currency):
+                            <strong>@_selectedProduct.UnitPrice.ToUI()</strong>
+                        </span>
+                        <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="0.25rem">
+                            <span style="font-size: 0.85rem;">
+                                Precio venta (@_travel.ChangeValueCurrency):
+                            </span>
+                            <span style="font-size: 0.85rem; text-decoration: line-through; color: var(--rz-danger);">
+                                @_selectedProduct.UnitChangePrice.ToUI()
+                            </span>
+                            <RadzenIcon Icon="arrow_forward" Style="font-size: 1rem;" />
+                            <span style="font-size: 0.85rem; font-weight: 600; color: var(--rz-success);">
+                                @_newUnitChangePrice
+                            </span>
+                        </RadzenStack>
+                    </RadzenStack>
+                </RadzenCard>
+            }
+        </RadzenStack>
+    }
+
+    <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" JustifyContent="JustifyContent.End"
+                 Gap=".5rem" class="rz-mt-4">
+        <RadzenButton Text="Cancelar" Icon="cancel" ButtonStyle="ButtonStyle.Danger" Click="Cancel" />
+        <RadzenButton Text="Guardar" Icon="save" ButtonStyle="ButtonStyle.Primary" ButtonType="ButtonType.Submit" />
+    </RadzenStack>
+</RadzenTemplateForm>
+
+@code {
+    [Parameter] public Guid TravelId { get; set; }
+
+    private TravelDto _travel = new TravelDto();
+    private bool _hasProducts;
+    private int _productCount;
+    private List<Product> _sourceProducts = [];
+    private List<ProductOption> _productOptions = [];
+    private Guid? _selectedProductId;
+
+    private Product? _selectedProduct => _selectedProductId.HasValue
+        ? _sourceProducts.FirstOrDefault(p => p.Id == _selectedProductId.Value)
+        : null;
+
+    private string _newUnitChangePrice
+    {
+        get
+        {
+            if (_selectedProduct == null) return "";
+            var newAmount = _selectedProduct.UnitPrice.Amount * (decimal)(_travel.ChangeValueAmount <= 0 ? 1.0m : _travel.ChangeValueAmount);
+            return $"{newAmount:N2} ({_travel.ChangeValueCurrency})";
+        }
+    }
+
+    private List<CurrencyOption> CurrencyOptions => Enum.GetValues<CurrencyCode>()
+        .Cast<CurrencyCode>()
+        .Select(c => new CurrencyOption { Value = c, Text = c.ToString() })
+        .ToList();
+
+    protected override void OnInitialized()
+    {
+        var travel = TravelState.CurrentTravel;
+        if (travel != null && travel.Id == TravelId)
+        {
+            _travel.StartDate = travel.StartDate;
+            _travel.EndDate = travel.EndDate;
+            _travel.Multiplicator = travel.Multiplicator;
+            _travel.MoneyToTravelAmount = travel.MoneyToTravel.Amount;
+            _travel.MoneyToTravelCurrency = travel.MoneyToTravel.Currency;
+            _travel.ChangeValueAmount = travel.ChangeValue.Amount;
+            _travel.ChangeValueCurrency = travel.ChangeValue.Currency;
+
+            _hasProducts = travel.Products.Count > 0;
+            _productCount = travel.Products.Count;
+            _sourceProducts = travel.Products.ToList();
+            _productOptions = travel.Products.Select(p => new ProductOption
+            {
+                Id = p.Id,
+                DisplayName = $"{p.Name} ({p.UnitPrice.ToUI()} | {p.UnitChangePrice.ToUI()})"
+            }).ToList();
+        }
+    }
+
+    private async Task Save()
+    {
+        if (_travel.EndDate < _travel.StartDate)
+        {
+            NotificationService.Notify(NotificationSeverity.Warning, "La fecha de fin debe ser posterior a la fecha de inicio");
+            return;
+        }
+
+        var request = new UpdateTravelRequest(
+            TravelId,
+            _travel.StartDate,
+            _travel.EndDate,
+            _travel.Multiplicator,
+            new MoneyRequest(_travel.ChangeValueAmount, _travel.ChangeValueCurrency),
+            new MoneyRequest(_travel.MoneyToTravelAmount, _travel.MoneyToTravelCurrency),
+            RecalculatePrices: false
+        );
+
+        try
+        {
+            await Handler.HandleAsync(request);
+            await TravelState.SetCurrentTravelAsync(TravelId);
+
+            NotificationService.Notify(NotificationSeverity.Success, "Viaje actualizado");
+
+            DialogService.CloseSide(true);
+        }
+        catch (Exception ex)
+        {
+            NotificationService.Notify(NotificationSeverity.Error, "Error al actualizar el viaje", ex.Message);
+        }
+    }
+
+    private async Task Recalculate()
+    {
+        if (_travel.EndDate < _travel.StartDate)
+        {
+            NotificationService.Notify(NotificationSeverity.Warning, "La fecha de fin debe ser posterior a la fecha de inicio");
+            return;
+        }
+
+        var request = new UpdateTravelRequest(
+            TravelId,
+            _travel.StartDate,
+            _travel.EndDate,
+            _travel.Multiplicator,
+            new MoneyRequest(_travel.ChangeValueAmount, _travel.ChangeValueCurrency),
+            new MoneyRequest(_travel.MoneyToTravelAmount, _travel.MoneyToTravelCurrency),
+            RecalculatePrices: true
+        );
+
+        try
+        {
+            await Handler.HandleAsync(request);
+            await TravelState.SetCurrentTravelAsync(TravelId);
+
+            NotificationService.Notify(NotificationSeverity.Success, "Viaje actualizado y precios recalculados");
+
+            DialogService.CloseSide(true);
+        }
+        catch (Exception ex)
+        {
+            NotificationService.Notify(NotificationSeverity.Error, "Error al actualizar el viaje", ex.Message);
+        }
+    }
+
+    private void Cancel()
+        => DialogService.CloseSide(false);
+
+    private sealed class CurrencyOption
+    {
+        public CurrencyCode Value { get; set; }
+        public string Text { get; set; } = string.Empty;
+    }
+
+    private sealed class ProductOption
+    {
+        public Guid Id { get; set; }
+        public string DisplayName { get; set; } = "";
+    }
+
+    private class TravelDto
+    {
+        public DateOnly StartDate { get; set; } = DateOnly.FromDateTime(DateTime.Now);
+        public DateOnly EndDate { get; set; } = DateOnly.FromDateTime(DateTime.Now);
+        public double Multiplicator { get; set; } = 2.5;
+        public decimal MoneyToTravelAmount { get; set; } = 0m;
+        public CurrencyCode MoneyToTravelCurrency { get; set; } = CurrencyCode.USD;
+        public decimal ChangeValueAmount { get; set; } = 650m;
+        public CurrencyCode ChangeValueCurrency { get; set; } = CurrencyCode.CUP;
+    }
+
+    private void ValueAmountChanged(decimal value)
+    {
+        try
+        {
+            StateHasChanged();
+        }
+        catch (Exception)
+        {
+        }
+    }
+}
