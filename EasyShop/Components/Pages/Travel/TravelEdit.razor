@@ -68,7 +68,7 @@
             <RadzenColumn Size="8">
                 <RadzenFormField Text="Valor de cambio" Style="width:100%;">
                     <ChildContent>
-                        <RadzenNumeric @bind-Value="@_travel.ChangeValueAmount" @ref="focus" Min="0" Step="1" Name="ChangeValueAmount" Immediate="true" TValue="decimal" Change="ValueAmountChanged" />
+                        <RadzenNumeric @bind-Value="@_travel.ChangeValueAmount" @ref="focus" Min="0" Step="1" Name="ChangeValueAmount" Format="N0" Immediate="true" TValue="decimal" Change="ValueAmountChanged" />
                     </ChildContent>
                     <Helper>
                         <RadzenNumericRangeValidator Component="ChangeValueAmount" Min="0.01" Text="Cantidad mínima mayor a 0" />
