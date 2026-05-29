@@ -16,7 +16,7 @@ namespace EasyShop
                     fonts.AddFont("OpenSans-Regular.ttf", "OpenSansRegular");
                 });
 
-            var conectionString = $"Filename={ConectionDb.GetConectionString("easyshop.db")}";
+            var conectionString = $"Filename={ConectionDb.GetConectionString("_easyshop.db")}";
 
             builder.Services.AddPresentation()
                             .AddLocalDataBase(conectionString);
