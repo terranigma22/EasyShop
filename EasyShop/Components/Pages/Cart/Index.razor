@@ -99,6 +99,14 @@
     protected override void OnInitialized()
     {
         LoadCart();
+        TravelState.OnTravelChanged += () =>
+        {
+            InvokeAsync(() =>
+            {
+                LoadCart();
+                StateHasChanged();
+            });
+        };
     }
 
     void LoadCart()

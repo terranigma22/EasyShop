@@ -13,7 +13,7 @@
             <RadzenColumn Size="6">
                 <RadzenFormField Text="Fecha de inicio" Style="width: 100%">
                     <ChildContent>
-                        <RadzenDatePicker @bind-Value="@_travel.StartDate" DateFormat="dd/MM/yyyy" />
+                        <RadzenDatePicker @bind-Value="@_travel.StartDate" DateFormat="dd/MM/yyyy" ReadOnly="true" />
                     </ChildContent>
                 </RadzenFormField>
             </RadzenColumn>
@@ -21,8 +21,28 @@
             <RadzenColumn Size="6">
                 <RadzenFormField Text="Fecha de fin" Style="width: 100%">
                     <ChildContent>
-                        <RadzenDatePicker @bind-Value="@_travel.EndDate" DateFormat="dd/MM/yyyy" />
+                        <RadzenDatePicker @bind-Value="@_travel.EndDate" DateFormat="dd/MM/yyyy" ReadOnly="true" />
                     </ChildContent>
+                </RadzenFormField>
+            </RadzenColumn>
+        </RadzenRow>
+
+        <RadzenRow>
+            <RadzenColumn Size="8">
+                <RadzenFormField Text="Presupuesto" Style="width:100%;">
+
+                    <ChildContent>
+                        <RadzenNumeric @bind-Value="@_travel.MoneyToTravelAmount" Min="0" Step="100" Name="MoneyToTravel" ReadOnly="true" />
+                    </ChildContent>
+                    <Helper>
+                        <RadzenNumericRangeValidator Component="MoneyToTravel" Min="1" Text="Cantidad mínima mayor a 1" />
+                    </Helper>
+                </RadzenFormField>
+            </RadzenColumn>
+            <RadzenColumn Size="4">
+                <RadzenFormField Text="Moneda" Style="width:100%;">
+                    <RadzenDropDown @bind-Value="@_travel.MoneyToTravelCurrency"
+                                    Data="@CurrencyOptions" TextProperty="Text" ValueProperty="Value" Disabled="true" />
                 </RadzenFormField>
             </RadzenColumn>
         </RadzenRow>
@@ -46,29 +66,9 @@
 
         <RadzenRow>
             <RadzenColumn Size="8">
-                <RadzenFormField Text="Presupuesto" Style="width:100%;">
-
-                    <ChildContent>
-                        <RadzenNumeric @bind-Value="@_travel.MoneyToTravelAmount" Min="0" Step="100" Name="MoneyToTravel" />
-                    </ChildContent>
-                    <Helper>
-                        <RadzenNumericRangeValidator Component="MoneyToTravel" Min="1" Text="Cantidad mínima mayor a 1" />
-                    </Helper>
-                </RadzenFormField>
-            </RadzenColumn>
-            <RadzenColumn Size="4">
-                <RadzenFormField Text="Moneda" Style="width:100%;">
-                    <RadzenDropDown @bind-Value="@_travel.MoneyToTravelCurrency"
-                                    Data="@CurrencyOptions" TextProperty="Text" ValueProperty="Value" />
-                </RadzenFormField>
-            </RadzenColumn>
-        </RadzenRow>
-
-        <RadzenRow>
-            <RadzenColumn Size="8">
                 <RadzenFormField Text="Valor de cambio" Style="width:100%;">
                     <ChildContent>
-                        <RadzenNumeric @bind-Value="@_travel.ChangeValueAmount" Min="0" Step="1" Name="ChangeValueAmount" Immediate="true" TValue="decimal" Change="ValueAmountChanged" />
+                        <RadzenNumeric @bind-Value="@_travel.ChangeValueAmount" @ref="focus" Min="0" Step="1" Name="ChangeValueAmount" Immediate="true" TValue="decimal" Change="ValueAmountChanged" />
                     </ChildContent>
                     <Helper>
                         <RadzenNumericRangeValidator Component="ChangeValueAmount" Min="0.01" Text="Cantidad mínima mayor a 0" />
@@ -88,8 +88,6 @@
     @if (_hasProducts)
     {
         <RadzenStack Gap=".5rem" class="rz-mt-4">
-            <RadzenButton Text="Recalcular precios" Icon="calculate" ButtonStyle="ButtonStyle.Warning" Style="width: 100%" Click="Recalculate" />
-
             <RadzenFormField Text="Vista previa de producto" Style="width:100%;">
                 <RadzenDropDown @bind-Value="@_selectedProductId"
                                 Data="@_productOptions"
@@ -138,7 +136,10 @@
 
     <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" JustifyContent="JustifyContent.End"
                  Gap=".5rem" class="rz-mt-4">
-        <RadzenButton Text="Cancelar" Icon="cancel" ButtonStyle="ButtonStyle.Danger" Click="Cancel" />
+        @if (_hasProducts)
+        {
+            <RadzenButton Text="Recalcular" Icon="calculate" ButtonStyle="ButtonStyle.Warning" Click="Recalculate" />
+        }
         <RadzenButton Text="Guardar" Icon="save" ButtonStyle="ButtonStyle.Primary" ButtonType="ButtonType.Submit" />
     </RadzenStack>
 </RadzenTemplateForm>
@@ -152,6 +153,8 @@
     private List<Product> _sourceProducts = [];
     private List<ProductOption> _productOptions = [];
     private Guid? _selectedProductId;
+
+    RadzenNumeric<decimal> focus;
 
     private Product? _selectedProduct => _selectedProductId.HasValue
         ? _sourceProducts.FirstOrDefault(p => p.Id == _selectedProductId.Value)
@@ -204,6 +207,17 @@
                 Name = p.Name,
                 ImageDataUri = p.ImageDataUri
             }).ToList();
+
+            if (_hasProducts)
+                _selectedProductId = _productOptions[0].Id;
+        }
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            await focus.FocusAsync();
         }
     }
 
@@ -229,8 +243,6 @@
         {
             await Handler.HandleAsync(request);
             await TravelState.SetCurrentTravelAsync(TravelId);
-
-            NotificationService.Notify(NotificationSeverity.Success, "Viaje actualizado");
 
             DialogService.CloseSide(true);
         }
@@ -263,8 +275,6 @@
             await Handler.HandleAsync(request);
             await TravelState.SetCurrentTravelAsync(TravelId);
 
-            NotificationService.Notify(NotificationSeverity.Success, "Viaje actualizado y precios recalculados");
-
             DialogService.CloseSide(true);
         }
         catch (Exception ex)
@@ -272,9 +282,6 @@
             NotificationService.Notify(NotificationSeverity.Error, "Error al actualizar el viaje", ex.Message);
         }
     }
-
-    private void Cancel()
-        => DialogService.CloseSide(false);
 
     private sealed class CurrencyOption
     {

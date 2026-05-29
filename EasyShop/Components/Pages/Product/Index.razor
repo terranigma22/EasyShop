@@ -58,6 +58,14 @@
     protected override void OnInitialized()
     {
         _travel = TravelState.CurrentTravel;
+        TravelState.OnTravelChanged += () =>
+        {
+            InvokeAsync(() =>
+            {
+                _travel = TravelState.CurrentTravel;
+                StateHasChanged();
+            });
+        };
     }
 
     private async Task HandleCardSelected(Guid id)
