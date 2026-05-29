@@ -1,8 +1,10 @@
 ﻿@inherits LayoutComponentBase
 
 @using EasyShop.Components.Pages.Travel
+@using EasyShop.Domain.Commons
 @inject TravelStateService TravelState
 @inject DialogService DialogService
+@inject NotificationService NotificationService
 
 <RadzenComponents />
 <RadzenTheme Theme="material-light" />
@@ -41,22 +43,29 @@
 
     </RadzenHeader>
 
-    <RadzenSidebar Responsive="false" @bind-Expanded="@sidebarExpanded" style="position: absolute; z-index: 3">
-        <RadzenStack AlignItems="AlignItems.End" class="rz-p-2">
-            <RadzenButton Icon="west" Variant="Variant.Text" ButtonStyle="ButtonStyle.Secondary"
-                          Click="@(() => sidebarExpanded = false)" />
-        </RadzenStack>
-        <RadzenPanelMenu>
-            <RadzenPanelMenuItem Text="Panel" Icon="dashboard" Path="/" Click="@OnClick" />
-            <RadzenPanelMenuItem Text="Viajes" Icon="travel" Path="/travels" Click="@OnClick" />
-            @if (TravelState.CurrentTravel != null)
-            {
-                <RadzenPanelMenuItem Text="Productos" Icon="inventory_2" Path="/products" Click="@OnClick" />
-                <RadzenPanelMenuItem Text="Deseados" Icon="favorite" Path="/wishlist" Click="@OnClick" />
-                <RadzenPanelMenuItem Text="Gastos" Icon="money_off" Path="/expenses" Click="@OnClick" />
-                <RadzenPanelMenuItem Text="Entradas" Icon="account_balance" Path="/incomes" Click="@OnClick" />
-            }
-        </RadzenPanelMenu>
+    <RadzenSidebar Responsive="false" @bind-Expanded="@sidebarExpanded" style="position: absolute; z-index: 3; display: flex; flex-direction: column; height: 100%">
+        <div>
+            <RadzenStack AlignItems="AlignItems.End" class="rz-p-2">
+                <RadzenButton Icon="west" Variant="Variant.Text" ButtonStyle="ButtonStyle.Secondary"
+                              Click="@(() => sidebarExpanded = false)" />
+            </RadzenStack>
+            <RadzenPanelMenu>
+                <RadzenPanelMenuItem Text="Panel" Icon="dashboard" Path="/" Click="@OnClick" />
+                <RadzenPanelMenuItem Text="Viajes" Icon="travel" Path="/travels" Click="@OnClick" />
+                @if (TravelState.CurrentTravel != null)
+                {
+                    <RadzenPanelMenuItem Text="Productos" Icon="inventory_2" Path="/products" Click="@OnClick" />
+                    <RadzenPanelMenuItem Text="Deseados" Icon="favorite" Path="/wishlist" Click="@OnClick" />
+                    <RadzenPanelMenuItem Text="Gastos" Icon="money_off" Path="/expenses" Click="@OnClick" />
+                    <RadzenPanelMenuItem Text="Entradas" Icon="account_balance" Path="/incomes" Click="@OnClick" />
+                }
+            </RadzenPanelMenu>
+        </div>
+        <div style="margin-top: auto; padding: 8px">
+            <RadzenButton Icon="download" ButtonStyle="ButtonStyle.Base"
+                          Style="width: 100%;" Text="Exportar base de datos"
+                          Click="@ExportDatabase" />
+        </div>
     </RadzenSidebar>
                 
     <RadzenBody>
@@ -118,6 +127,21 @@
         {
             await TravelState.SetCurrentTravelAsync(travel.Id);
             StateHasChanged();
+        }
+    }
+
+    private void ExportDatabase()
+    {
+        try
+        {
+            var path = ConectionDb.ExportToDownloads();
+            NotificationService.Notify(NotificationSeverity.Success,
+                $"Base de datos exportada a: {path}");
+        }
+        catch (Exception ex)
+        {
+            NotificationService.Notify(NotificationSeverity.Error,
+                "Error al exportar", ex.Message);
         }
     }
 }

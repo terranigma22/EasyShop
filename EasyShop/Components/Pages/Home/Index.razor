@@ -104,6 +104,7 @@
                           Subtitle="@($"{_travel.Incomes.Sum(i => i.Value.Amount):F2} {_travel.MoneyToTravel.Currency}")"
                           Click="@(() => NavigationManager.NavigateTo("/incomes"))" />
             </RadzenColumn>
+
         </RadzenRow>
     }
 </PageContainer>
