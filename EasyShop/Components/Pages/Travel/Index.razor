@@ -56,6 +56,14 @@
     protected override async Task OnInitializedAsync()
     {
         await LoadTravels();
+        TravelState.OnTravelChanged += async () =>
+        {
+            await InvokeAsync(async () =>
+            {
+                await LoadTravels();
+                StateHasChanged();
+            });
+        };
     }
 
     private async Task LoadTravels()
