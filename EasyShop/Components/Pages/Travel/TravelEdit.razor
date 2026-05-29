@@ -93,32 +93,44 @@
             <RadzenFormField Text="Vista previa de producto" Style="width:100%;">
                 <RadzenDropDown @bind-Value="@_selectedProductId"
                                 Data="@_productOptions"
-                                TextProperty="DisplayName" ValueProperty="Id"
+                                TextProperty="Name" ValueProperty="Id"
                                 Placeholder="Seleccionar producto..." />
             </RadzenFormField>
 
             @if (_selectedProduct != null)
             {
-                <RadzenCard Variant="Variant.Flat" Style="padding: 0.75rem;">
-                    <RadzenStack Gap="0.25rem">
-                        <span style="font-weight: 600;">@_selectedProduct.Name</span>
-                        <span style="font-size: 0.85rem;">
-                            Precio venta (@_selectedProduct.UnitPrice.Currency):
-                            <strong>@_selectedProduct.UnitPrice.ToUI()</strong>
-                        </span>
-                        <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="0.25rem">
-                            <span style="font-size: 0.85rem;">
-                                Precio venta (@_travel.ChangeValueCurrency):
-                            </span>
-                            <span style="font-size: 0.85rem; text-decoration: line-through; color: var(--rz-danger);">
-                                @_selectedProduct.UnitChangePrice.ToUI()
-                            </span>
-                            <RadzenIcon Icon="arrow_forward" Style="font-size: 1rem;" />
-                            <span style="font-size: 0.85rem; font-weight: 600; color: var(--rz-success);">
-                                @_newUnitChangePrice
-                            </span>
-                        </RadzenStack>
-                    </RadzenStack>
+                <RadzenCard Variant="Variant.Outlined" Style="padding: 0; position: relative; overflow: hidden;">
+                    <div style="display: flex; align-items: stretch; min-height: 80px;">
+                        @if (!string.IsNullOrEmpty(_selectedProduct.ImageDataUri))
+                        {
+                            <img src="@_selectedProduct.ImageDataUri" style="width: 64px; object-fit: cover; flex-shrink: 0;" />
+                        }
+                        else
+                        {
+                            <div style="width: 64px; flex-shrink: 0; display: flex; align-items: center; justify-content: center; background: var(--rz-base-200);">
+                                <RadzenIcon Icon="shopping_bag" Style="width: 32px; height: 32px;" />
+                            </div>
+                        }
+                        <div style="flex: 1; padding: 0.75rem;">
+                            <div style="display: flex; justify-content: space-between; font-weight: 600;">
+                                <span>@_selectedProduct.Name</span>
+                            </div>
+                            <div style="display: flex; justify-content: space-between; font-size: 0.85rem; margin-top: 0.25rem;">
+                                <span>Precio actual (@_travel.ChangeValueCurrency)</span>
+                                <span style="text-decoration: line-through; color: var(--rz-danger);">@_selectedProduct.UnitChangePrice.ToUI()</span>
+                            </div>
+                            <div style="display: flex; justify-content: space-between; font-size: 0.85rem;">
+                                <span>Nuevo precio (@_travel.ChangeValueCurrency)</span>
+                                <span style="font-weight: 600; color: var(--rz-success);">@_newPriceFormatted</span>
+                            </div>
+                            <div style="display: flex; justify-content: space-between; font-size: 0.85rem;">
+                                <span>Diferencia</span>
+                                <span style="font-weight: 600; color: @(_priceDiff >= 0 ? "var(--rz-success)" : "var(--rz-danger)");">
+                                    @(_priceDiff >= 0 ? "+" : "")@_priceDiff.ToString("N2")
+                                </span>
+                            </div>
+                        </div>
+                    </div>
                 </RadzenCard>
             }
         </RadzenStack>
@@ -145,13 +157,23 @@
         ? _sourceProducts.FirstOrDefault(p => p.Id == _selectedProductId.Value)
         : null;
 
-    private string _newUnitChangePrice
+    private decimal _newPriceAmount
     {
         get
         {
-            if (_selectedProduct == null) return "";
-            var newAmount = _selectedProduct.UnitPrice.Amount * (decimal)(_travel.ChangeValueAmount <= 0 ? 1.0m : _travel.ChangeValueAmount);
-            return $"{newAmount:N2} ({_travel.ChangeValueCurrency})";
+            if (_selectedProduct == null) return 0;
+            return _selectedProduct.UnitPrice.Amount * (decimal)(_travel.ChangeValueAmount <= 0 ? 1.0m : _travel.ChangeValueAmount);
+        }
+    }
+
+    private string _newPriceFormatted => $"{_newPriceAmount:N2} ({_travel.ChangeValueCurrency})";
+
+    private decimal _priceDiff
+    {
+        get
+        {
+            if (_selectedProduct == null) return 0;
+            return _newPriceAmount - _selectedProduct.UnitChangePrice.Amount;
         }
     }
 
@@ -179,7 +201,8 @@
             _productOptions = travel.Products.Select(p => new ProductOption
             {
                 Id = p.Id,
-                DisplayName = $"{p.Name} ({p.UnitPrice.ToUI()} | {p.UnitChangePrice.ToUI()})"
+                Name = p.Name,
+                ImageDataUri = p.ImageDataUri
             }).ToList();
         }
     }
@@ -262,7 +285,8 @@
     private sealed class ProductOption
     {
         public Guid Id { get; set; }
-        public string DisplayName { get; set; } = "";
+        public string Name { get; set; } = "";
+        public string? ImageDataUri { get; set; }
     }
 
     private class TravelDto
