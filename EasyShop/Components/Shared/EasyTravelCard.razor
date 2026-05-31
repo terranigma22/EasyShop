@@ -4,7 +4,7 @@
             <RadzenIcon Icon="check" IconColor="@_iconColor" />
         </div>
         <RadzenStack Gap="0" Style="flex: 1;">
-            <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.End" Gap="0.5rem">
+            <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" JustifyContent="JustifyContent.SpaceBetween">
                 <RadzenIcon Icon="calendar_month" Style="font-size: 1.25rem;" />
                 <span style="font-weight: 500;">
                     @Data.StartDate.ToString("dd/MM/yyyy") → @Data.EndDate.ToString("dd/MM/yyyy")
@@ -12,21 +12,23 @@
             </RadzenStack>
             <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="0.5rem">
                 <RadzenIcon Icon="payments" Style="font-size: 1.25rem;" />
-                <span>Viaje:    @($"{Data.MoneyToTravel.ToUI()}")</span>
+                <span style="flex: 1;">Presupuesto</span>
+                <span>@($"{Data.MoneyToTravel.ToUI()}")</span>
             </RadzenStack>
             <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="0.5rem">
                 <RadzenIcon Icon="swap_horiz" Style="font-size: 1.25rem;" />
-                <span>Venta:    @($"{Data.ChangeValue.ToUI()}")</span>
+                <span style="flex: 1;">Venta</span>
+                <span>@($"{Data.ChangeValue.ToUI()}")</span>
             </RadzenStack>
-
             <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="0.5rem">
                 <RadzenIcon Icon="swap_horiz" Style="font-size: 1.25rem;" />
-                <span>Compra:   @($"{Data.ChangeValueToBuy.ToUI()}")</span>
+                <span style="flex: 1;">Compra</span>
+                <span>@($"{Data.ChangeValueToBuy.ToUI()}")</span>
             </RadzenStack>
-
             <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="0.5rem">
                 <RadzenIcon Icon="calculate" Style="font-size: 1.25rem;" />
-                <span>Multiplicador:    @Data.Multiplicator.ToString("F2")</span>
+                <span style="flex: 1;">Multiplicador</span>
+                <span>@Data.Multiplicator.ToString("F2")</span>
             </RadzenStack>
         </RadzenStack>
     </RadzenStack>
