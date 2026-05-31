@@ -39,4 +39,10 @@ public class Product : BaseEntity
 
     public decimal GetProfit()
         => UnitPrice.Amount * Units - TotalCost.Amount;
+
+    public decimal GetTotalPrice()
+        => UnitPrice.Amount * Units;
+
+    public decimal GetTotalChangePrice()
+        => UnitChangePrice.Amount * Units;
 }

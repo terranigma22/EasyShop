@@ -43,4 +43,10 @@ public class Travel : BaseEntity
 
         return profit * amount;
     }
+
+    public decimal GetTotalPrices()
+        => Products.Where(p => p.Status == ProductStatus.Purchased).Sum(p => p.GetTotalPrice());
+
+    public decimal GetTotalChangePrices()
+        => Products.Where(p => p.Status == ProductStatus.Purchased).Sum(p => p.GetTotalChangePrice());
 }
