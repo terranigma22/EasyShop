@@ -67,7 +67,7 @@
 
         <RadzenRow>
             <RadzenColumn Size="8">
-                <RadzenFormField Text="Valor de cambio" Style="width:100%;">
+                <RadzenFormField Text="Valor de cambio (venta)" Style="width:100%;">
                     <ChildContent>
                         <RadzenNumeric @bind-Value="@_travel.ChangeValueAmount" Min="0" Step="1" Name="ChangeValueAmount" />
                     </ChildContent>
@@ -84,6 +84,24 @@
             </RadzenColumn>
         </RadzenRow>
 
+        <RadzenRow>
+            <RadzenColumn Size="8">
+                <RadzenFormField Text="Valor de cambio (compra)" Style="width:100%;">
+                    <ChildContent>
+                        <RadzenNumeric @bind-Value="@_travel.ChangeValueToBuyAmount" Min="0" Step="1" Name="ChangeValueToBuyAmount" />
+                    </ChildContent>
+                    <Helper>
+                        <RadzenNumericRangeValidator Component="ChangeValueToBuyAmount" Min="0.01" Text="Cantidad mínima mayor a 0" />
+                    </Helper>
+                </RadzenFormField>
+            </RadzenColumn>
+            <RadzenColumn Size="4">
+                <RadzenFormField Text="Moneda" Style="width:100%;">
+                    <RadzenDropDown @bind-Value="@_travel.ChangeValueToBuyCurrency"
+                                    Data="@CurrencyOptions" TextProperty="Text" ValueProperty="Value" />
+                </RadzenFormField>
+            </RadzenColumn>
+        </RadzenRow>
 
     </RadzenStack>
 
@@ -116,6 +134,7 @@
             _travel.EndDate,
             _travel.Multiplicator,
             new MoneyRequest(_travel.ChangeValueAmount, _travel.ChangeValueCurrency),
+            new MoneyRequest(_travel.ChangeValueToBuyAmount, _travel.ChangeValueToBuyCurrency),
             new MoneyRequest(_travel.MoneyToTravelAmount, _travel.MoneyToTravelCurrency)
         );
 
@@ -152,5 +171,7 @@
         public CurrencyCode MoneyToTravelCurrency { get; set; } = CurrencyCode.USD;
         public decimal ChangeValueAmount { get; set; } = 650m;
         public CurrencyCode ChangeValueCurrency { get; set; } = CurrencyCode.CUP;
+        public decimal ChangeValueToBuyAmount { get; set; } = 650m;
+        public CurrencyCode ChangeValueToBuyCurrency { get; set; } = CurrencyCode.CUP;
     }
 }

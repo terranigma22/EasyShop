@@ -10,6 +10,7 @@ public sealed record CreateTravelRequest(
     DateOnly EndDate,
     double Multiplicator,
     MoneyRequest ChangeValue,
+    MoneyRequest ChangeValueToBuy,
     MoneyRequest MoneyToTravel
 );
 

@@ -14,6 +14,7 @@ public sealed record UpdateTravelRequest(
     DateOnly EndDate,
     double Multiplicator,
     MoneyRequest ChangeValue,
+    MoneyRequest ChangeValueToBuy,
     MoneyRequest MoneyToTravel,
     bool RecalculatePrices = false
 );

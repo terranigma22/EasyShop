@@ -7,6 +7,7 @@ public class Travel : BaseEntity
     public Money MoneyToTravel { get; set; } = new Money(0m, CurrencyCode.USD);
     public double Multiplicator { get; set; } = 1.0;
     public Money ChangeValue { get; set; } = new Money(500m, CurrencyCode.CUP);
+    public Money ChangeValueToBuy { get; set; } = new Money(500m, CurrencyCode.CUP);
     public DateOnly StartDate { get; set; } = DateOnly.FromDateTime(DateTime.Now);
     public DateOnly EndDate { get; set; } = DateOnly.FromDateTime(DateTime.Now);
 
@@ -39,7 +40,7 @@ public class Travel : BaseEntity
         decimal amount = 1.0m;
 
         if (currency != MoneyToTravel.Currency)
-            amount = ChangeValue.Amount <= 0 ? 1.0m : ChangeValue.Amount;
+            amount = ChangeValueToBuy.Amount <= 0 ? 1.0m : ChangeValueToBuy.Amount;
 
         return profit * amount;
     }

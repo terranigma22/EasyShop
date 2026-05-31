@@ -1,4 +1,5 @@
-﻿using EasyShop.Domain.Models;
+﻿using System.Data.Common;
+using EasyShop.Domain.Models;
 using Microsoft.EntityFrameworkCore;
 
 namespace EasyShop.Data;
@@ -26,6 +27,12 @@ public class ApplicationDbContext : DbContext
             {
                 b.Property(e => e.Amount).HasColumnName("ChangeValue_Amount");
                 b.Property(e => e.Currency).HasColumnName("ChangeValue_Currency").HasConversion<int>();
+            });
+
+            entity.ComplexProperty(e => e.ChangeValueToBuy, b =>
+            {
+                b.Property(e => e.Amount).HasColumnName("ChangeValueToBuy_Amount");
+                b.Property(e => e.Currency).HasColumnName("ChangeValueToBuy_Currency").HasConversion<int>();
             });
 
             entity.ComplexProperty(e => e.MoneyToTravel, b =>
@@ -116,7 +123,31 @@ public class ApplicationDbContext : DbContext
         {
             Database.EnsureCreated();
         }
-        catch (Exception ex)
+        catch
+        {
+        }
+
+        ApplyMigrations();
+    }
+
+    private void ApplyMigrations()
+    {
+        try
+        {
+            var conn = Database.GetDbConnection();
+            conn.Open();
+            using var cmd = conn.CreateCommand();
+            cmd.CommandText = "SELECT COUNT(*) FROM pragma_table_info('Travels') WHERE name='ChangeValueToBuy_Amount'";
+            var exists = (long)(cmd.ExecuteScalar() ?? 0);
+            if (exists == 0)
+            {
+                cmd.CommandText = "ALTER TABLE Travels ADD COLUMN ChangeValueToBuy_Amount REAL NOT NULL DEFAULT 0";
+                cmd.ExecuteNonQuery();
+                cmd.CommandText = "ALTER TABLE Travels ADD COLUMN ChangeValueToBuy_Currency INTEGER NOT NULL DEFAULT 0";
+                cmd.ExecuteNonQuery();
+            }
+        }
+        catch
         {
         }
     }

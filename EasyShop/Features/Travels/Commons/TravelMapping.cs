@@ -30,6 +30,7 @@ internal static class TravelMapping
             EndDate = request.EndDate,
             Multiplicator = request.Multiplicator <= 0 ? 1.0 : request.Multiplicator,
             ChangeValue = new Money(request.ChangeValue.Amount, request.ChangeValue.Currency),
+            ChangeValueToBuy = new Money(request.ChangeValueToBuy.Amount, request.ChangeValueToBuy.Currency),
             MoneyToTravel = new Money(request.MoneyToTravel.Amount, request.MoneyToTravel.Currency)
         };
     }
@@ -40,6 +41,7 @@ internal static class TravelMapping
         entity.EndDate = request.EndDate;
         entity.Multiplicator = request.Multiplicator <= 0 ? 1.0 : request.Multiplicator;
         entity.ChangeValue = new Money(request.ChangeValue.Amount, request.ChangeValue.Currency);
+        entity.ChangeValueToBuy = new Money(request.ChangeValueToBuy.Amount, request.ChangeValueToBuy.Currency);
         entity.MoneyToTravel = new Money(request.MoneyToTravel.Amount, request.MoneyToTravel.Currency);
 
         entity.UpdatedAt = DomainHelpers.Now;
