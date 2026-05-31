@@ -130,13 +130,17 @@
         }
     }
 
-    private void ExportDatabase()
+    private async Task ExportDatabase()
     {
         try
         {
-            var path = ConectionDb.ExportToDownloads();
-            NotificationService.Notify(NotificationSeverity.Success,
-                $"Base de datos exportada a: {path}");
+            var path = await ConectionDb.ExportToDownloadsAsync();
+            if (path is not null)
+                NotificationService.Notify(NotificationSeverity.Success,
+                    $"Base de datos exportada a: {path}");
+            else
+                NotificationService.Notify(NotificationSeverity.Success,
+                    "Base de datos exportada correctamente");
         }
         catch (Exception ex)
         {

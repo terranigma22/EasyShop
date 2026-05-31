@@ -27,7 +27,7 @@ internal static class ConectionDb
         return folderPath;
     }
 
-    public static string ExportToDownloads()
+    public static async Task<string?> ExportToDownloadsAsync()
     {
         var dbName = "_easyshop.db";
         var sourcePath = GetConectionString(dbName);
@@ -49,12 +49,26 @@ internal static class ConectionDb
         cmd.CommandText = "PRAGMA wal_checkpoint(TRUNCATE)";
         cmd.ExecuteNonQuery();
 
-        var downloads = DeviceInfo.Platform == DevicePlatform.WinUI
-            ? Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), "Downloads")
-            : Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
+        var destName = $"EasyShop_{DateTime.Now:yyyy-MM-dd}.db";
 
-        var destPath = Path.Combine(downloads, $"EasyShop_{DateTime.Now:yyyy-MM-dd}.db");
-        File.Copy(sourcePath, destPath, overwrite: true);
-        return destPath;
+        if (DeviceInfo.Platform == DevicePlatform.WinUI)
+        {
+            var downloads = Path.Combine(
+                Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), "Downloads");
+            var destPath = Path.Combine(downloads, destName);
+            File.Copy(sourcePath, destPath, overwrite: true);
+            return destPath;
+        }
+
+        var cachePath = Path.Combine(FileSystem.CacheDirectory, destName);
+        File.Copy(sourcePath, cachePath, overwrite: true);
+
+        await Share.Default.RequestAsync(new ShareFileRequest
+        {
+            Title = "Exportar base de datos",
+            File = new ShareFile(cachePath)
+        });
+
+        return null;
     }
 }
