@@ -127,6 +127,19 @@
         _travel = TravelState.CurrentTravel;
 
         if (_travel == null)
+        {
             NavigationManager.NavigateTo("/travels");
+            return;
+        }
+
+        TravelState.OnTravelChanged += () =>
+        {
+            InvokeAsync(() =>
+            {
+                _travel = TravelState.CurrentTravel;
+                StateHasChanged();
+            });
+        };
+
     }
 }
